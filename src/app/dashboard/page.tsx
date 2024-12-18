@@ -1,36 +1,49 @@
-import { currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { UserButton } from "@clerk/nextjs";
 
-export default async function DashboardPage() {
-    const user = await currentUser();
-
-    if (!user) {
-        redirect("/auth/sign-in");
-    }
-
+export default function DashboardPage() {
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-            <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
-                <h1 className="text-2xl font-bold text-center mb-6">
-                    欢迎, {user.firstName || '用户'}
-                </h1>
-
-                <div className="space-y-4">
-                    <a
-                        href="/dashboard/teacher"
-                        className="w-full block text-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-                    >
-                        我是教师
-                    </a>
-
-                    <a
-                        href="/dashboard/student"
-                        className="w-full block text-center bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-                    >
-                        我是学生
-                    </a>
+        <div className="min-h-screen bg-white">  {/* 改为白色背景 */}
+            <nav className="border-b">
+                <div className="max-w-7xl mx-auto px-4">
+                    <div className="flex justify-between h-16 items-center">
+                        <h1 className="text-2xl font-bold text-black">  {/* 明确设置黑色文字 */}
+                            Classroom Task Manager
+                        </h1>
+                        <div className="flex items-center">
+                            <UserButton
+                                afterSignOutUrl="/auth/sign-in"
+                                appearance={{
+                                    elements: {
+                                        avatarBox: "w-10 h-10"  // 设置头像大小
+                                    }
+                                }}
+                            />
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </nav>
+
+            <main className="max-w-7xl mx-auto px-4 py-8">
+                <div className="text-center space-y-6">
+                    <h2 className="text-xl font-semibold text-black">  {/* 加深文字颜色 */}
+                        Please select your role:
+                    </h2>
+                    <div className="flex gap-4 justify-center">
+                        <a
+                            href="/dashboard/teacher"
+                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                        >
+                            Teacher Dashboard
+                        </a>
+                        <a
+                            href="/dashboard/student"
+                            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+                        >
+                            Student Dashboard
+                        </a>
+                    </div>
+                </div>
+            </main>
         </div>
     );
 }
