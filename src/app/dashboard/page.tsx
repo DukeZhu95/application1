@@ -10,14 +10,7 @@ export default function DashboardPage() {
                             Classroom Task Manager
                         </h1>
                         <div className="flex items-center">
-                            <UserButton
-                                afterSignOutUrl="/auth/sign-in"
-                                appearance={{
-                                    elements: {
-                                        avatarBox: "w-10 h-10"  // 设置头像大小
-                                    }
-                                }}
-                            />
+                            <UserButton />
                         </div>
                     </div>
                 </div>
