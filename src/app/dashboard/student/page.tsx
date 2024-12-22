@@ -1,4 +1,5 @@
 import { UserButton } from "@clerk/nextjs";
+import { ClassCodeInput } from "@/app/components/shared/class-code-input";
 
 export default function StudentDashboard() {
     return (
@@ -15,19 +16,16 @@ export default function StudentDashboard() {
             </nav>
 
             <main className="max-w-7xl mx-auto px-4 py-8">
-                <div className="text-center space-y-6">
-                    <h2 className="text-xl font-semibold text-black">
-                        Welcome, Student
-                    </h2>
-                    {/* 这里将添加学生功能，如：*/}
-                    <div className="grid gap-4">
-                        <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                            View Assignments
-                        </button>
-                        <button className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                            Submit Work
-                        </button>
+                <div className="space-y-8">
+                    <div className="text-center">
+                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                            Join a Classroom
+                        </h2>
+                        <p className="text-gray-600 mb-8">
+                            Enter the class code provided by your teacher
+                        </p>
                     </div>
+                    <ClassCodeInput userRole="student" />
                 </div>
             </main>
         </div>
