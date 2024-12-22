@@ -1,26 +1,28 @@
-"use client"
+"use client";
 
 import { useSignUp } from "@clerk/nextjs";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { UserRole } from "@/lib/types";
+import { useRouter } from "next/navigation";
 
 export function RoleSelect() {
     const { signUp, setActive } = useSignUp();
     const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
 
     const selectRole = async (role: UserRole) => {
         if (!signUp) return;
 
         try {
             setIsLoading(true);
-            // 将角色保存到 Clerk 的 publicMetadata
-            await signUp.update({
-                // publicMetadata: { role }
-            });
 
             // 继续注册流程
             await setActive({ session: signUp.createdSessionId });
+
+            // 成功登录后重定向到对应角色的仪表板
+            router.push(`/dashboard/${role}`);
+
         } catch (error) {
             console.error('Error selecting role:', error);
         } finally {

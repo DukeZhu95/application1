@@ -1,6 +1,10 @@
 import { UserButton } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
+import { RoleSelect } from "../components/auth/role-select";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+    const {userId} = await auth();
+
     return (
         <div className="min-h-screen bg-white">  {/* 改为白色背景 */}
             <nav className="border-b">
@@ -10,7 +14,7 @@ export default function DashboardPage() {
                             Classroom Task Manager
                         </h1>
                         <div className="flex items-center">
-                            <UserButton />
+                            <UserButton/>
                         </div>
                     </div>
                 </div>
@@ -18,9 +22,10 @@ export default function DashboardPage() {
 
             <main className="max-w-7xl mx-auto px-4 py-8">
                 <div className="text-center space-y-6">
-                    <h2 className="text-xl font-semibold text-black">  {/* 加深文字颜色 */}
-                        Please select your role:
+                    <h2 className="text-xl font-semibold text-black">
+                        Select your role:
                     </h2>
+
                     <div className="flex gap-4 justify-center">
                         <a
                             href="/dashboard/teacher"
