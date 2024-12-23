@@ -2,20 +2,27 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
+import { useMutation } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
 import { classCodeSchema } from "@/lib/validations";
 
 interface ClassCodeInputProps {
     userRole: 'teacher' | 'student';
+    onClassCreated?: (code: string) => void;
 }
 
 export function ClassCodeInput({ userRole }: ClassCodeInputProps) {
+    const { user } = useUser();
+    const router = useRouter();
     const [code, setCode] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const router = useRouter();
+
+    const createClass = useMutation(api.classes.createClass);
+    const joinClass = useMutation(api.classes.joinClass);
 
     const generateClassCode = () => {
-        // 生成6位随机字母数字组合
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let result = '';
         for (let i = 0; i < 6; i++) {
@@ -30,15 +37,24 @@ export function ClassCodeInput({ userRole }: ClassCodeInputProps) {
         setLoading(true);
 
         try {
-            // 验证班级代码
             const validatedCode = classCodeSchema.parse(code);
-            console.log('Valid class code:', validatedCode);
-            // TODO: 之后会添加数据库操作
-            setTimeout(() => {
-                router.push(`/dashboard/${userRole}?classCode=${validatedCode}`);
-            }, 1000);
+
+            if (userRole === 'teacher') {
+                await createClass({
+                    code: validatedCode,
+                    teacherId: user?.id || '',
+                    name: `Class ${validatedCode}`
+                });
+            } else {
+                await joinClass({
+                    code: validatedCode,
+                    studentId: user?.id || ''
+                });
+            }
+
+            router.push(`/dashboard/${userRole}?classCode=${validatedCode}`);
         } catch (error) {
-            setError('Invalid class code format');
+            setError(error instanceof Error ? error.message : 'An error occurred');
         } finally {
             setLoading(false);
         }
