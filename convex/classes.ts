@@ -81,3 +81,28 @@ export const getClassInfo = query({
             .first();
     },
 });
+
+// 获取教师的班级列表
+export const getTeacherClasses = query({
+    args: { teacherId: v.string() },
+    handler: async (ctx, args) => {
+        return await ctx.db
+            .query("classrooms")
+            .filter(q => q.eq(q.field("teacherId"), args.teacherId))
+            .collect();
+    },
+});
+
+// 获取学生的班级列表
+export const getStudentClasses = query({
+    args: { studentId: v.string() },
+    handler: async (ctx, args) => {
+        // 获取学生加入的所有班级
+        return await ctx.db
+            .query("classrooms")
+            .withSearchIndex("by_student", q =>
+                q.search("students", args.studentId)
+            )
+            .collect();
+    },
+});

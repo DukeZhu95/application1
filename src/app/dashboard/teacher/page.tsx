@@ -2,12 +2,15 @@
 
 import { UserButton, useUser } from "@clerk/nextjs";
 import { useState } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { ClassCodeInput } from "@/app/components/shared/class-code-input";
 
 export default function TeacherDashboard() {
     const { user } = useUser();
+    const classes = useQuery(api.classes.getTeacherClasses, {
+        teacherId: user?.id || ""
+    })
     const [className, setClassName] = useState("");
     const [isCreating, setIsCreating] = useState(false);
     const [feedback, setFeedback] = useState<{
@@ -57,7 +60,7 @@ export default function TeacherDashboard() {
                         <h1 className="text-2xl font-bold text-black">
                             Teacher Dashboard
                         </h1>
-                        <UserButton />
+                        <UserButton/>
                     </div>
                 </div>
             </nav>
@@ -99,6 +102,33 @@ export default function TeacherDashboard() {
                     </div>
                 </div>
             </main>
+
+            <div className="bg-white p-6 rounded-lg shadow-sm mt-8">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                    Your Classes
+                </h2>
+                {classes === undefined ? (
+                    <p className="text-gray-500">Loading classes...</p>
+                ) : classes.length === 0 ? (
+                    <p className="text-gray-500">No classes created yet.</p>
+                ) : (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {classes.map((classItem) => (
+                            <div
+                                key={classItem._id}
+                                className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                            >
+                                <h3 className="font-semibold text-lg">{classItem.name}</h3>
+                                <p className="text-sm text-gray-600 mt-1">Code: {classItem.code}</p>
+                                <div className="mt-2 text-sm text-gray-500">
+                                    {classItem.students.length} student(s)
+                                </div>
+                                {/* 稍后可以添加更多操作按钮 */}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
