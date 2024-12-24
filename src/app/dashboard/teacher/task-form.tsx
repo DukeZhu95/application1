@@ -18,8 +18,8 @@ import { toast } from "../../components/ui/use-toast";
 import { Id } from "../../../../convex/_generated/dataModel";
 
 const taskSchema = z.object({
-    title: z.string().min(1, "标题不能为空"),
-    description: z.string().min(1, "描述不能为空"),
+    title: z.string().min(1, "The title is required"),
+    description: z.string().min(1, "The description is required"),
     dueDate: z.string().optional(), // 保持为字符串类型，在提交时转换
 });
 
@@ -53,17 +53,17 @@ export function TaskForm({ classroomId }: TaskFormProps) {
                 dueDate: data.dueDate ? new Date(data.dueDate).getTime() : undefined,
             });
             toast({
-                title: "任务发布成功",
-                description: "学生将立即看到新任务",
+                title: "Task created",
+                description: "Students can now see the new task",
             });
             reset();
         } catch (error) {
             const errorMessage = error instanceof Error
                 ? error.message
-                : "发生未知错误";
+                : "Unknown error";
 
             toast({
-                title: "发布失败",
+                title: "Could not create task",
                 description: errorMessage,
                 variant: "destructive",
             });
@@ -75,14 +75,14 @@ export function TaskForm({ classroomId }: TaskFormProps) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>发布新任务</CardTitle>
+                <CardTitle>Creat New Task</CardTitle>
             </CardHeader>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <CardContent className="space-y-4">
                     <div>
                         <Input
                             {...register("title")}
-                            placeholder="任务标题"
+                            placeholder="task title"
                             className="w-full"
                         />
                         {errors.title && (
@@ -95,7 +95,7 @@ export function TaskForm({ classroomId }: TaskFormProps) {
                     <div>
                         <Textarea
                             {...register("description")}
-                            placeholder="任务描述"
+                            placeholder="task description"
                             className="w-full min-h-[100px]"
                         />
                         {errors.description && (
@@ -119,7 +119,7 @@ export function TaskForm({ classroomId }: TaskFormProps) {
                         disabled={isSubmitting}
                         className="w-full"
                     >
-                        {isSubmitting ? "发布中..." : "发布任务"}
+                        {isSubmitting ? "creating..." : "task creates"}
                     </Button>
                 </CardFooter>
             </form>
