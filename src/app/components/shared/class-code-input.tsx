@@ -10,6 +10,7 @@ import { classCodeSchema } from "@/lib/validations";
 interface ClassCodeInputProps {
     userRole: 'teacher' | 'student';
     onClassCreated?: (code: string) => void;
+    isDisabled?: boolean;
 }
 
 export function ClassCodeInput({ userRole }: ClassCodeInputProps) {
