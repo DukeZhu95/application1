@@ -45,3 +45,25 @@ export const getClassTasks = query({
             .collect();
     },
 });
+
+// 获取任务详情
+export const getStudentTaskStatus = query({
+    args: {
+        taskId: v.id("tasks"),
+    },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new Error("You must be logged in to view task status");
+
+        // 获取任务信息
+        const task = await ctx.db.get(args.taskId);
+        if (!task) throw new Error("Task not found");
+
+        // 在这里可以添加获取学生完成状态的逻辑
+        // 目前返回一个基础状态
+        return {
+            isSubmitted: false,
+            submittedAt: null,
+        };
+    },
+});
