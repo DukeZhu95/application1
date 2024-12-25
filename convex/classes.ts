@@ -34,6 +34,7 @@ export const createClass = mutation({
 export const joinClass = mutation({
     args: {
         code: v.string(),
+        studentId: v.string()
     },
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
@@ -80,7 +81,20 @@ export const checkClassExists = query({
             .query("classrooms")
             .withIndex("by_code", (q) => q.eq("code", args.code))
             .first();
-        return !!classroom;
+
+        // 返回更详细的信息
+        if (!classroom) {
+            return {
+                exists: false,
+                message: "Class not found"
+            };
+        }
+
+        return {
+            exists: true,
+            message: "Class found",
+            className: classroom.name
+        };
     },
 });
 

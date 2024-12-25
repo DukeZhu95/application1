@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/app/components/ui/ca
 import { formatDate } from "@/lib/utils";
 import { Clock } from "lucide-react";
 import {Id} from "../../../../../../../../convex/_generated/dataModel";
+import { TaskSubmissionForm } from '@/app/dashboard/student/task-submission-form';
 
 interface TaskPageProps {
     params: {
@@ -63,6 +64,10 @@ export default function TaskPage({ params }: TaskPageProps) {
                                     Submitted at: {formatDate(taskStatus.submittedAt)}
                                 </p>
                             )}
+                            <TaskSubmissionForm
+                                taskId={params.taskId}
+                                isSubmitted={taskStatus.isSubmitted}
+                            />
                         </div>
                     </CardContent>
                 </Card>
