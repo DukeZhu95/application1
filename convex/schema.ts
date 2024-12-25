@@ -3,13 +3,16 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
-    // 保留现有的 classrooms 表
     classrooms: defineTable({
         code: v.string(),
         teacherId: v.string(),
         name: v.optional(v.string()),
         createdAt: v.number(),
-        students: v.array(v.string()),
+        students: v.array(v.object({
+            studentId: v.string(),
+            joinedAt: v.number(),
+            status: v.string(), // "active" | "inactive"
+        })),
     })
         .index("by_code", ["code"])
         .searchIndex("by_student", {

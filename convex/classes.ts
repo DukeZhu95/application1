@@ -30,31 +30,44 @@ export const createClass = mutation({
     },
 });
 
-// 加入班级
+// 学生加入班级
 export const joinClass = mutation({
     args: {
         code: v.string(),
-        studentId: v.string(),
     },
     handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new Error("You must be logged in to join a class");
+
         // 查找班级
         const classroom = await ctx.db
             .query("classrooms")
-            .withIndex("by_code", (q) => q.eq("code", args.code))
+            .withIndex("by_code", q => q.eq("code", args.code))
             .first();
 
         if (!classroom) {
-            throw new Error("Class not found");
+            throw new Error("Invalid class code");
         }
 
-        // 检查学生是否已经在班级中
-        if (classroom.students.includes(args.studentId)) {
-            throw new Error("Student already in class");
+        // 检查是否已经在班级中
+        const isAlreadyJoined = classroom.students.some(
+            student => student.studentId === identity.subject
+        );
+
+        if (isAlreadyJoined) {
+            throw new Error("You are already in this class");
         }
 
-        // 将学生添加到班级
+        // 添加学生到班级
         return await ctx.db.patch(classroom._id, {
-            students: [...classroom.students, args.studentId],
+            students: [
+                ...classroom.students,
+                {
+                    studentId: identity.subject,
+                    joinedAt: Date.now(),
+                    status: "active",
+                }
+            ],
         });
     },
 });
@@ -93,15 +106,16 @@ export const getTeacherClasses = query({
     },
 });
 
-// 获取学生的班级列表
+// 获取学生加入的班级列表
 export const getStudentClasses = query({
-    args: { studentId: v.string() },
-    handler: async (ctx, args) => {
-        // 获取学生加入的所有班级
+    handler: async (ctx) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new Error("You must be logged in to view classes");
+
         return await ctx.db
             .query("classrooms")
-            .withSearchIndex("by_student", q =>
-                q.search("students", args.studentId)
+            .withSearchIndex("by_student", (q) =>
+                q.search("students", identity.subject)
             )
             .collect();
     },

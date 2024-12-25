@@ -2,6 +2,7 @@
 
 import { UserButton } from "@clerk/nextjs";
 import { ClassCodeInput } from "@/app/components/shared/class-code-input";
+import { JoinClassForm } from "@/app/dashboard/student/join-class-form";
 import { StudentClassList } from "@/app/dashboard/student/class-list";
 
 export default function StudentDashboard() {
@@ -24,20 +25,20 @@ export default function StudentDashboard() {
                     <div className="space-y-8">
                         <div className="text-center lg:text-left">
                             <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                                Join a Classroom
+                                Join a class
                             </h2>
                             <p className="text-gray-600 mb-8">
-                                Enter the class code provided by your teacher
+                                Input the class code to join a class
                             </p>
                         </div>
-                        <ClassCodeInput userRole="student" />
+                        <JoinClassForm />
                     </div>
 
                     {/* 班级列表部分 */}
                     <div>
                         <div className="mb-8">
                             <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                                My Classes
+                                My classes
                             </h2>
                             <p className="text-gray-600">
                                 View all your enrolled classes
