@@ -8,9 +8,9 @@ import { Button } from '@/app/components/ui/button';
 import { Textarea } from '@/app/components/ui/textarea';
 import {
   Card,
+  CardContent,
   CardHeader,
   CardTitle,
-  CardContent,
 } from '@/app/components/ui/card';
 import { toast } from '@/app/components/ui/use-toast';
 import { Id } from '../../../../convex/_generated/dataModel';
