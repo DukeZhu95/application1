@@ -29,22 +29,14 @@ export function ClassCodeInput({ userRole }: ClassCodeInputProps) {
         userRole === 'student' && code.length === 6 ? { code } : "skip"
     );
 
-    const generateClassCode = () => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let result = '';
-        for (let i = 0; i < 6; i++) {
-            result += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        setCode(result);
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
         try {
-            const validatedCode = classCodeSchema.parse(code);
+            const validated = classCodeSchema.parse({ code });  // 传入对象
+            const validatedCode = validated.code;  // 获取 code 字符串
 
             if (userRole === 'teacher') {
                 await createClass({
@@ -82,6 +74,20 @@ export function ClassCodeInput({ userRole }: ClassCodeInputProps) {
         }
     };
 
+    const generateClassCode = () => {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < 6; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;  // 添加 return 语句
+    };
+
+    const handleGenerateCode = () => {
+        const newCode: string = generateClassCode();  // 使用导入的函数
+        setCode(newCode);
+    };
+
     return (
         <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-sm">
             <h3 className="text-lg font-semibold mb-4">
@@ -101,7 +107,7 @@ export function ClassCodeInput({ userRole }: ClassCodeInputProps) {
                         {userRole === 'teacher' && (
                             <button
                                 type="button"
-                                onClick={generateClassCode}
+                                onClick={handleGenerateCode}
                                 className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
                             >
                                 Generate

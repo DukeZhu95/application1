@@ -9,23 +9,30 @@ export const createClass = mutation({
         name: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
-        // 检查班级代码是否已存在
+        // 检查班级代码格式
+        if (!/^[A-Z0-9]{6}$/.test(args.code)) {
+            throw new Error("Invalid class code format");
+        }
+
+        if (!/[A-Z]/.test(args.code) || !/[0-9]/.test(args.code)) {
+            throw new Error("Class code must contain both letters and numbers");
+        }
+
+        // 检查代码是否已存在
         const existingClass = await ctx.db
             .query("classrooms")
-            .withIndex("by_code", (q) => q.eq("code", args.code))
+            .withIndex("by_code", q => q.eq("code", args.code))
             .first();
 
         if (existingClass) {
             throw new Error("Class code already exists");
         }
 
-        // 创建新班级
+        // 创建班级
         return await ctx.db.insert("classrooms", {
-            code: args.code,
-            teacherId: args.teacherId,
-            name: args.name || `Class ${args.code}`,
+            ...args,
             createdAt: Date.now(),
-            students: [],
+            students: []
         });
     },
 });
@@ -37,38 +44,30 @@ export const joinClass = mutation({
         studentId: v.string()
     },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) throw new Error("You must be logged in to join a class");
-
-        // 查找班级
         const classroom = await ctx.db
             .query("classrooms")
             .withIndex("by_code", q => q.eq("code", args.code))
             .first();
 
         if (!classroom) {
-            throw new Error("Invalid class code");
+            throw new Error("Class not found");
         }
 
-        // 检查是否已经在班级中
-        const isAlreadyJoined = classroom.students.some(
-            student => student.studentId === identity.subject
-        );
-
-        if (isAlreadyJoined) {
-            throw new Error("You are already in this class");
+        // 检查学生是否已在班级中
+        if (classroom.students.some(student => student.studentId === args.studentId)) {
+            throw new Error("You are already a member of this class");
         }
 
-        // 添加学生到班级
+        // 添加学生到班级，使用正确的对象格式
         return await ctx.db.patch(classroom._id, {
             students: [
                 ...classroom.students,
                 {
-                    studentId: identity.subject,
+                    studentId: args.studentId,
                     joinedAt: Date.now(),
-                    status: "active",
+                    status: "active"
                 }
-            ],
+            ]
         });
     },
 });
