@@ -1,0 +1,11 @@
+# Ignore artifacts:
+.next
+build
+coverage
+node_modules
+
+# Ignore convex generated files
+convex/_generated
+
+# Ignore all HTML files:
+*.html
