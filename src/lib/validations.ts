@@ -36,3 +36,16 @@ export function generateClassCode(): string {
     .sort(() => Math.random() - 0.5)
     .join('');
 }
+
+export const userIdSchema = z.object({
+  alphanumericId: z
+    .string()
+    .length(6, 'ID must be exactly 6 characters')
+    .regex(/^[A-Z0-9]+$/, 'Only uppercase letters and numbers are allowed')
+    .refine((id) => {
+      // 确保包含至少一个字母和一个数字
+      const hasLetter = /[A-Z]/.test(id);
+      const hasNumber = /[0-9]/.test(id);
+      return hasLetter && hasNumber;
+    }, 'Must contain both letters and numbers'),
+});
