@@ -1,54 +1,101 @@
-// app/components/dashboard/student/class-list.tsx
-import { useQuery } from 'convex/react';
+'use client';
+
 import { useUser } from '@clerk/nextjs';
+import { useQuery } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
-} from '../../components/ui/card';
-import { Id } from '../../../../convex/_generated/dataModel';
-
-interface Classroom {
-  _id: Id<'classrooms'>;
-  code: string;
-  name?: string;
-  teacherId: string;
-  createdAt: number;
-  students: string[];
-}
+} from '@/app/components/ui/card';
+import { useRouter } from 'next/navigation';
+import { formatDate } from '@/lib/utils';
 
 export function StudentClassList() {
   const { user } = useUser();
-  const classes = useQuery(api.classes.getStudentClasses, {
-    studentId: user?.id || '',
-  });
+  const router = useRouter();
 
-  if (!classes || classes.length === 0) {
+  const classes = useQuery(
+    api.classes.getStudentClasses,
+    user?.id ? { studentId: user.id } : 'skip'
+  );
+
+  // 添加更详细的调试日志
+  console.log('StudentClassList render:');
+  console.log('- User:', user);
+  console.log('- User ID:', user?.id);
+  console.log('- Classes:', classes);
+
+  if (!user?.id) {
     return (
-      <div className="text-center p-8 bg-gray-50 rounded-lg">
-        <p className="text-gray-600">You haven't joined any classes yet.</p>
+      <Card>
+        <CardContent className="text-center py-6">
+          <p className="text-gray-500">Please sign in to view your classes.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!classes) {
+    return (
+      <div className="space-y-4">
+        {[1, 2].map((n) => (
+          <div key={n} className="animate-pulse">
+            <div className="h-32 bg-gray-100 rounded-lg" />
+          </div>
+        ))}
       </div>
+    );
+  }
+
+  if (classes.length === 0) {
+    return (
+      <Card>
+        <CardContent className="text-center py-6">
+          <p className="text-gray-500">
+            You haven&apos;t joined any classes yet.
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <div className="space-y-4">
-      {classes.map((classroom: Classroom) => (
-        <Card key={classroom._id}>
-          <CardHeader>
-            <CardTitle>{classroom.name || `Class ${classroom.code}`}</CardTitle>
-            <CardDescription>Code: {classroom.code}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-500">
-              Students: {classroom.students.length}
-            </p>
-          </CardContent>
-        </Card>
-      ))}
+      {classes.map((classroom) => {
+        // 添加每个班级的调试日志
+        console.log('Rendering classroom:', classroom);
+        return (
+          <Card
+            key={classroom._id}
+            className="hover:bg-gray-50 cursor-pointer transition-colors"
+            onClick={() =>
+              router.push(`/dashboard/student/classroom/${classroom.code}`)
+            }
+          >
+            <CardHeader>
+              <CardTitle>
+                {classroom.name || `Class ${classroom.code}`}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-500">Code: {classroom.code}</p>
+              {classroom.students?.map(
+                (student) =>
+                  student.studentId === user?.id && (
+                    <p
+                      key={student.studentId}
+                      className="text-sm text-gray-500"
+                    >
+                      Joined: {formatDate(student.joinedAt)}
+                    </p>
+                  )
+              )}
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }

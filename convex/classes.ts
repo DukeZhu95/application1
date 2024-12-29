@@ -44,24 +44,27 @@ export const joinClass = mutation({
     studentId: v.string(),
   },
   handler: async (ctx, args) => {
+    // 查找课程
     const classroom = await ctx.db
       .query('classrooms')
       .withIndex('by_code', (q) => q.eq('code', args.code))
       .first();
 
     if (!classroom) {
-      throw new Error('Class not found');
+      throw new Error('Classroom not found');
     }
 
-    // 检查学生是否已在班级中
-    if (
-      classroom.students.some((student) => student.studentId === args.studentId)
-    ) {
-      throw new Error('You are already a member of this class');
+    // 检查学生是否已经加入
+    const isAlreadyJoined = classroom.students.some(
+      (student) => student.studentId === args.studentId
+    );
+
+    if (isAlreadyJoined) {
+      throw new Error('Already joined this class');
     }
 
-    // 添加学生到班级，使用正确的对象格式
-    return await ctx.db.patch(classroom._id, {
+    // 添加学生到课程
+    await ctx.db.patch(classroom._id, {
       students: [
         ...classroom.students,
         {
@@ -71,6 +74,8 @@ export const joinClass = mutation({
         },
       ],
     });
+
+    return classroom;
   },
 });
 
@@ -133,15 +138,24 @@ export const getTeacherClasses = query({
 
 // 获取学生加入的班级列表
 export const getStudentClasses = query({
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error('You must be logged in to view classes');
+  args: { studentId: v.string() },
+  handler: async (ctx, args) => {
+    // 首先，让我们看看所有的课程
+    const allClasses = await ctx.db.query('classrooms').collect();
 
-    return await ctx.db
+    console.log('All classes in database:', allClasses);
+    console.log('Looking for student ID:', args.studentId);
+
+    // 然后获取学生的课程
+    const studentClasses = await ctx.db
       .query('classrooms')
       .withSearchIndex('by_student', (q) =>
-        q.search('students', identity.subject)
+        q.search('students', args.studentId)
       )
       .collect();
+
+    console.log('Found student classes:', studentClasses);
+
+    return studentClasses;
   },
 });

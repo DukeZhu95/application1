@@ -1,4 +1,3 @@
-// app/components/dashboard/student/classroom-header.tsx
 import { useQuery } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
 

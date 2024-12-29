@@ -1,82 +1,92 @@
-// app/components/dashboard/student/join-class-form.tsx
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+'use client';
+
+import React, { useState } from 'react';
+import { useUser } from '@clerk/nextjs';
 import { useMutation } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
-import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
+import { Button } from '@/app/components/ui/button';
 import { toast } from '@/app/components/ui/use-toast';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/app/components/ui/card';
-
-const joinClassSchema = z.object({
-  code: z
-    .string()
-    .length(6, 'The class code must be 6 characters')
-    .regex(/^[A-Z0-9]+$/, 'Only uppercase letters and numbers are allowed'),
-});
-
-type JoinClassFormData = z.infer<typeof joinClassSchema>;
+import { Card, CardContent } from '@/app/components/ui/card';
+import { useRouter } from 'next/navigation';
 
 export function JoinClassForm() {
+  const [code, setCode] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const joinClass = useMutation(api.classes.joinClass);
-  const [isJoining, setIsJoining] = useState(false);
+  const { user } = useUser();
+  const router = useRouter();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<JoinClassFormData>({
-    resolver: zodResolver(joinClassSchema),
-  });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !code.trim()) return;
 
-  const onSubmit = async (data: JoinClassFormData) => {
+    console.log('Attempting to join class with code:', code);
+    console.log('User ID:', user.id);
+
     try {
-      setIsJoining(true);
-      await joinClass({ code: data.code.toUpperCase() });
-      toast({
-        title: 'Successfully joined',
-        description: 'You have successfully joined the class',
+      setIsLoading(true);
+      const result = await joinClass({
+        code: code.toUpperCase(),
+        studentId: user.id,
       });
-      reset();
-    } catch (error) {
+
+      console.log('Join class result:', result);
+
       toast({
-        title: 'Failed to join',
-        description: error instanceof Error ? error.message : 'Unknown error',
+        title: 'Success',
+        description: 'Successfully joined the class',
+      });
+
+      // 清空输入
+      setCode('');
+
+      // 使用 router.push 到当前路径来触发页面刷新
+      const currentPath = window.location.pathname;
+      router.push(currentPath);
+    } catch (error: any) {
+      console.error('Error joining class:', error);
+
+      // 处理特定错误消息
+      let errorMessage = 'Failed to join class';
+      if (error.message.includes('already a member')) {
+        errorMessage = 'You are already a member of this class';
+      } else if (error.message.includes('not found')) {
+        errorMessage = 'Class not found. Please check the code and try again';
+      }
+
+      toast({
+        title: 'Error',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
-      setIsJoining(false);
+      setIsLoading(false);
     }
   };
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Join the class</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
+      <CardContent className="pt-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
             <Input
-              {...register('code')}
-              placeholder="please enter the class code"
+              placeholder="Enter class code (e.g., COM555)"
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
               className="uppercase"
-              maxLength={6}
+              disabled={isLoading}
+              required
+              minLength={4}
+              maxLength={10}
             />
-            {errors.code && (
-              <p className="text-sm text-red-500 mt-1">{errors.code.message}</p>
-            )}
           </div>
-          <Button type="submit" className="w-full" disabled={isJoining}>
-            {isJoining ? 'joining...' : 'join the class'}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={!code.trim() || isLoading}
+          >
+            {isLoading ? 'Joining...' : 'Join class'}
           </Button>
         </form>
       </CardContent>
