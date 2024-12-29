@@ -171,3 +171,44 @@ export const getTaskSubmissions = query({
       .collect();
   },
 });
+
+// 删除任务
+export const deleteTask = mutation({
+  args: { taskId: v.id('tasks') },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Not authorized');
+
+    const task = await ctx.db.get(args.taskId);
+    if (!task) throw new Error('Task not found');
+
+    await ctx.db.delete(args.taskId);
+    return task;
+  },
+});
+
+// 更新任务
+export const updateTask = mutation({
+  args: {
+    taskId: v.id('tasks'),
+    title: v.string(),
+    description: v.string(),
+    dueDate: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    // 验证任务是否存在
+    const task = await ctx.db.get(args.taskId);
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    // 更新任务
+    await ctx.db.patch(args.taskId, {
+      title: args.title,
+      description: args.description,
+      dueDate: args.dueDate,
+    });
+
+    return task;
+  },
+});
