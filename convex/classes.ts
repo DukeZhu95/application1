@@ -99,7 +99,7 @@ export const checkClassExists = query({
   },
 });
 
-// 获取班级信息
+// 保持现有的通过代码获取班级信息的查询
 export const getClassInfo = query({
   args: { code: v.string() },
   handler: async (ctx, args) => {
@@ -107,6 +107,14 @@ export const getClassInfo = query({
       .query('classrooms')
       .withIndex('by_code', (q) => q.eq('code', args.code))
       .first();
+  },
+});
+
+// 添加通过 ID 获取班级信息的查询
+export const getClassById = query({
+  args: { classId: v.id('classrooms') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.classId);
   },
 });
 

@@ -1,4 +1,4 @@
-// app/components/dashboard/teacher/task-list.tsx
+// app/dashboard/teacher/task-list.tsx
 import { useQuery } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
 import {
@@ -11,12 +11,12 @@ import { formatDate } from '@/lib/utils';
 import { Id } from '../../../../convex/_generated/dataModel';
 
 interface TaskListProps {
-  classroomId: Id<'classrooms'>; // 修改为 Convex Id 类型
+  classId: Id<'classrooms'>; // 修改为 Convex Id 类型
 }
 
-export function TaskList({ classroomId }: TaskListProps) {
+export function TaskList({ classId }: TaskListProps) {
   const tasks = useQuery(api.tasks.getClassTasks, {
-    classroomId,
+    classroomId: classId,
   });
 
   if (!tasks) {

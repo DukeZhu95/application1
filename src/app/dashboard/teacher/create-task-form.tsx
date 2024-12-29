@@ -1,17 +1,14 @@
-// app/components/dashboard/teacher/task-form.tsx
-'use client';
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useMutation } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
-import { Id } from '../../../../convex/_generated/dataModel';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Textarea } from '@/app/components/ui/textarea';
 import { toast } from '@/app/components/ui/use-toast';
+import { Id } from '../../../../convex/_generated/dataModel';
 
 const taskSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -21,18 +18,18 @@ const taskSchema = z.object({
 
 type TaskFormData = z.infer<typeof taskSchema>;
 
-interface TaskFormProps {
+interface CreateTaskFormProps {
   classId: Id<'classrooms'>;
+  onClose: () => void;
 }
 
-export function TaskForm({ classId }: TaskFormProps) {
+export function CreateTaskForm({ classId, onClose }: CreateTaskFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createTask = useMutation(api.tasks.createTask);
 
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
@@ -42,8 +39,7 @@ export function TaskForm({ classId }: TaskFormProps) {
     try {
       setIsSubmitting(true);
       await createTask({
-        title: data.title,
-        description: data.description,
+        ...data,
         classroomId: classId,
         dueDate: data.dueDate ? new Date(data.dueDate).getTime() : undefined,
       });
@@ -52,7 +48,7 @@ export function TaskForm({ classId }: TaskFormProps) {
         title: 'Success',
         description: 'Task created successfully',
       });
-      reset();
+      onClose();
     } catch (error) {
       toast({
         title: 'Error',
@@ -66,8 +62,8 @@ export function TaskForm({ classId }: TaskFormProps) {
   };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Create New Task</h2>
+    <div className="space-y-4 mt-4 p-4 border rounded-lg">
+      <h4 className="font-medium">Create New Task</h4>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <Input {...register('title')} placeholder="Task title" />
@@ -93,9 +89,14 @@ export function TaskForm({ classId }: TaskFormProps) {
           <Input {...register('dueDate')} type="datetime-local" />
         </div>
 
-        <Button type="submit" disabled={isSubmitting} className="w-full">
-          {isSubmitting ? 'Creating...' : 'Create Task'}
-        </Button>
+        <div className="flex gap-2 justify-end">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Creating...' : 'Create Task'}
+          </Button>
+        </div>
       </form>
     </div>
   );

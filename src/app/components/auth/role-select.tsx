@@ -1,6 +1,6 @@
 'use client';
 
-import { useSignUp } from '@clerk/nextjs';
+import { useSignUp, useUser } from '@clerk/nextjs';
 import { Button } from '../ui/button';
 import { useState } from 'react';
 import { UserRole } from '@/lib/types';
@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 
 export function RoleSelect() {
   const { signUp, setActive } = useSignUp();
+  const { user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -20,7 +21,20 @@ export function RoleSelect() {
       // 继续注册流程
       await setActive({ session: signUp.createdSessionId });
 
-      // 成功登录后重定向到对应角色的仪表板
+      // 设置用户元数据
+      try {
+        await fetch('/api/set-user-role', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ role }),
+        });
+      } catch (error) {
+        console.error('Error setting user role:', error);
+      }
+
+      // 重定向到对应角色的仪表板
       router.push(`/dashboard/${role}`);
     } catch (error) {
       console.error('Error selecting role:', error);

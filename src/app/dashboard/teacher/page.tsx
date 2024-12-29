@@ -3,11 +3,16 @@
 import { UserButton, useUser } from '@clerk/nextjs';
 import { useState } from 'react';
 import { useMutation, useQuery } from 'convex/react';
+import { useRouter } from 'next/navigation';
 import { api } from '../../../../convex/_generated/api';
 import { ClassCodeInput } from '@/app/components/shared/class-code-input';
+import { Button } from '@/app/components/ui/button';
+import { CreateTaskForm } from '@/app/dashboard/teacher/create-task-form';
 
 export default function TeacherDashboard() {
   const { user } = useUser();
+  const [currentClass, setCurrentClass] = useState<string | null>(null);
+  const router = useRouter();
   const classes = useQuery(api.classes.getTeacherClasses, {
     teacherId: user?.id || '',
   });
@@ -130,7 +135,33 @@ export default function TeacherDashboard() {
                 <div className="mt-2 text-sm text-gray-500">
                   {classItem.students.length} student(s)
                 </div>
-                {/* 稍后可以添加更多操作按钮 */}
+
+                {/* 添加创建任务按钮 */}
+                <div className="mt-4 space-y-2">
+                  <Button
+                    onClick={() =>
+                      router.push(`/dashboard/teacher/class/${classItem._id}`)
+                    }
+                    variant="outline"
+                    className="w-full"
+                  >
+                    View Details
+                  </Button>
+                  <Button
+                    onClick={() => setCurrentClass(classItem._id)}
+                    className="w-full"
+                  >
+                    Create Task
+                  </Button>
+                </div>
+
+                {/* 当前选中的班级显示任务创建表单 */}
+                {currentClass === classItem._id && (
+                  <CreateTaskForm
+                    classId={classItem._id}
+                    onClose={() => setCurrentClass(null)}
+                  />
+                )}
               </div>
             ))}
           </div>

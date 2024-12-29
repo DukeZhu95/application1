@@ -3,6 +3,7 @@ import { SignUp } from '@clerk/nextjs';
 import { useSignUp } from '@clerk/nextjs';
 import { useState } from 'react';
 import { UserIdInput } from '@/app/components/auth/user-id-input';
+import { RoleSelect } from '@/app/components/auth/role-select';
 
 export default function SignUpPage() {
   const [showIdInput, setShowIdInput] = useState(false);
@@ -14,6 +15,7 @@ export default function SignUpPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <RoleSelect />
       {showIdInput ? (
         <UserIdInput
           onIdSubmit={async (id) => {
