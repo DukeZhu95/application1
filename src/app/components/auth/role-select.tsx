@@ -1,43 +1,66 @@
 'use client';
 
-import { useSignUp, useUser } from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
 import { Button } from '../ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { UserRole } from '@/lib/types';
 import { useRouter } from 'next/navigation';
+import { useMutation, useQuery } from 'convex/react';
+import { api } from '../../../../convex/_generated/api';
+import { toast } from '../ui/use-toast';
 
 export function RoleSelect() {
-  const { signUp, setActive } = useSignUp();
   const { user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  const setUserRole = useMutation(api.users.setUserRole);
+  const userRole = useQuery(api.users.getUserRole, {
+    userId: user?.id ?? '',
+  });
+
+  // 使用 useEffect 处理角色检查和重定向
+  useEffect(() => {
+    if (userRole?.role) {
+      const destination =
+        userRole.role === 'teacher'
+          ? '/dashboard/teacher'
+          : '/dashboard/student';
+      router.push(destination);
+    }
+  }, [userRole, router]);
+
+  // 如果已经有角色，不渲染选择界面
+  if (userRole?.role) {
+    return null;
+  }
+
   const selectRole = async (role: UserRole) => {
-    if (!signUp) return;
+    if (!user) return;
 
     try {
       setIsLoading(true);
 
-      // 继续注册流程
-      await setActive({ session: signUp.createdSessionId });
+      await setUserRole({
+        userId: user.id,
+        email: user.emailAddresses[0]?.emailAddress ?? '',
+        role,
+        name: user.fullName ?? '',
+      });
 
-      // 设置用户元数据
-      try {
-        await fetch('/api/set-user-role', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ role }),
-        });
-      } catch (error) {
-        console.error('Error setting user role:', error);
-      }
+      toast({
+        title: 'Success',
+        description: 'Role set successfully',
+      });
 
-      // 重定向到对应角色的仪表板
-      router.push(`/dashboard/${role}`);
+      // 让 useEffect 处理重定向
     } catch (error) {
       console.error('Error selecting role:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to set role',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -47,9 +70,7 @@ export function RoleSelect() {
     <div className="space-y-6 p-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold">Select your role:</h2>
-        <p className="text-sm text-gray-600">
-          Please select your account type for signing up
-        </p>
+        <p className="text-sm text-gray-600">Please select your account type</p>
       </div>
 
       <div className="flex flex-col gap-4">
