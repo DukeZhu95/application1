@@ -8,9 +8,13 @@
  * @module
  */
 
-import type { ApiFromModules, FilterApi, FunctionReference } from 'convex/server';
-import type * as classes from '../classes.js';
-import type * as tasks from '../tasks.js';
+import type {
+  ApiFromModules,
+  FilterApi,
+  FunctionReference,
+} from "convex/server";
+import type * as classes from "../classes.js";
+import type * as tasks from "../tasks.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -26,9 +30,9 @@ declare const fullApi: ApiFromModules<{
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
-  FunctionReference<any, 'public'>
+  FunctionReference<any, "public">
 >;
 export declare const internal: FilterApi<
   typeof fullApi,
-  FunctionReference<any, 'internal'>
+  FunctionReference<any, "internal">
 >;

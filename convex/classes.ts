@@ -114,7 +114,9 @@ export const getClassInfo = query({
 export const getClassById = query({
   args: { classId: v.id('classrooms') },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.classId);
+    const classroom = await ctx.db.get(args.classId);
+    if (!classroom) throw new Error('Class not found');
+    return classroom;
   },
 });
 

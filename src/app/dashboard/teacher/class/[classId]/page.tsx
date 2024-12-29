@@ -1,11 +1,11 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import { useQuery } from 'convex/react';
 import { api } from '../../../../../../convex/_generated/api';
 import { Button } from '@/app/components/ui/button';
 import { Id } from '../../../../../../convex/_generated/dataModel';
 import { TaskForm } from '@/app/dashboard/teacher/task-form';
 import { TaskList } from '@/app/dashboard/teacher/task-list';
-import { Suspense, use } from 'react';
 
 interface ClassDetailsPageProps {
   params: {
@@ -13,7 +13,11 @@ interface ClassDetailsPageProps {
   };
 }
 
-function ClassDetails({ classId }: { classId: Id<'classrooms'> }) {
+export default function ClassDetailsPage() {
+  const router = useRouter();
+  const pathSegments = window.location.pathname.split('/');
+  const classId = pathSegments[pathSegments.length - 1] as Id<'classrooms'>;
+
   const classroom = useQuery(api.classes.getClassById, {
     classId,
   });
@@ -33,7 +37,7 @@ function ClassDetails({ classId }: { classId: Id<'classrooms'> }) {
               {classroom.students.length} student(s)
             </p>
           </div>
-          <Button variant="outline" onClick={() => window.history.back()}>
+          <Button variant="outline" onClick={() => router.back()}>
             Back
           </Button>
         </div>
@@ -48,15 +52,5 @@ function ClassDetails({ classId }: { classId: Id<'classrooms'> }) {
         </div>
       </div>
     </div>
-  );
-}
-
-export default function ClassDetailsPage({ params }: ClassDetailsPageProps) {
-  const resolvedParams = use(Promise.resolve(params)); // 添加这行
-
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ClassDetails classId={params.classId} />
-    </Suspense>
   );
 }
