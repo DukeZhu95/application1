@@ -140,13 +140,13 @@ export const getTeacherClasses = query({
 export const getStudentClasses = query({
   args: { studentId: v.string() },
   handler: async (ctx, args) => {
-    // 首先，让我们看看所有的课程
+    // 先获取所有课程进行调试
     const allClasses = await ctx.db.query('classrooms').collect();
 
     console.log('All classes in database:', allClasses);
-    console.log('Looking for student ID:', args.studentId);
+    console.log('Looking for studentId:', args.studentId);
 
-    // 然后获取学生的课程
+    // 使用 searchIndex 查询
     const studentClasses = await ctx.db
       .query('classrooms')
       .withSearchIndex('by_student', (q) =>
@@ -154,8 +154,16 @@ export const getStudentClasses = query({
       )
       .collect();
 
-    console.log('Found student classes:', studentClasses);
+    console.log('Found classes using search index:', studentClasses);
 
-    return studentClasses;
+    // 作为备用，手动过滤尝试
+    const manuallyFiltered = allClasses.filter((classroom) =>
+      classroom.students.some((student) => student.studentId === args.studentId)
+    );
+
+    console.log('Manually filtered classes:', manuallyFiltered);
+
+    // 如果搜索索引方法失败，使用手动过滤的结果
+    return studentClasses.length > 0 ? studentClasses : manuallyFiltered;
   },
 });

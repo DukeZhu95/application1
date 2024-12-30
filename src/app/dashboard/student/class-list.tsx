@@ -16,18 +16,17 @@ export function StudentClassList() {
   const { user } = useUser();
   const router = useRouter();
 
+  console.log('StudentClassList - Current user:', user);
+
   const classes = useQuery(
     api.classes.getStudentClasses,
     user?.id ? { studentId: user.id } : 'skip'
   );
 
-  // 添加更详细的调试日志
-  console.log('StudentClassList render:');
-  console.log('- User:', user);
-  console.log('- User ID:', user?.id);
-  console.log('- Classes:', classes);
+  console.log('StudentClassList - Query result:', classes);
 
   if (!user?.id) {
+    console.log('StudentClassList - No user ID');
     return (
       <Card>
         <CardContent className="text-center py-6">
@@ -38,6 +37,7 @@ export function StudentClassList() {
   }
 
   if (!classes) {
+    console.log('StudentClassList - Loading classes...');
     return (
       <div className="space-y-4">
         {[1, 2].map((n) => (
@@ -50,6 +50,7 @@ export function StudentClassList() {
   }
 
   if (classes.length === 0) {
+    console.log('StudentClassList - No classes found');
     return (
       <Card>
         <CardContent className="text-center py-6">
@@ -61,41 +62,33 @@ export function StudentClassList() {
     );
   }
 
+  console.log('StudentClassList - Rendering classes:', classes);
   return (
     <div className="space-y-4">
-      {classes.map((classroom) => {
-        // 添加每个班级的调试日志
-        console.log('Rendering classroom:', classroom);
-        return (
-          <Card
-            key={classroom._id}
-            className="hover:bg-gray-50 cursor-pointer transition-colors"
-            onClick={() =>
-              router.push(`/dashboard/student/classroom/${classroom.code}`)
-            }
-          >
-            <CardHeader>
-              <CardTitle>
-                {classroom.name || `Class ${classroom.code}`}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-500">Code: {classroom.code}</p>
-              {classroom.students?.map(
-                (student) =>
-                  student.studentId === user?.id && (
-                    <p
-                      key={student.studentId}
-                      className="text-sm text-gray-500"
-                    >
-                      Joined: {formatDate(student.joinedAt)}
-                    </p>
-                  )
-              )}
-            </CardContent>
-          </Card>
-        );
-      })}
+      {classes.map((classroom) => (
+        <Card
+          key={classroom._id}
+          className="hover:bg-gray-50 cursor-pointer transition-colors"
+          onClick={() =>
+            router.push(`/dashboard/student/classroom/${classroom.code}`)
+          }
+        >
+          <CardHeader>
+            <CardTitle>{classroom.name || `Class ${classroom.code}`}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-gray-500">Code: {classroom.code}</p>
+            {classroom.students?.map(
+              (student) =>
+                student.studentId === user?.id && (
+                  <p key={student.studentId} className="text-sm text-gray-500">
+                    Joined: {formatDate(student.joinedAt)}
+                  </p>
+                )
+            )}
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }
