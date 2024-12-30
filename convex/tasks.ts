@@ -69,22 +69,26 @@ export const getStudentTaskStatus = query({
 });
 
 // 提交任务
+type TaskSubmissionData = {
+  content: string;
+  submittedAt: number;
+  status: string;
+  attachmentUrl?: string;
+  attachmentName?: string;
+  storageId?: string;
+};
+
 export const submitTask = mutation({
   args: {
     taskId: v.id('tasks'),
     content: v.string(),
-    attachmentUrl: v.optional(v.string()),
-    attachmentName: v.optional(v.string()),
+    storageId: v.optional(v.string()),
+    fileName: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error('Not authorized');
 
-    // 检查任务是否存在
-    const task = await ctx.db.get(args.taskId);
-    if (!task) throw new Error('Task not found');
-
-    // 检查是否已提交
     const existingSubmission = await ctx.db
       .query('taskSubmissions')
       .withIndex('by_task_student', (q) =>
@@ -92,21 +96,36 @@ export const submitTask = mutation({
       )
       .first();
 
+    const submissionData: TaskSubmissionData = {
+      content: args.content,
+      submittedAt: Date.now(),
+      status: 'submitted',
+    };
+
+    // 如果有文件，添加文件相关字段
+    if (args.storageId) {
+      submissionData.storageId = args.storageId;
+      // 使用空值合并运算符，如果是 null 就不设置这个字段
+      const attachmentUrl = await ctx.storage.getUrl(args.storageId);
+      attachmentUrl && (submissionData.attachmentUrl = attachmentUrl);
+      submissionData.attachmentName = args.fileName;
+    }
+
     if (existingSubmission) {
-      // 更新现有提交
-      return await ctx.db.patch(existingSubmission._id, {
-        content: args.content,
-        submittedAt: Date.now(),
-      });
+      // 处理现有文件
+      if (existingSubmission.storageId) {
+        await ctx.storage.delete(existingSubmission.storageId);
+      }
+
+      // 更新提交
+      return await ctx.db.patch(existingSubmission._id, submissionData);
     }
 
     // 创建新提交
     return await ctx.db.insert('taskSubmissions', {
+      ...submissionData,
       taskId: args.taskId,
       studentId: identity.subject,
-      content: args.content,
-      submittedAt: Date.now(),
-      status: 'submitted',
     });
   },
 });
@@ -217,14 +236,35 @@ export const updateTask = mutation({
 export const getTask = query({
   args: { taskId: v.id('tasks') },
   handler: async (ctx, args) => {
-    console.log('getTask query called with:', args);
     const task = await ctx.db.get(args.taskId);
-    console.log('Found task:', task);
 
     if (!task) {
       throw new Error(`Task not found: ${args.taskId}`);
     }
 
     return task;
+  },
+});
+
+// 任务提交
+export const getTaskSubmission = query({
+  args: { taskId: v.id('tasks') },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Not authenticated');
+
+    return await ctx.db
+      .query('taskSubmissions')
+      .withIndex('by_task_student', (q) =>
+        q.eq('taskId', args.taskId).eq('studentId', identity.subject)
+      )
+      .first();
+  },
+});
+
+// 生成上传 URL
+export const generateUploadUrl = mutation({
+  handler: async (ctx) => {
+    return await ctx.storage.generateUploadUrl();
   },
 });

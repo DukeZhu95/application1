@@ -8,6 +8,7 @@ import { formatDate } from '@/lib/utils';
 import { Id } from '../../../../../../../../convex/_generated/dataModel';
 import { useState } from 'react';
 import { TaskSubmissionForm } from '@/app/dashboard/student/task-submission-form';
+import { FileIcon } from 'lucide-react';
 
 interface TaskDetailClientProps {
   classCode: string;
@@ -20,8 +21,11 @@ export default function TaskDetailClient({
 }: TaskDetailClientProps) {
   const router = useRouter();
   const [isSubmissionFormOpen, setIsSubmissionFormOpen] = useState(false);
+  const submission = useQuery(api.tasks.getTaskSubmission, {
+    taskId: taskId as Id<'tasks'>,
+  });
 
-  console.log('TaskDetailClient - Props received:', { classCode, taskId });
+  // console.log('TaskDetailClient - Props received:', { classCode, taskId });
 
   // 验证 taskId
   if (!taskId) {
@@ -33,7 +37,7 @@ export default function TaskDetailClient({
     taskId: taskId as Id<'tasks'>,
   });
 
-  console.log('TaskDetailClient - Query result:', task);
+  // console.log('TaskDetailClient - Query result:', task);
 
   // 加载状态
   if (!task) {
@@ -114,6 +118,26 @@ export default function TaskDetailClient({
           isOpen={isSubmissionFormOpen}
           onClose={() => setIsSubmissionFormOpen(false)}
         />
+
+        {submission && (
+          <div className="mt-8 p-4 border rounded-lg">
+            <h2 className="text-lg font-semibold mb-2">Your Submission</h2>
+            <p className="whitespace-pre-wrap">{submission.content}</p>
+            {submission.attachmentUrl && (
+              <div className="mt-2">
+                <a
+                  href={submission.attachmentUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:underline flex items-center gap-2"
+                >
+                  <FileIcon className="w-4 h-4" />
+                  {submission.attachmentName || 'Download Attachment'}
+                </a>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

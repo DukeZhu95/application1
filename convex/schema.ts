@@ -55,6 +55,9 @@ export default defineSchema({
     feedback: v.optional(v.string()),
     gradedAt: v.optional(v.number()),
     gradedBy: v.optional(v.string()),
+    attachmentUrl: v.optional(v.string()),
+    attachmentName: v.optional(v.string()),
+    storageId: v.optional(v.string()),
   })
     .index('by_task_student', ['taskId', 'studentId'])
     .index('by_task', ['taskId'])

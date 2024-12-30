@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useMutation } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
+import { Id } from '../../../../convex/_generated/dataModel';
 import {
   Dialog,
   DialogContent,
@@ -21,11 +22,13 @@ import {
   FormControl,
   FormMessage,
 } from '@/app/components/ui/form';
-import { Id } from '../../../../convex/_generated/dataModel';
+import { FileUpload } from './file-upload';
 
 const formSchema = z.object({
   content: z.string().min(1, 'Please write your submission'),
 });
+
+type FormValues = z.infer<typeof formSchema>;
 
 interface TaskSubmissionFormProps {
   taskId: string;
@@ -40,23 +43,57 @@ export function TaskSubmissionForm({
 }: TaskSubmissionFormProps) {
   const submit = useMutation(api.tasks.submitTask);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const generateUploadUrl = useMutation(api.tasks.generateUploadUrl);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  // 获取当前任务的提交情况
+  const existingSubmission = useQuery(api.tasks.getTaskSubmission, {
+    taskId: taskId as Id<'tasks'>,
+  });
+
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      content: '',
+      content: existingSubmission?.content || '',
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: FormValues) => {
     try {
       setIsSubmitting(true);
+      let storageId: string | undefined;
+      let fileName: string | undefined;
+
+      if (file) {
+        const uploadUrl = await generateUploadUrl();
+
+        const result = await fetch(uploadUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': file.type,
+          },
+          body: file,
+        });
+
+        if (!result.ok) {
+          throw new Error('Failed to upload file');
+        }
+
+        const { storageId: newStorageId } = await result.json();
+        storageId = newStorageId;
+        fileName = file.name;
+      }
+
       await submit({
         taskId: taskId as Id<'tasks'>,
         content: values.content,
+        storageId,
+        fileName,
       });
+
       onClose();
       form.reset();
+      setFile(null);
     } catch (error) {
       console.error('Failed to submit task:', error);
     } finally {
@@ -66,7 +103,7 @@ export function TaskSubmissionForm({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Submit Task</DialogTitle>
         </DialogHeader>
@@ -88,6 +125,13 @@ export function TaskSubmissionForm({
                 </FormItem>
               )}
             />
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Attachment</label>
+              <FileUpload
+                onFileSelect={(selectedFile) => setFile(selectedFile)}
+                disabled={isSubmitting}
+              />
+            </div>
             <div className="flex justify-end gap-2">
               <Button
                 type="button"
