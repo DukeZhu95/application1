@@ -212,3 +212,19 @@ export const updateTask = mutation({
     return task;
   },
 });
+
+// 获取任务
+export const getTask = query({
+  args: { taskId: v.id('tasks') },
+  handler: async (ctx, args) => {
+    console.log('getTask query called with:', args);
+    const task = await ctx.db.get(args.taskId);
+    console.log('Found task:', task);
+
+    if (!task) {
+      throw new Error(`Task not found: ${args.taskId}`);
+    }
+
+    return task;
+  },
+});

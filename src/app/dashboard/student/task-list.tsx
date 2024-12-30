@@ -1,17 +1,26 @@
+'use client';
+
 import { useQuery } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
 import { Id } from '../../../../convex/_generated/dataModel';
-import { Card, CardHeader, CardTitle } from '@/app/components/ui/card';
-import { Button } from '@/app/components/ui/button';
-import { Clock } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { Button } from '@/app/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 interface StudentTaskListProps {
   classroomId: Id<'classrooms'>;
+  classCode: string;
 }
 
-export function StudentTaskList({ classroomId }: StudentTaskListProps) {
+export function StudentTaskList({
+  classroomId,
+  classCode,
+}: StudentTaskListProps) {
+  const router = useRouter();
   const tasks = useQuery(api.tasks.getClassTasks, { classroomId });
+
+  console.log('StudentTaskList - Props:', { classroomId, classCode });
+  console.log('StudentTaskList - Tasks:', tasks);
 
   if (!tasks) {
     return (
@@ -41,36 +50,37 @@ export function StudentTaskList({ classroomId }: StudentTaskListProps) {
         </div>
       ) : (
         <div className="grid gap-4">
-          {tasks.map((task) => (
-            <Card
-              key={task._id}
-              className="overflow-hidden hover:shadow-md transition-shadow"
-            >
-              <CardHeader className="p-6">
-                <div className="flex flex-col md:flex-row md:items-start md:justify-between">
-                  <div className="space-y-2">
-                    <CardTitle>{task.title}</CardTitle>
-                    <p className="text-gray-600">{task.description}</p>
+          {tasks.map((task) => {
+            const taskPath = `/dashboard/student/classroom/${classCode}/task/${task._id}`;
+            console.log('Task card path:', taskPath); // 调试日志
+
+            return (
+              <div key={task._id} className="border rounded-lg p-4 bg-white">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-semibold">{task.title}</h3>
+                    <p className="text-gray-600 mt-2">{task.description}</p>
                     {task.dueDate && (
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Clock className="w-4 h-4 mr-1" />
-                        <span>Due: {formatDate(task.dueDate)}</span>
-                      </div>
+                      <p className="text-sm text-gray-500 mt-2">
+                        Due: {formatDate(task.dueDate)}
+                      </p>
                     )}
                   </div>
-                  <div className="mt-4 md:mt-0 md:ml-4 flex-shrink-0">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full md:w-auto"
-                    >
-                      View Details
-                    </Button>
-                  </div>
+                  <Button
+                    onClick={() => {
+                      console.log('Navigating to:', taskPath, {
+                        classCode,
+                        taskId: task._id,
+                      });
+                      router.push(taskPath);
+                    }}
+                  >
+                    View Details
+                  </Button>
                 </div>
-              </CardHeader>
-            </Card>
-          ))}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

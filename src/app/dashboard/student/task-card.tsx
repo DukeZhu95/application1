@@ -1,14 +1,9 @@
-// app/components/dashboard/student/task-card.tsx
+'use client';
+
 import { formatDate } from '@/lib/utils';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { Clock, FileText } from 'lucide-react';
+import { Clock } from 'lucide-react';
 
 interface TaskCardProps {
   task: {
@@ -18,46 +13,36 @@ interface TaskCardProps {
     dueDate?: number;
     createdAt: number;
   };
-  classroomId: string;
+  classCode: string;
 }
 
-export function TaskCard({ task, classroomId }: TaskCardProps) {
+export function TaskCard({ task, classCode }: TaskCardProps) {
   const router = useRouter();
 
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>{task.title}</CardTitle>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              router.push(
-                `/dashboard/student/classroom/${classroomId}/task/${task._id}`
-              )
-            }
-          >
-            <FileText className="w-4 h-4 mr-2" />
-            View details
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <p className="text-gray-600">{task.description}</p>
-          <div className="flex items-center space-x-4 text-sm text-gray-500">
-            <div className="flex items-center">
+    <div className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex justify-between items-start">
+        <div>
+          <h3 className="text-lg font-semibold">{task.title}</h3>
+          <p className="text-gray-600 mt-2">{task.description}</p>
+          {task.dueDate && (
+            <div className="flex items-center text-sm text-gray-500 mt-2">
               <Clock className="w-4 h-4 mr-1" />
-              {task.dueDate ? (
-                <span>Due date：{formatDate(task.dueDate)}</span>
-              ) : (
-                <span>No due date</span>
-              )}
+              Due: {formatDate(task.dueDate)}
             </div>
-          </div>
+          )}
         </div>
-      </CardContent>
-    </Card>
+        <Button
+          onClick={() =>
+            router.push(
+              `/dashboard/student/classroom/${classCode}/task/${task._id}`
+            )
+          }
+          variant="secondary"
+        >
+          View Details
+        </Button>
+      </div>
+    </div>
   );
 }
