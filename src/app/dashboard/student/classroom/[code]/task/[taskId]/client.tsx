@@ -6,6 +6,8 @@ import { Button } from '@/app/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/utils';
 import { Id } from '../../../../../../../../convex/_generated/dataModel';
+import { useState } from 'react';
+import { TaskSubmissionForm } from '@/app/dashboard/student/task-submission-form';
 
 interface TaskDetailClientProps {
   classCode: string;
@@ -17,6 +19,8 @@ export default function TaskDetailClient({
   taskId,
 }: TaskDetailClientProps) {
   const router = useRouter();
+  const [isSubmissionFormOpen, setIsSubmissionFormOpen] = useState(false);
+
   console.log('TaskDetailClient - Props received:', { classCode, taskId });
 
   // 验证 taskId
@@ -25,7 +29,6 @@ export default function TaskDetailClient({
     return <div>Error: Task ID is missing</div>;
   }
 
-  // 将 useQuery 移到最外层
   const task = useQuery(api.tasks.getTask, {
     taskId: taskId as Id<'tasks'>,
   });
@@ -99,15 +102,18 @@ export default function TaskDetailClient({
           <div className="pt-6">
             <Button
               className="w-full"
-              onClick={() => {
-                console.log('Submit task:', taskId);
-                // TODO: 实现提交功能
-              }}
+              onClick={() => setIsSubmissionFormOpen(true)}
             >
               Submit Task
             </Button>
           </div>
         </div>
+
+        <TaskSubmissionForm
+          taskId={taskId}
+          isOpen={isSubmissionFormOpen}
+          onClose={() => setIsSubmissionFormOpen(false)}
+        />
       </div>
     </div>
   );
