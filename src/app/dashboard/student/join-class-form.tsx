@@ -12,7 +12,9 @@ import { useRouter } from 'next/navigation';
 
 interface ConvexError {
   message: string;
-  [key: string]: any;
+  code?: string;
+  data?: unknown;
+  stack?: string;
 }
 
 export function JoinClassForm() {

@@ -12,19 +12,24 @@ type ToastProps = {
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
 
-type ActionType = {
-  ADD_TOAST: 'ADD_TOAST';
-  UPDATE_TOAST: 'UPDATE_TOAST';
-  DISMISS_TOAST: 'DISMISS_TOAST';
-  REMOVE_TOAST: 'REMOVE_TOAST';
-};
-
-const actionTypes: ActionType = {
-  ADD_TOAST: 'ADD_TOAST',
-  UPDATE_TOAST: 'UPDATE_TOAST',
-  DISMISS_TOAST: 'DISMISS_TOAST',
-  REMOVE_TOAST: 'REMOVE_TOAST',
-};
+type Action =
+  | {
+      type: 'ADD_TOAST';
+      toast: ToastProps;
+    }
+  | {
+      type: 'UPDATE_TOAST';
+      toast: Partial<ToastProps>;
+      id: string;
+    }
+  | {
+      type: 'DISMISS_TOAST';
+      toastId?: string;
+    }
+  | {
+      type: 'REMOVE_TOAST';
+      toastId?: string;
+    };
 
 let count = 0;
 
@@ -32,27 +37,6 @@ function genId() {
   count = (count + 1) % Number.MAX_VALUE;
   return count.toString();
 }
-
-// type ActionType = typeof actionTypes;
-
-type Action =
-  | {
-      type: ActionType['ADD_TOAST'];
-      toast: ToastProps;
-    }
-  | {
-      type: ActionType['UPDATE_TOAST'];
-      toast: Partial<ToastProps>;
-      id: string;
-    }
-  | {
-      type: ActionType['DISMISS_TOAST'];
-      toastId?: string;
-    }
-  | {
-      type: ActionType['REMOVE_TOAST'];
-      toastId?: string;
-    };
 
 interface State {
   toasts: ToastProps[];
