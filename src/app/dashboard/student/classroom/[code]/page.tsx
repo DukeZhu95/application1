@@ -1,11 +1,11 @@
+import { use } from 'react';
 import ClassroomPageClient from './client';
 
-interface PageProps {
-  params: {
-    code: string;
-  };
-}
-
-export default function ClassroomPage({ params }: PageProps) {
-  return <ClassroomPageClient code={params.code} />;
+export default function ClassroomPage({
+  params,
+}: {
+  params: Promise<{ code: string }>;
+}) {
+  const { code } = use(params);
+  return <ClassroomPageClient code={code} />;
 }
