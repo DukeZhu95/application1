@@ -1,14 +1,16 @@
-import { Suspense } from 'react';
+import { Suspense, use } from 'react';
 import TaskDetailClient from './client';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     code: string;
     taskId: string;
-  };
+  }>;
 }
 
 export default function TaskDetailPage({ params }: PageProps) {
+  const resolvedParams = use(params);
+
   return (
     <Suspense
       fallback={
@@ -23,7 +25,10 @@ export default function TaskDetailPage({ params }: PageProps) {
         </div>
       }
     >
-      <TaskDetailClient classCode={params.code} taskId={params.taskId} />
+      <TaskDetailClient
+        classCode={resolvedParams.code}
+        taskId={resolvedParams.taskId}
+      />
     </Suspense>
   );
 }
