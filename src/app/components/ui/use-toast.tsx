@@ -126,8 +126,6 @@ function dispatch(action: Action) {
   });
 }
 
-interface Toast extends Omit<ToastProps, 'id' | 'open' | 'onOpenChange'> {}
-
 function toast({ ...props }: Toast) {
   const id = genId();
 
