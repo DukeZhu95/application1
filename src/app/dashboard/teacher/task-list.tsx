@@ -5,6 +5,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '../../components/ui/card';
 import { formatDate } from '@/lib/utils';
 import { Id } from '../../../../convex/_generated/dataModel';
@@ -13,6 +14,7 @@ import { useState } from 'react';
 import { Button } from '@/app/components/ui/button';
 import { Edit2, Trash2 } from 'lucide-react';
 import { EditTaskDialog } from './edit-task-dialog';
+import { SubmissionList } from './submission-list';
 
 interface Task {
   _id: Id<'tasks'>;
@@ -28,6 +30,7 @@ interface TaskListProps {
 
 export function TaskList({ classId }: TaskListProps) {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [expandedTask, setExpandedTask] = useState<Id<'tasks'> | null>(null);
   const deleteTask = useMutation(api.tasks.deleteTask);
   const tasks = useQuery(api.tasks.getClassTasks, { classroomId: classId });
 
@@ -103,6 +106,23 @@ export function TaskList({ classId }: TaskListProps) {
                   </p>
                 )}
               </CardContent>
+              <CardFooter className="flex justify-between items-center">
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    setExpandedTask(expandedTask === task._id ? null : task._id)
+                  }
+                >
+                  {expandedTask === task._id
+                    ? 'Hide Submissions'
+                    : 'View Submissions'}
+                </Button>
+              </CardFooter>
+              {expandedTask === task._id && (
+                <CardContent className="pt-0">
+                  <SubmissionList taskId={task._id} />
+                </CardContent>
+              )}
             </Card>
           ))}
         </div>

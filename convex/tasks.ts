@@ -176,14 +176,15 @@ export const getTaskSubmissions = query({
   args: { taskId: v.id('tasks') },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error('Not authorized');
+    if (!identity) throw new Error('Not authenticated');
 
-    // 验证是否是教师
+    // 获取任务信息以验证教师身份
     const task = await ctx.db.get(args.taskId);
     if (!task || task.teacherId !== identity.subject) {
       throw new Error('Not authorized to view submissions');
     }
 
+    // 获取所有提交
     return await ctx.db
       .query('taskSubmissions')
       .withIndex('by_task', (q) => q.eq('taskId', args.taskId))

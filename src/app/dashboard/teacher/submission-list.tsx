@@ -9,6 +9,7 @@ import {
 } from '@/app/components/ui/card';
 import { GradeSubmissionForm } from './grade-submission-form';
 import { Id } from '../../../../convex/_generated/dataModel';
+import { FileIcon } from 'lucide-react'; // 添加文件图标
 
 interface SubmissionListProps {
   taskId: Id<'tasks'>;
@@ -59,7 +60,25 @@ export function SubmissionList({ taskId }: SubmissionListProps) {
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-medium">Content:</h4>
-                    <p className="mt-1 text-gray-600">{submission.content}</p>
+                    <p className="mt-1 text-gray-600 whitespace-pre-wrap">
+                      {submission.content}
+                    </p>
+
+                    {/* 添加附件显示 */}
+                    {submission.attachmentUrl && (
+                      <div className="mt-4">
+                        <h4 className="font-medium mb-2">Attachment:</h4>
+                        <a
+                          href={submission.attachmentUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center text-blue-500 hover:text-blue-600 gap-2"
+                        >
+                          <FileIcon className="w-4 h-4" />
+                          {submission.attachmentName || 'Download Attachment'}
+                        </a>
+                      </div>
+                    )}
                   </div>
 
                   {submission.status === 'graded' ? (

@@ -119,20 +119,46 @@ export default function TaskDetailClient({
         {submission && (
           <div className="mt-8 p-4 border rounded-lg">
             <h2 className="text-lg font-semibold mb-2">Your Submission</h2>
-            <p className="whitespace-pre-wrap">{submission.content}</p>
-            {submission.attachmentUrl && (
-              <div className="mt-2">
-                <a
-                  href={submission.attachmentUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-500 hover:underline flex items-center gap-2"
-                >
-                  <FileIcon className="w-4 h-4" />
-                  {submission.attachmentName || 'Download Attachment'}
-                </a>
+            <div className="space-y-4">
+              {/* 提交内容 */}
+              <div>
+                <p className="whitespace-pre-wrap">{submission.content}</p>
+                {submission.attachmentUrl && (
+                  <div className="mt-2">
+                    <a
+                      href={submission.attachmentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline flex items-center gap-2"
+                    >
+                      <FileIcon className="w-4 h-4" />
+                      {submission.attachmentName || 'Download Attachment'}
+                    </a>
+                  </div>
+                )}
               </div>
-            )}
+
+              {/* 评分和反馈部分 */}
+              {submission.status === 'graded' && (
+                <div className="mt-4 bg-gray-50 p-4 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold">Grade</h3>
+                    <span className="text-lg font-bold">
+                      {submission.grade}
+                    </span>
+                  </div>
+                  {submission.feedback && (
+                    <div className="mt-2">
+                      <h3 className="font-semibold mb-1">Teacher's Feedback</h3>
+                      <p className="text-gray-700">{submission.feedback}</p>
+                    </div>
+                  )}
+                  <p className="text-sm text-gray-500 mt-2">
+                    Graded on: {formatDate(submission.gradedAt!)}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
