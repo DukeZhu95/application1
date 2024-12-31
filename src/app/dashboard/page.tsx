@@ -1,9 +1,6 @@
 import { UserButton } from '@clerk/nextjs';
-import { auth } from '@clerk/nextjs/server';
 
 export default async function DashboardPage() {
-  const { userId } = await auth();
-
   return (
     <div className="min-h-screen bg-white">
       {' '}

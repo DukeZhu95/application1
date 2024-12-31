@@ -12,12 +12,19 @@ type ToastProps = {
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
 
-const actionTypes = {
+type ActionType = {
+  ADD_TOAST: 'ADD_TOAST';
+  UPDATE_TOAST: 'UPDATE_TOAST';
+  DISMISS_TOAST: 'DISMISS_TOAST';
+  REMOVE_TOAST: 'REMOVE_TOAST';
+};
+
+const actionTypes: ActionType = {
   ADD_TOAST: 'ADD_TOAST',
   UPDATE_TOAST: 'UPDATE_TOAST',
   DISMISS_TOAST: 'DISMISS_TOAST',
   REMOVE_TOAST: 'REMOVE_TOAST',
-} as const;
+};
 
 let count = 0;
 
@@ -26,7 +33,7 @@ function genId() {
   return count.toString();
 }
 
-type ActionType = typeof actionTypes;
+// type ActionType = typeof actionTypes;
 
 type Action =
   | {
@@ -49,6 +56,12 @@ type Action =
 
 interface State {
   toasts: ToastProps[];
+}
+
+interface Toast extends Omit<ToastProps, 'id' | 'open' | 'onOpenChange'> {
+  title?: string;
+  description?: string;
+  variant?: 'default' | 'destructive';
 }
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>();

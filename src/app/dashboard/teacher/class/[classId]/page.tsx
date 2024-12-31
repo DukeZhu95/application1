@@ -7,12 +7,6 @@ import { Id } from '../../../../../../convex/_generated/dataModel';
 import { TaskForm } from '@/app/dashboard/teacher/task-form';
 import { TaskList } from '@/app/dashboard/teacher/task-list';
 
-interface ClassDetailsPageProps {
-  params: {
-    classId: Id<'classrooms'>;
-  };
-}
-
 export default function ClassDetailsPage() {
   const router = useRouter();
   const pathSegments = window.location.pathname.split('/');

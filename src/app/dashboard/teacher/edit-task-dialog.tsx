@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useMutation } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
+import { Id } from '../../../../convex/_generated/dataModel';
 import {
   Dialog,
   DialogContent,
@@ -23,7 +24,17 @@ const taskSchema = z.object({
 
 type TaskFormData = z.infer<typeof taskSchema>;
 
-export function EditTaskDialog({ task, onClose }: any) {
+interface EditTaskDialogProps {
+  task: {
+    _id: Id<'tasks'>;
+    title: string;
+    description: string;
+    dueDate?: number;
+  };
+  onClose: () => void;
+}
+
+export function EditTaskDialog({ task, onClose }: EditTaskDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const updateTask = useMutation(api.tasks.updateTask);
 
@@ -55,7 +66,7 @@ export function EditTaskDialog({ task, onClose }: any) {
         description: 'Task updated successfully',
       });
       onClose();
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to update task',

@@ -39,7 +39,7 @@ export function TaskList({ classId }: TaskListProps) {
           title: 'Success',
           description: 'Task deleted successfully',
         });
-      } catch (error) {
+      } catch {
         toast({
           title: 'Error',
           description: 'Failed to delete task',

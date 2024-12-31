@@ -10,6 +10,11 @@ import { toast } from '@/app/components/ui/use-toast';
 import { Card, CardContent } from '@/app/components/ui/card';
 import { useRouter } from 'next/navigation';
 
+interface ConvexError {
+  message: string;
+  [key: string]: any;
+}
+
 export function JoinClassForm() {
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -44,15 +49,19 @@ export function JoinClassForm() {
       // 使用 router.push 到当前路径来触发页面刷新
       const currentPath = window.location.pathname;
       router.push(currentPath);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error joining class:', error);
 
-      // 处理特定错误消息
+      // 使用类型守卫来检查错误
+      const convexError = error as ConvexError;
       let errorMessage = 'Failed to join class';
-      if (error.message.includes('already a member')) {
-        errorMessage = 'You are already a member of this class';
-      } else if (error.message.includes('not found')) {
-        errorMessage = 'Class not found. Please check the code and try again';
+
+      if (convexError.message) {
+        if (convexError.message.includes('already a member')) {
+          errorMessage = 'You are already a member of this class';
+        } else if (convexError.message.includes('not found')) {
+          errorMessage = 'Class not found. Please check the code and try again';
+        }
       }
 
       toast({

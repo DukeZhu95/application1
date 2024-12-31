@@ -21,23 +21,20 @@ export default function TaskDetailClient({
 }: TaskDetailClientProps) {
   const router = useRouter();
   const [isSubmissionFormOpen, setIsSubmissionFormOpen] = useState(false);
-  const submission = useQuery(api.tasks.getTaskSubmission, {
+
+  const task = useQuery(api.tasks.getTask, {
     taskId: taskId as Id<'tasks'>,
   });
 
-  // console.log('TaskDetailClient - Props received:', { classCode, taskId });
+  const submission = useQuery(api.tasks.getTaskSubmission, {
+    taskId: taskId as Id<'tasks'>,
+  });
 
   // 验证 taskId
   if (!taskId) {
     console.error('TaskDetailClient - No taskId provided');
     return <div>Error: Task ID is missing</div>;
   }
-
-  const task = useQuery(api.tasks.getTask, {
-    taskId: taskId as Id<'tasks'>,
-  });
-
-  // console.log('TaskDetailClient - Query result:', task);
 
   // 加载状态
   if (!task) {

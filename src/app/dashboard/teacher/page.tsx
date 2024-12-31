@@ -47,7 +47,8 @@ export default function TeacherDashboard() {
         message: `Class "${className}" created successfully with code: ${code}`,
       });
       setClassName('');
-    } catch (error) {
+    } catch {
+      // 移除未使用的 error 参数
       setFeedback({
         type: 'error',
         message: 'Failed to create class. Please try again.',
