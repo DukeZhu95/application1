@@ -47,7 +47,7 @@ export const getClassTasks = query({
 });
 
 // 获取任务详情
-export const getStudentTaskStatus = query({
+query({
   args: {
     taskId: v.id('tasks'),
   },
@@ -67,7 +67,6 @@ export const getStudentTaskStatus = query({
     };
   },
 });
-
 // 提交任务
 type TaskSubmissionData = {
   content: string;

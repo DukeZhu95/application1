@@ -59,47 +59,35 @@ export default function TeacherDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <nav className="border-b">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between h-16 items-center">
-            <h1 className="text-2xl font-bold text-black">Teacher Dashboard</h1>
+    <div className="dashboard-container">
+      <nav className="dashboard-nav">
+        <div className="container">
+          <div className="nav-content">
+            <h1>Teacher Dashboard</h1>
             <UserButton />
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="space-y-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Create New Class
-            </h2>
+      <main className="container">
+        <div className="dashboard-sections">
+          {/* 创建新班级部分 */}
+          <section className="dashboard-section">
+            <h2>Create New Class</h2>
             {feedback && (
-              <div
-                className={`p-4 rounded-md mb-4 ${
-                  feedback.type === 'success'
-                    ? 'bg-green-50 text-green-700'
-                    : 'bg-red-50 text-red-700'
-                }`}
-              >
+              <div className={`feedback-message ${feedback.type}`}>
                 {feedback.message}
               </div>
             )}
-            <div className="space-y-4">
+            <div className="form-group">
               <div>
-                <label
-                  htmlFor="className"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Class Name
-                </label>
+                <label htmlFor="className">Class Name</label>
                 <input
                   type="text"
                   id="className"
                   value={className}
                   onChange={(e) => setClassName(e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="form-input"
                   placeholder="Enter class name"
                   disabled={isCreating}
                 />
@@ -110,64 +98,60 @@ export default function TeacherDashboard() {
                 isDisabled={isCreating}
               />
             </div>
-          </div>
+          </section>
+
+          {/* 班级列表部分 */}
+          <section className="dashboard-section">
+            <h2>Your Classes</h2>
+            {classes === undefined ? (
+              <p className="status-message">Loading classes...</p>
+            ) : classes.length === 0 ? (
+              <p className="status-message">No classes created yet.</p>
+            ) : (
+              <div className="class-grid">
+                {classes.map((classItem) => (
+                  <div key={classItem._id} className="class-card">
+                    <div className="class-card-header">
+                      <h3>{classItem.name}</h3>
+                      <p className="class-code">Code: {classItem.code}</p>
+                      <p className="student-count">
+                        {classItem.students.length} student(s)
+                      </p>
+                    </div>
+
+                    <div className="class-card-actions">
+                      <Button
+                        onClick={() =>
+                          router.push(
+                            `/dashboard/teacher/class/${classItem._id}`
+                          )
+                        }
+                        variant="outline"
+                        className="action-button"
+                      >
+                        View Details
+                      </Button>
+                      <Button
+                        onClick={() => setCurrentClass(classItem._id)}
+                        className="action-button primary"
+                      >
+                        Create Task
+                      </Button>
+                    </div>
+
+                    {currentClass === classItem._id && (
+                      <CreateTaskForm
+                        classId={classItem._id}
+                        onClose={() => setCurrentClass(null)}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
         </div>
       </main>
-
-      <div className="bg-white p-6 rounded-lg shadow-sm mt-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          Your Classes
-        </h2>
-        {classes === undefined ? (
-          <p className="text-gray-500">Loading classes...</p>
-        ) : classes.length === 0 ? (
-          <p className="text-gray-500">No classes created yet.</p>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {classes.map((classItem) => (
-              <div
-                key={classItem._id}
-                className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-              >
-                <h3 className="font-semibold text-lg">{classItem.name}</h3>
-                <p className="text-sm text-gray-600 mt-1">
-                  Code: {classItem.code}
-                </p>
-                <div className="mt-2 text-sm text-gray-500">
-                  {classItem.students.length} student(s)
-                </div>
-
-                {/* 添加创建任务按钮 */}
-                <div className="mt-4 space-y-2">
-                  <Button
-                    onClick={() =>
-                      router.push(`/dashboard/teacher/class/${classItem._id}`)
-                    }
-                    variant="outline"
-                    className="w-full"
-                  >
-                    View Details
-                  </Button>
-                  <Button
-                    onClick={() => setCurrentClass(classItem._id)}
-                    className="w-full"
-                  >
-                    Create Task
-                  </Button>
-                </div>
-
-                {/* 当前选中的班级显示任务创建表单 */}
-                {currentClass === classItem._id && (
-                  <CreateTaskForm
-                    classId={classItem._id}
-                    onClose={() => setCurrentClass(null)}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 }

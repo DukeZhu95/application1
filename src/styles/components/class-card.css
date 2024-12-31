@@ -1,0 +1,41 @@
+/* src/styles/components/class-card.css */
+.class-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-4);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-bottom: var(--spacing-4);
+}
+
+.class-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-200);
+}
+
+.class-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-2);
+}
+
+.class-title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.class-code {
+    color: var(--primary-500);
+    font-size: var(--text-sm);
+    font-family: var(--font-mono), serif;
+}
+
+.class-meta {
+    color: var(--gray-500);
+    font-size: var(--text-sm);
+    margin-top: var(--spacing-2);
+}

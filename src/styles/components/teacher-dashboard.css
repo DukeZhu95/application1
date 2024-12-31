@@ -1,0 +1,93 @@
+/* src/styles/components/teacher-dashboard.css */
+.dashboard-sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+    padding: var(--spacing-8) 0;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
+.form-input {
+    width: 100%;
+    padding: var(--spacing-2) var(--spacing-3);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 2px var(--primary-100);
+}
+
+.feedback-message {
+    padding: var(--spacing-4);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-4);
+}
+
+.feedback-message.success {
+    background-color: var(--success);
+    color: white;
+}
+
+.feedback-message.error {
+    background-color: var(--error);
+    color: white;
+}
+
+.class-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-4);
+}
+
+.class-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-4);
+    transition: all 0.3s ease;
+}
+
+.class-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.class-card-header h3 {
+    color: var(--gray-700);
+    margin-bottom: var(--spacing-2);
+}
+
+.class-code {
+    color: var(--gray-500);
+    font-size: var(--text-sm);
+}
+
+.student-count {
+    color: var(--gray-500);
+    font-size: var(--text-sm);
+    margin-top: var(--spacing-2);
+}
+
+.class-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+    margin-top: var(--spacing-4);
+}
+
+.action-button {
+    width: 100%;
+}
+
+.action-button.primary {
+    background-color: var(--primary-500);
+    color: white;
+}

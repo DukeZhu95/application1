@@ -1,0 +1,45 @@
+/* src/styles/components/student-dashboard.css */
+.dashboard-container {
+    min-height: 100vh;
+    background-color: var(--gray-50);
+}
+
+.dashboard-nav {
+    background-color: white;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 4rem;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-8);
+    padding: var(--spacing-8) 0;
+}
+
+.dashboard-section {
+    background-color: white;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+    box-shadow: var(--shadow-sm);
+}
+
+.section-header {
+    margin-bottom: var(--spacing-6);
+}
+
+.section-description {
+    color: var(--gray-600);
+}
+
+@media (min-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

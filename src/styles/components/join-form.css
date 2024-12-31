@@ -1,0 +1,43 @@
+/* src/styles/components/join-form.css */
+.join-form {
+    width: 100%;
+}
+
+.form-input {
+    width: 100%;
+    padding: var(--spacing-3) var(--spacing-4);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    transition: all 0.3s ease;
+    margin-bottom: var(--spacing-4);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-400);
+    box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+.form-input::placeholder {
+    color: var(--gray-400);
+}
+
+.join-button {
+    width: 100%;
+    background: var(--primary-500);
+    color: white;
+    padding: var(--spacing-3) var(--spacing-4);
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.join-button:hover {
+    background: var(--primary-600);
+}
+
+.join-button:disabled {
+    background: var(--gray-300);
+    cursor: not-allowed;
+}

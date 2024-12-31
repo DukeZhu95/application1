@@ -8,43 +8,41 @@ import { RouteGuard } from '@/app/components/auth/route-guard';
 export default function StudentDashboard() {
   return (
     <RouteGuard>
-      <div className="min-h-screen bg-white">
-        <nav className="border-b">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex justify-between h-16 items-center">
-              <h1 className="text-2xl font-bold text-black">
-                Student Dashboard
-              </h1>
+      <div className="dashboard-container">
+        {/* 导航栏 */}
+        <nav className="dashboard-nav">
+          <div className="container">
+            <div className="nav-content">
+              <h1>Student Dashboard</h1>
               <UserButton afterSignOutUrl="/auth/sign-in" />
             </div>
           </div>
         </nav>
 
-        <main className="max-w-7xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* 主要内容 */}
+        <main className="container">
+          <div className="dashboard-grid">
             {/* 加入班级部分 */}
-            <div className="space-y-8">
-              <div className="text-center lg:text-left">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                  Join a class
-                </h2>
-                <p className="text-gray-600 mb-8">
+            <section className="dashboard-section">
+              <div className="section-header">
+                <h2>Join a class</h2>
+                <p className="section-description">
                   Input the class code to join a class
                 </p>
               </div>
               <JoinClassForm />
-            </div>
+            </section>
 
             {/* 班级列表部分 */}
-            <div>
-              <div className="mb-8">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                  My classes
-                </h2>
-                <p className="text-gray-600">View all your enrolled classes</p>
+            <section className="dashboard-section">
+              <div className="section-header">
+                <h2>My classes</h2>
+                <p className="section-description">
+                  View all your enrolled classes
+                </p>
               </div>
               <StudentClassList />
-            </div>
+            </section>
           </div>
         </main>
       </div>

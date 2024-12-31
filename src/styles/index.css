@@ -1,0 +1,7 @@
+@import './global/variables.css';
+@import './global/reset.css';
+@import './global/base.css';
+
+@import './components/student-dashboard.css';
+@import './components/class-card.css';
+@import './components/join-form.css';

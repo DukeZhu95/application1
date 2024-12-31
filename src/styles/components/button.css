@@ -1,0 +1,74 @@
+/* src/styles/components/button.css */
+.button-base {
+    /* 基础样式 */
+    display: inline-flex;
+    align-items: center;
+    justify-center: center;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+/* 变体样式 */
+.button-default {
+    background-color: var(--primary-500);
+    color: white;
+}
+
+.button-default:hover {
+    background-color: var(--primary-600);
+}
+
+.button-secondary {
+    background-color: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.button-secondary:hover {
+    background-color: var(--gray-300);
+}
+
+.button-outline {
+    background-color: transparent;
+    border: 1px solid var(--gray-300);
+    color: var(--gray-700);
+}
+
+.button-outline:hover {
+    background-color: var(--gray-100);
+    color: var(--primary-500);
+}
+
+.button-ghost {
+    background-color: transparent;
+    color: var(--gray-700);
+}
+
+.button-ghost:hover {
+    background-color: var(--gray-100);
+    color: var(--primary-500);
+}
+
+/* 尺寸变体 */
+.button-size-default {
+    height: 2.5rem; /* h-10 */
+    padding: 0.5rem 1rem; /* px-4 py-2 */
+}
+
+.button-size-sm {
+    height: 2.25rem; /* h-9 */
+    padding: 0 0.75rem; /* px-3 */
+}
+
+.button-size-lg {
+    height: 2.75rem; /* h-11 */
+    padding: 0 2rem; /* px-8 */
+}
+
+/* 焦点状态 */
+.button-base:focus-visible {
+    outline: none;
+    ring: 2px;
+    ring-offset: 2px;
+    ring-color: var(--primary-200);
+}
