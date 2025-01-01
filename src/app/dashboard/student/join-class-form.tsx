@@ -7,7 +7,6 @@ import { api } from '../../../../convex/_generated/api';
 import { Input } from '@/app/components/ui/input';
 import { Button } from '@/app/components/ui/button';
 import { toast } from '@/app/components/ui/use-toast';
-import { Card, CardContent } from '@/app/components/ui/card';
 import { useRouter } from 'next/navigation';
 
 interface ConvexError {

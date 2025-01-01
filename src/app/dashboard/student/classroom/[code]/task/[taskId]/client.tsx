@@ -149,7 +149,9 @@ export default function TaskDetailClient({
                   </div>
                   {submission.feedback && (
                     <div className="mt-2">
-                      <h3 className="font-semibold mb-1">Teacher's Feedback</h3>
+                      <h3 className="font-semibold mb-1">
+                        Teacher&apos;s Feedback
+                      </h3>
                       <p className="text-gray-700">{submission.feedback}</p>
                     </div>
                   )}
