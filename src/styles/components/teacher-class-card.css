@@ -1,0 +1,38 @@
+.teacher-class-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    width: 100%;
+}
+
+.class-head {
+    margin-bottom: 16px;
+}
+
+.class-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.class-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.class-code {
+    color: rgb(59 130 246);
+    font-size: 14px;
+}
+
+.student-count {
+    color: rgb(107 114 128);
+    font-size: 14px;
+}
+
+.class-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}

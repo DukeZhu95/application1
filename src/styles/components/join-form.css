@@ -1,43 +1,77 @@
 /* src/styles/components/join-form.css */
-.join-form {
+.form-container {
     width: 100%;
+    max-width: 28rem; /* max-w-md */
+    margin: 0 auto;
+    background-color: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.form-content {
+    padding: var(--spacing-6);
+}
+
+.form-title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin-bottom: var(--spacing-4);
+    color: var(--gray-700);
+}
+
+.form-group {
+    display: flex;
+    gap: var(--spacing-2);
+    margin-bottom: var(--spacing-4);
 }
 
 .form-input {
     width: 100%;
-    padding: var(--spacing-3) var(--spacing-4);
-    border: 2px solid var(--gray-200);
+    padding: var(--spacing-2) var(--spacing-4);
+    border: 1px solid var(--gray-300);
     border-radius: var(--radius-md);
     font-size: var(--text-base);
     transition: all 0.3s ease;
-    margin-bottom: var(--spacing-4);
 }
 
 .form-input:focus {
     outline: none;
-    border-color: var(--primary-400);
-    box-shadow: 0 0 0 3px var(--primary-100);
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 2px var(--primary-100);
 }
 
-.form-input::placeholder {
-    color: var(--gray-400);
+.form-input:disabled {
+    background-color: var(--gray-100);
+    cursor: not-allowed;
 }
 
-.join-button {
+.form-button {
     width: 100%;
-    background: var(--primary-500);
+    padding: var(--spacing-2) var(--spacing-4);
+    background-color: var(--primary-500);
     color: white;
-    padding: var(--spacing-3) var(--spacing-4);
     border-radius: var(--radius-md);
     font-weight: 500;
     transition: background-color 0.3s ease;
 }
 
-.join-button:hover {
-    background: var(--primary-600);
+.form-button:hover:not(:disabled) {
+    background-color: var(--primary-600);
 }
 
-.join-button:disabled {
-    background: var(--gray-300);
+.form-button:disabled {
+    opacity: 0.5;
     cursor: not-allowed;
+}
+
+.form-error {
+    color: var(--error);
+    font-size: var(--text-sm);
+    margin-top: var(--spacing-1);
+}
+
+.form-success {
+    color: var(--success);
+    font-size: var(--text-sm);
+    margin-top: var(--spacing-1);
 }

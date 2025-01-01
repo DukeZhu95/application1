@@ -77,15 +77,15 @@ export function JoinClassForm() {
   };
 
   return (
-    <Card>
-      <CardContent className="pt-6">
+    <div className="form-container">
+      <div className="form-content">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
+          <div className="form-group">
             <Input
               placeholder="Enter class code (e.g., COM555)"
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
-              className="uppercase"
+              className="form-input uppercase"
               disabled={isLoading}
               required
               minLength={4}
@@ -94,13 +94,13 @@ export function JoinClassForm() {
           </div>
           <Button
             type="submit"
-            className="w-full"
+            className="form-button"
             disabled={!code.trim() || isLoading}
           >
             {isLoading ? 'Joining...' : 'Join class'}
           </Button>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

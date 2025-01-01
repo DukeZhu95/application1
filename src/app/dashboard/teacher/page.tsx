@@ -81,7 +81,7 @@ export default function TeacherDashboard() {
             )}
             <div className="form-group">
               <div>
-                <label htmlFor="className">Class Name</label>
+                <label htmlFor="className">(Not Class Code)</label>
                 <input
                   type="text"
                   id="className"

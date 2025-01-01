@@ -26,29 +26,31 @@ export function UserIdInput({ onIdSubmit }: UserIdInputProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <Input
-          {...register('alphanumericId')}
-          placeholder="Enter 6-character ID"
-          className="uppercase"
-          maxLength={6}
-          onChange={(e) => {
-            e.target.value = e.target.value.toUpperCase();
-            register('alphanumericId')
-              .onChange(e)
-              .then((r) => r);
-          }}
-        />
-        {errors.alphanumericId && (
-          <p className="text-sm text-red-500 mt-1">
-            {errors.alphanumericId.message}
-          </p>
-        )}
+    <div className="form-container">
+      <div className="form-content">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="form-group">
+            <Input
+              {...register('alphanumericId')}
+              placeholder="Enter 6-character ID"
+              className="form-input uppercase"
+              maxLength={6}
+              onChange={(e) => {
+                e.target.value = e.target.value.toUpperCase();
+                register('alphanumericId')
+                  .onChange(e)
+                  .then((r) => r);
+              }}
+            />
+          </div>
+          {errors.alphanumericId && (
+            <p className="form-error">{errors.alphanumericId.message}</p>
+          )}
+          <Button type="submit" className="form-button">
+            Continue
+          </Button>
+        </form>
       </div>
-      <Button type="submit" className="w-full">
-        Continue
-      </Button>
-    </form>
+    </div>
   );
 }

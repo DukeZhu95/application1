@@ -16,17 +16,12 @@ export function StudentClassList() {
   const { user } = useUser();
   const router = useRouter();
 
-  console.log('StudentClassList - Current user:', user);
-
   const classes = useQuery(
     api.classes.getStudentClasses,
     user?.id ? { studentId: user.id } : 'skip'
   );
 
-  console.log('StudentClassList - Query result:', classes);
-
   if (!user?.id) {
-    console.log('StudentClassList - No user ID');
     return (
       <Card>
         <CardContent className="text-center py-6">
@@ -37,7 +32,6 @@ export function StudentClassList() {
   }
 
   if (!classes) {
-    console.log('StudentClassList - Loading classes...');
     return (
       <div className="space-y-4">
         {[1, 2].map((n) => (
@@ -62,7 +56,6 @@ export function StudentClassList() {
     );
   }
 
-  console.log('StudentClassList - Rendering classes:', classes);
   return (
     <div className="space-y-4">
       {classes.map((classroom) => (
