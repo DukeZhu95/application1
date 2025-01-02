@@ -73,25 +73,25 @@ export default function TeacherDashboard() {
         <div className="dashboard-sections">
           {/* 创建新班级部分 */}
           <section className="dashboard-section">
-            <h2>Create New Class</h2>
+            {/*<h2>Create New Class</h2>*/}
             {feedback && (
               <div className={`feedback-message ${feedback.type}`}>
                 {feedback.message}
               </div>
             )}
             <div className="form-group">
-              <div>
-                <label htmlFor="className">(Not Class Code)</label>
-                <input
-                  type="text"
-                  id="className"
-                  value={className}
-                  onChange={(e) => setClassName(e.target.value)}
-                  className="form-input"
-                  placeholder="Enter class name"
-                  disabled={isCreating}
-                />
-              </div>
+              {/*<div>*/}
+              {/*  <label htmlFor="className">(Not Class Code)</label>*/}
+              {/*  <input*/}
+              {/*    type="text"*/}
+              {/*    id="className"*/}
+              {/*    value={className}*/}
+              {/*    onChange={(e) => setClassName(e.target.value)}*/}
+              {/*    className="form-input"*/}
+              {/*    placeholder="Enter class name"*/}
+              {/*    disabled={isCreating}*/}
+              {/*  />*/}
+              {/*</div>*/}
               <ClassCodeInput
                 userRole="teacher"
                 onClassCreated={handleClassCreated}
