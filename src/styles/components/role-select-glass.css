@@ -1,0 +1,484 @@
+/* ===================================
+   玻璃态设计 - 角色选择页面
+   Glassmorphism Design for Role Selection
+   =================================== */
+
+/* 主容器 */
+.glass-role-select-container {
+  min-height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem;
+}
+
+/* 动态渐变背景 */
+.glass-role-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #43e97b 100%);
+}
+
+.glass-role-gradient-1,
+.glass-role-gradient-2,
+.glass-role-gradient-3 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.7;
+  animation: roleFloat 25s ease-in-out infinite;
+}
+
+.glass-role-gradient-1 {
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.9) 0%, transparent 70%);
+  top: -15%;
+  left: -15%;
+  animation-delay: 0s;
+}
+
+.glass-role-gradient-2 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(240, 147, 251, 0.9) 0%, transparent 70%);
+  top: 30%;
+  right: -15%;
+  animation-delay: 8s;
+}
+
+.glass-role-gradient-3 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(79, 172, 254, 0.9) 0%, transparent 70%);
+  bottom: -15%;
+  left: 35%;
+  animation-delay: 16s;
+}
+
+@keyframes roleFloat {
+  0%, 100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translate(40px, -40px) scale(1.1) rotate(90deg);
+  }
+  50% {
+    transform: translate(-30px, 30px) scale(0.9) rotate(180deg);
+  }
+  75% {
+    transform: translate(50px, 20px) scale(1.05) rotate(270deg);
+  }
+}
+
+/* 内容容器 */
+.glass-role-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1400px;
+  animation: fadeInScale 0.8s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 顶部标题区域 */
+.glass-role-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  animation: slideDown 0.6s ease-out;
+}
+
+.glass-role-sparkle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  color: #667eea;
+  margin-bottom: 1rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 12px 48px rgba(102, 126, 234, 0.3);
+  }
+}
+
+.glass-role-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: white;
+  margin: 0 0 0.75rem 0;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  line-height: 1.2;
+}
+
+.glass-role-subtitle {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-weight: 500;
+}
+
+/* 卡片网格 */
+.glass-role-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+/* 角色卡片 */
+.glass-role-card {
+  position: relative;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 28px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.glass-role-teacher {
+  animation-delay: 0.1s;
+}
+
+.glass-role-student {
+  animation-delay: 0.2s;
+}
+
+.glass-role-card-hovered {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+.glass-role-card-dimmed {
+  opacity: 0.6;
+  transform: scale(0.98);
+}
+
+/* 卡片发光效果 */
+.glass-role-card-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.glass-role-card-hovered .glass-role-card-glow {
+  opacity: 1;
+}
+
+.glass-role-teacher-glow {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+}
+
+.glass-role-student-glow {
+  background: linear-gradient(90deg, #4facfe 0%, #00f2fe 50%, #43e97b 100%);
+}
+
+/* 卡片内容 */
+.glass-role-card-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* 图标包装器 */
+.glass-role-icon-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 28px;
+  margin-bottom: 1.5rem;
+  color: white;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-role-teacher-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+}
+
+.glass-role-student-icon {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  box-shadow: 0 12px 40px rgba(79, 172, 254, 0.4);
+}
+
+.glass-role-card-hovered .glass-role-icon-wrapper {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.glass-role-icon-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 36px;
+  border: 3px solid currentColor;
+  opacity: 0.2;
+  transition: all 0.5s ease;
+}
+
+.glass-role-card-hovered .glass-role-icon-ring {
+  inset: -16px;
+  opacity: 0.4;
+  border-radius: 40px;
+}
+
+/* 卡片标题和描述 */
+.glass-role-card-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 0.75rem 0;
+}
+
+.glass-role-card-description {
+  font-size: 1rem;
+  color: rgba(0, 0, 0, 0.7);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+/* 特性列表 */
+.glass-role-features {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.glass-role-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4a5568;
+  transition: all 0.3s ease;
+}
+
+.glass-role-teacher .glass-role-feature {
+  color: #667eea;
+}
+
+.glass-role-student .glass-role-feature {
+  color: #4facfe;
+}
+
+.glass-role-card-hovered .glass-role-feature {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateX(4px);
+}
+
+/* 按钮 */
+.glass-role-btn {
+  width: 100%;
+  padding: 1rem 1.75rem !important;
+  border-radius: 14px !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.625rem !important;
+  border: none !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  color: white !important;
+}
+
+.glass-role-teacher-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4) !important;
+}
+
+.glass-role-teacher-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 36px rgba(102, 126, 234, 0.5) !important;
+}
+
+.glass-role-student-btn {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+  box-shadow: 0 8px 24px rgba(79, 172, 254, 0.4) !important;
+}
+
+.glass-role-student-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 36px rgba(79, 172, 254, 0.5) !important;
+}
+
+.glass-role-btn:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+/* 底部提示 */
+.glass-role-footer {
+  text-align: center;
+  animation: fadeIn 1s ease-out 0.6s;
+  animation-fill-mode: both;
+}
+
+.glass-role-footer p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .glass-role-cards {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .glass-role-card {
+    padding: 2.5rem;
+  }
+
+  .glass-role-icon-wrapper {
+    width: 140px;
+    height: 140px;
+  }
+}
+
+@media (max-width: 768px) {
+  .glass-role-select-container {
+    padding: 1.5rem;
+  }
+
+  .glass-role-title {
+    font-size: 2rem;
+  }
+
+  .glass-role-subtitle {
+    font-size: 1rem;
+  }
+
+  .glass-role-card {
+    padding: 2rem;
+  }
+
+  .glass-role-icon-wrapper {
+    width: 120px;
+    height: 120px;
+  }
+
+  .glass-role-card-title {
+    font-size: 1.75rem;
+  }
+
+  .glass-role-card-description {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .glass-role-select-container {
+    padding: 1rem;
+  }
+
+  .glass-role-title {
+    font-size: 1.75rem;
+  }
+
+  .glass-role-card {
+    padding: 1.5rem;
+  }
+
+  .glass-role-icon-wrapper {
+    width: 100px;
+    height: 100px;
+  }
+
+  .glass-role-features {
+    gap: 0.75rem;
+  }
+
+  .glass-role-feature {
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+  }
+}

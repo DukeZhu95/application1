@@ -1,0 +1,426 @@
+/* ===================================
+   玻璃态设计 - 学生仪表板
+   Glassmorphism Design for Student Dashboard
+   =================================== */
+
+/* 主容器 */
+.glass-student-container {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 动态渐变背景 - 使用更活泼的配色 */
+.glass-student-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #43e97b 100%);
+}
+
+.glass-student-gradient-1,
+.glass-student-gradient-2,
+.glass-student-gradient-3 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.6;
+  animation: studentFloat 20s ease-in-out infinite;
+}
+
+.glass-student-gradient-1 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(79, 172, 254, 0.8) 0%, transparent 70%);
+  top: -10%;
+  left: -10%;
+  animation-delay: 0s;
+}
+
+.glass-student-gradient-2 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(67, 233, 123, 0.8) 0%, transparent 70%);
+  top: 40%;
+  right: -10%;
+  animation-delay: 7s;
+}
+
+.glass-student-gradient-3 {
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.8) 0%, transparent 70%);
+  bottom: -10%;
+  left: 30%;
+  animation-delay: 14s;
+}
+
+@keyframes studentFloat {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  50% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  75% {
+    transform: translate(40px, 10px) scale(1.05);
+  }
+}
+
+/* 导航栏 */
+.glass-student-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  padding: 1rem 0;
+}
+
+.glass-student-nav-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.glass-student-nav-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.glass-student-nav-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  border-radius: 16px;
+  color: white;
+  box-shadow: 0 8px 16px rgba(79, 172, 254, 0.3);
+}
+
+.glass-student-nav-title h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.glass-student-nav-subtitle {
+  font-size: 0.875rem;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0;
+}
+
+.glass-student-user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* 主内容区 */
+.glass-student-main {
+  position: relative;
+  z-index: 1;
+  padding: 2rem 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* 欢迎区域 */
+.glass-student-welcome {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.6s ease-out;
+}
+
+.glass-student-welcome-content {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.glass-student-sparkle-icon {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  border-radius: 20px;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 8px 16px rgba(67, 233, 123, 0.3);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.glass-student-welcome-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+}
+
+.glass-student-welcome-subtitle {
+  font-size: 1.125rem;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* 快速统计卡片 */
+.glass-student-quick-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.glass-student-stat-mini {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.glass-student-stat-mini:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.glass-student-stat-1 {
+  animation-delay: 0.1s;
+}
+
+.glass-student-stat-2 {
+  animation-delay: 0.2s;
+}
+
+.glass-student-stat-3 {
+  animation-delay: 0.3s;
+}
+
+.glass-student-stat-mini-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.glass-student-stat-1 .glass-student-stat-mini-icon {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+}
+
+.glass-student-stat-2 .glass-student-stat-mini-icon {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  box-shadow: 0 4px 12px rgba(67, 233, 123, 0.3);
+}
+
+.glass-student-stat-3 .glass-student-stat-mini-icon {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  box-shadow: 0 4px 12px rgba(250, 112, 154, 0.3);
+}
+
+.glass-student-stat-mini-content {
+  flex: 1;
+}
+
+.glass-student-stat-mini-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0 0 0.25rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.glass-student-stat-mini-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+}
+
+/* 网格布局 */
+.glass-student-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+/* 章节 */
+.glass-student-section {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.glass-student-join-section {
+  animation-delay: 0.1s;
+}
+
+.glass-student-classes-section {
+  animation-delay: 0.2s;
+}
+
+.glass-student-section-header {
+  margin-bottom: 1.5rem;
+}
+
+.glass-student-section-title-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.glass-student-section-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  border-radius: 16px;
+  color: white;
+  box-shadow: 0 8px 16px rgba(79, 172, 254, 0.3);
+}
+
+.glass-student-section-title-group h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 0.25rem 0;
+}
+
+.glass-student-section-subtitle {
+  font-size: 1rem;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0;
+}
+
+/* 表单包装器 */
+.glass-student-form-wrapper,
+.glass-student-classes-wrapper {
+  /* 为子组件提供适当的间距 */
+}
+
+/* 动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 响应式设计 */
+@media (min-width: 1024px) {
+  .glass-student-grid {
+    grid-template-columns: 1fr 1.5fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .glass-student-main {
+    padding: 1.5rem 1rem;
+  }
+
+  .glass-student-welcome-title {
+    font-size: 1.5rem;
+  }
+
+  .glass-student-welcome-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .glass-student-quick-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .glass-student-nav-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .glass-student-section-title-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .glass-student-welcome,
+  .glass-student-section {
+    padding: 1.5rem;
+  }
+
+  .glass-student-stat-mini {
+    flex-direction: column;
+    text-align: center;
+  }
+}

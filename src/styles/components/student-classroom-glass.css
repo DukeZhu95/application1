@@ -1,0 +1,454 @@
+/* ===================================
+   玻璃态设计 - 学生课程详情页
+   Glassmorphism Design for Student Classroom
+   =================================== */
+
+/* 主容器 */
+.glass-student-classroom-container {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 动态渐变背景 - 蓝绿色系 */
+.glass-student-classroom-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #43e97b 100%);
+}
+
+.glass-student-classroom-gradient-1,
+.glass-student-classroom-gradient-2,
+.glass-student-classroom-gradient-3 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.6;
+  animation: classroomFloat 20s ease-in-out infinite;
+}
+
+.glass-student-classroom-gradient-1 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(79, 172, 254, 0.8) 0%, transparent 70%);
+  top: -10%;
+  left: -10%;
+  animation-delay: 0s;
+}
+
+.glass-student-classroom-gradient-2 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(67, 233, 123, 0.8) 0%, transparent 70%);
+  top: 40%;
+  right: -10%;
+  animation-delay: 7s;
+}
+
+.glass-student-classroom-gradient-3 {
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.8) 0%, transparent 70%);
+  bottom: -10%;
+  left: 30%;
+  animation-delay: 14s;
+}
+
+@keyframes classroomFloat {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  50% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  75% {
+    transform: translate(40px, 10px) scale(1.05);
+  }
+}
+
+/* 主内容区 */
+.glass-student-classroom-main {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* 课程信息卡片 */
+.glass-student-classroom-info {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.glass-student-classroom-icon {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  border-radius: 24px;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 12px 32px rgba(79, 172, 254, 0.4);
+}
+
+.glass-student-classroom-icon-glow {
+  position: absolute;
+  inset: -4px;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  border-radius: 28px;
+  z-index: -1;
+  filter: blur(12px);
+  opacity: 0.6;
+}
+
+.glass-student-classroom-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.glass-student-classroom-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.glass-student-classroom-subtitle {
+  font-size: 1.125rem;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0.5rem 0 0 0;
+}
+
+.glass-student-classroom-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+}
+
+.glass-student-classroom-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.glass-student-classroom-meta-item:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.glass-student-meta-code {
+  color: #4facfe;
+}
+
+.glass-student-meta-teacher {
+  color: #43e97b;
+}
+
+.glass-student-meta-status {
+  color: #f093fb;
+}
+
+.glass-student-classroom-meta-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0 0 0.25rem 0;
+}
+
+.glass-student-classroom-meta-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+}
+
+/* 快速统计卡片 */
+.glass-student-classroom-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.glass-student-classroom-stat-card {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.glass-student-classroom-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.glass-student-stat-1 {
+  animation-delay: 0.1s;
+}
+
+.glass-student-stat-2 {
+  animation-delay: 0.2s;
+}
+
+.glass-student-stat-3 {
+  animation-delay: 0.3s;
+}
+
+.glass-student-classroom-stat-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.glass-student-stat-1 .glass-student-classroom-stat-icon {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+}
+
+.glass-student-stat-2 .glass-student-classroom-stat-icon {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  box-shadow: 0 4px 12px rgba(67, 233, 123, 0.3);
+}
+
+.glass-student-stat-3 .glass-student-classroom-stat-icon {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  box-shadow: 0 4px 12px rgba(250, 112, 154, 0.3);
+}
+
+.glass-student-classroom-stat-content {
+  flex: 1;
+}
+
+.glass-student-classroom-stat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0 0 0.25rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.glass-student-classroom-stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+}
+
+/* 任务列表章节 */
+.glass-student-classroom-section {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  animation: fadeInUp 0.8s ease-out 0.4s;
+  animation-fill-mode: both;
+}
+
+.glass-student-classroom-section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.glass-student-classroom-section-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  border-radius: 16px;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 8px 16px rgba(79, 172, 254, 0.3);
+}
+
+.glass-student-classroom-section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 0.25rem 0;
+}
+
+.glass-student-classroom-section-subtitle {
+  font-size: 1rem;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0;
+}
+
+/* 任务包装器 */
+.glass-student-classroom-tasks-wrapper {
+  /* 为子组件提供适当的间距 */
+}
+
+/* 加载状态 */
+.glass-student-classroom-loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  padding: 3rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.glass-student-classroom-loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #4facfe;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.glass-student-classroom-loading p {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.7);
+  margin: 0;
+}
+
+/* 动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .glass-student-classroom-main {
+    padding: 1.5rem;
+  }
+
+  .glass-student-classroom-info {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .glass-student-classroom-icon {
+    margin: 0 auto;
+  }
+
+  .glass-student-classroom-meta {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .glass-student-classroom-main {
+    padding: 1rem;
+  }
+
+  .glass-student-classroom-title {
+    font-size: 2rem;
+  }
+
+  .glass-student-classroom-info {
+    padding: 2rem;
+  }
+
+  .glass-student-classroom-section {
+    padding: 1.5rem;
+  }
+
+  .glass-student-classroom-section-header {
+    flex-direction: column;
+  }
+
+  .glass-student-classroom-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .glass-student-classroom-title {
+    font-size: 1.5rem;
+  }
+
+  .glass-student-classroom-info {
+    padding: 1.5rem;
+  }
+
+  .glass-student-classroom-section {
+    padding: 1.25rem;
+  }
+
+  .glass-student-classroom-stat-card {
+    flex-direction: column;
+    text-align: center;
+  }
+}
