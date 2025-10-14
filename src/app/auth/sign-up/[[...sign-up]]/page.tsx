@@ -16,7 +16,11 @@ export default function SignUpPage() {
   // 如果显示ID输入，只显示ID输入组件
   if (showIdInput) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="auth-page-container">
+        {/* 渐变背景 */}
+        <div className="auth-page-background"></div>
+
+        {/* 用户ID输入组件 */}
         <UserIdInput
           onIdSubmit={async (id) => {
             try {
@@ -38,7 +42,11 @@ export default function SignUpPage() {
 
   // 否则显示注册表单
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+    <div className="auth-page-container">
+      {/* 渐变背景 */}
+      <div className="auth-page-background"></div>
+
+      {/* Clerk 注册组件 */}
       <SignUp
         path="/auth/sign-up"
         routing="path"

@@ -1,0 +1,144 @@
+/* ================================
+   UserIdInput 组件美化样式
+   与认证页面保持一致的玻璃态设计
+   ================================ */
+
+/* 如果 UserIdInput 组件有自己的容器类，这里提供统一的样式 */
+
+/* 确保 UserIdInput 在认证页面容器中也能正确显示 */
+.auth-page-container .user-id-input-wrapper,
+.auth-page-container .user-id-container,
+.auth-page-container [class*="user-id"] {
+  /* 确保组件在玻璃态背景上正确显示 */
+  position: relative;
+  z-index: 1;
+}
+
+/* 如果组件有自己的卡片样式，应用玻璃态效果 */
+.user-id-card,
+.user-id-input-card {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 
+              0 0 0 1px rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 24px !important;
+  padding: 2.5rem !important;
+  max-width: 440px;
+  width: 100%;
+  animation: fadeInScale 0.6s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* UserIdInput 内的输入框样式 */
+.user-id-input-card input,
+.auth-page-container input[type="text"],
+.auth-page-container input[type="number"] {
+  background: white !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  padding: 0.875rem 1rem !important;
+  fontSize: 0.9375rem !important;
+  color: #1a202c !important;
+  transition: all 0.3s ease !important;
+  width: 100% !important;
+}
+
+.user-id-input-card input:hover {
+  border-color: #cbd5e1 !important;
+}
+
+.user-id-input-card input:focus {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+  outline: none !important;
+}
+
+/* UserIdInput 内的按钮样式 */
+.user-id-input-card button,
+.auth-page-container button[type="submit"] {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 0.875rem 1.5rem !important;
+  fontSize: 1rem !important;
+  font-weight: 600 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3) !important;
+  cursor: pointer !important;
+  width: 100% !important;
+}
+
+.user-id-input-card button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4) !important;
+}
+
+.user-id-input-card button:active {
+  transform: translateY(0) !important;
+}
+
+/* UserIdInput 标题和文本样式 */
+.user-id-input-card h2,
+.user-id-input-card h3 {
+  color: #1a202c !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.user-id-input-card p {
+  color: #64748b !important;
+  text-align: center !important;
+  margin-bottom: 1.5rem !important;
+}
+
+/* UserIdInput 标签样式 */
+.user-id-input-card label {
+  font-size: 0.9375rem !important;
+  font-weight: 500 !important;
+  color: #1a202c !important;
+  margin-bottom: 0.5rem !important;
+  display: block !important;
+}
+
+/* 错误提示样式 */
+.user-id-input-card .error,
+.user-id-input-card [class*="error"] {
+  color: #f5576c !important;
+  font-size: 0.875rem !important;
+  margin-top: 0.375rem !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .user-id-card,
+  .user-id-input-card {
+    padding: 2rem !important;
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-id-card,
+  .user-id-input-card {
+    padding: 1.75rem !important;
+  }
+  
+  .user-id-input-card button {
+    padding: 0.875rem !important;
+    font-size: 0.9375rem !important;
+  }
+}

@@ -1,0 +1,151 @@
+/* ================================
+   Clerk 认证页面全局样式
+   与角色选择页面保持一致的玻璃态设计
+   ================================ */
+
+/* 认证页面容器背景 */
+.auth-page-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem 1rem;
+}
+
+/* 渐变背景 */
+.auth-page-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  z-index: -1;
+}
+
+/* 动画背景装饰 */
+.auth-page-background::before,
+.auth-page-background::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.5;
+  animation: authFloat 20s ease-in-out infinite;
+}
+
+.auth-page-background::before {
+  width: 600px;
+  height: 600px;
+  background: rgba(240, 147, 251, 0.4);
+  top: -100px;
+  right: -100px;
+}
+
+.auth-page-background::after {
+  width: 500px;
+  height: 500px;
+  background: rgba(102, 126, 234, 0.5);
+  bottom: -150px;
+  left: -150px;
+  animation-delay: -10s;
+}
+
+@keyframes authFloat {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(40px, -40px) scale(1.15);
+  }
+  66% {
+    transform: translate(-30px, 30px) scale(0.85);
+  }
+}
+
+/* Clerk 组件的额外样式覆盖 */
+.cl-rootBox {
+  animation: authFadeInUp 0.6s ease-out;
+}
+
+@keyframes authFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 覆盖 Clerk 的默认样式以确保玻璃态效果 */
+.cl-card {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+/* 确保输入框的焦点效果 */
+.cl-formFieldInput:focus {
+  outline: none !important;
+}
+
+/* 美化滚动条（如果需要） */
+.cl-card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cl-card::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.3);
+  border-radius: 10px;
+}
+
+.cl-card::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.5);
+  border-radius: 10px;
+}
+
+.cl-card::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.7);
+}
+
+/* 移动端响应式 */
+@media (max-width: 768px) {
+  .auth-page-container {
+    padding: 1.5rem 1rem;
+  }
+  
+  .auth-page-background::before {
+    width: 400px;
+    height: 400px;
+  }
+  
+  .auth-page-background::after {
+    width: 350px;
+    height: 350px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-page-container {
+    padding: 1rem 0.75rem;
+  }
+  
+  .cl-card {
+    padding: 1.75rem !important;
+  }
+}
+
+/* 开发模式标签样式优化 */
+.cl-internal-1ta0xpz {
+  background: rgba(245, 87, 108, 0.1) !important;
+  color: #f5576c !important;
+  border: 1px solid rgba(245, 87, 108, 0.2) !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  padding: 0.5rem 0.875rem !important;
+  font-size: 0.8125rem !important;
+}

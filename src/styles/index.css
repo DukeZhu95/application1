@@ -9,3 +9,5 @@
 @import './components/teacher-dashboard-glass.css';
 @import './components/teacher-class-detail-glass.css';
 @import './components/student-classroom-glass.css';
+@import './auth-page-styles.css';
+@import './user-id-input-styles.css';
