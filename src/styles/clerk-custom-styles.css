@@ -1,0 +1,124 @@
+/* src/styles/clerk-custom-styles.css */
+/* Clerk 全局样式覆盖 - 强制修复 footer 背景 */
+
+/* 🔥 最高优先级：强制 footer 为白色背景 */
+.cl-footer,
+.cl-footer *,
+.cl-footerAction,
+.cl-footerAction *,
+.cl-footerAction > div,
+.cl-internal-b3fm6y,
+.cl-internal-b3fm6y *,
+[class*="cl-footer"],
+[class*="cl-footerAction"],
+[class*="internal-b3fm6y"],
+[data-localization-key*="footer"] {
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    box-shadow: none !important;
+}
+
+/* Footer 容器样式 */
+.cl-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-radius: 0 0 24px 24px !important;
+    padding: 1.5rem 2rem !important;
+    margin: 0 !important;
+}
+
+/* Footer Action 区域 */
+.cl-footerAction {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Footer 文字 */
+.cl-footerActionText {
+    color: #64748b !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+}
+
+/* Footer 链接 */
+.cl-footerActionLink {
+    color: #6366f1 !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    transition: color 0.2s ease !important;
+}
+
+.cl-footerActionLink:hover {
+    color: #4f46e5 !important;
+    text-decoration: underline !important;
+}
+
+/* 主卡片样式 */
+.cl-card {
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3) !important;
+    border: none !important;
+    overflow: visible !important;
+}
+
+/* Root Box */
+.cl-rootBox {
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+/* 社交按钮 */
+.cl-socialButtonsBlockButton {
+    background: white !important;
+    border: 1.5px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 12px !important;
+    transition: all 0.2s ease !important;
+}
+
+.cl-socialButtonsBlockButton:hover {
+    border-color: rgba(0, 0, 0, 0.2) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* 输入框 */
+.cl-formFieldInput {
+    background: white !important;
+    border: 1.5px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 12px !important;
+    transition: all 0.2s ease !important;
+}
+
+.cl-formFieldInput:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+}
+
+/* Continue 按钮 */
+.cl-formButtonPrimary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+}
+
+.cl-formButtonPrimary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3) !important;
+}
+
+/* 响应式 */
+@media (max-width: 640px) {
+    .cl-footer {
+        padding: 1.25rem 1.5rem !important;
+    }
+
+    .cl-card {
+        border-radius: 20px !important;
+    }
+}

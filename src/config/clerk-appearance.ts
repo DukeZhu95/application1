@@ -4,7 +4,7 @@
 import { Theme } from "@clerk/types";
 
 export const clerkAppearance: Theme = {
-  baseTheme: undefined, // 不使用预设主题，完全自定义
+  baseTheme: undefined, // 不使用预设主题,完全自定义
   variables: {
     // 颜色变量
     colorPrimary: "#667eea", // 主色调 - 紫色
@@ -18,7 +18,7 @@ export const clerkAppearance: Theme = {
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     fontFamilyButtons: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
 
-    // 圆角
+    // 圆角 - 增加圆角大小
     borderRadius: "16px", // 统一圆角
 
     // 间距
@@ -29,17 +29,19 @@ export const clerkAppearance: Theme = {
     rootBox: {
       width: "100%",
       maxWidth: "440px",
+      overflow: "hidden", // 🔥 确保圆角不被子元素破坏
     },
 
-    // 卡片容器 - 玻璃态效果
+    // 卡片容器 - 玻璃态效果 + 圆角
     card: {
       background: "rgba(255, 255, 255, 0.95)",
       backdropFilter: "blur(20px)",
       WebkitBackdropFilter: "blur(20px)",
       boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.3)",
       border: "1px solid rgba(255, 255, 255, 0.3)",
-      borderRadius: "24px",
+      borderRadius: "24px", // 🔥 主卡片圆角
       padding: "2.5rem",
+      overflow: "hidden", // 🔥 确保内容不会破坏圆角
     },
 
     // 标题
@@ -63,7 +65,7 @@ export const clerkAppearance: Theme = {
     socialButtonsBlockButton: {
       background: "white",
       border: "1.5px solid #e2e8f0",
-      borderRadius: "12px",
+      borderRadius: "12px", // 圆角按钮
       padding: "0.875rem 1.25rem",
       fontSize: "0.9375rem",
       fontWeight: "500",
@@ -118,11 +120,11 @@ export const clerkAppearance: Theme = {
       marginBottom: "0.5rem",
     },
 
-    // 输入框
+    // 输入框 - 圆角
     formFieldInput: {
       background: "white",
       border: "1.5px solid #e2e8f0",
-      borderRadius: "12px",
+      borderRadius: "12px", // 🔥 输入框圆角
       padding: "0.875rem 1rem",
       fontSize: "0.9375rem",
       color: "#1a202c",
@@ -140,12 +142,12 @@ export const clerkAppearance: Theme = {
       },
     },
 
-    // 主按钮（Continue/Sign in）
+    // 主按钮（Continue/Sign in）- 圆角
     formButtonPrimary: {
       background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
       color: "white",
       border: "none",
-      borderRadius: "12px",
+      borderRadius: "12px", // 🔥 按钮圆角
       padding: "0.875rem 1.5rem",
       fontSize: "1rem",
       fontWeight: "600",
@@ -209,13 +211,22 @@ export const clerkAppearance: Theme = {
       },
     },
 
-    // Footer (Secured by Clerk)
+    // 🔥 Footer (Secured by Clerk) - 白色背景 + 底部圆角
     footer: {
-      background: "rgba(255, 255, 255, 0.5)",
-      borderTop: "1px solid rgba(226, 232, 240, 0.5)",
-      padding: "1rem",
-      borderRadius: "0 0 24px 24px",
+      background: "rgba(255, 255, 255, 0.95)", // 白色背景
+      backdropFilter: "blur(20px)", // 模糊效果
+      WebkitBackdropFilter: "blur(20px)", // Safari 支持
+      borderTop: "1px solid rgba(226, 232, 240, 0.8)", // 分割线
+      padding: "1.5rem", // 内边距
+      borderRadius: "0 0 24px 24px", // 🔥 底部圆角（重要！）
       marginTop: "1.5rem",
+      marginLeft: "-2.5rem", // 🔥 负边距，让 footer 延伸到卡片边缘
+      marginRight: "-2.5rem", // 🔥 负边距，让 footer 延伸到卡片边缘
+      marginBottom: "-2.5rem", // 🔥 负边距，让 footer 延伸到卡片底部
+      paddingLeft: "2.5rem", // 🔥 补偿负边距，保持内容居中
+      paddingRight: "2.5rem", // 🔥 补偿负边距，保持内容居中
+      paddingBottom: "2rem", // 🔥 底部额外间距
+      boxShadow: "none", // 无阴影
       "& a": {
         color: "#667eea",
         fontWeight: "500",
@@ -223,6 +234,11 @@ export const clerkAppearance: Theme = {
           color: "#764ba2",
         },
       },
+    },
+
+    // 🔥 Footer Action - 确保背景透明
+    footerAction: {
+      background: "transparent",
     },
 
     // OTP (One-Time Password) 输入框
@@ -239,14 +255,14 @@ export const clerkAppearance: Theme = {
       color: "#64748b",
     },
 
-    // Badge (如 "Recommended")
+    // Badge (如 "Recommended") - 圆角
     badge: {
       background: "rgba(102, 126, 234, 0.1)",
       color: "#667eea",
       fontSize: "0.75rem",
       fontWeight: "600",
       padding: "0.25rem 0.625rem",
-      borderRadius: "6px",
+      borderRadius: "6px", // 🔥 Badge 圆角
     },
   },
 };
