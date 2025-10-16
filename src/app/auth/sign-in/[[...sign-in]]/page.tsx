@@ -39,7 +39,7 @@ export default function SignInPage() {
               }
             }
           });
-        } catch (e) {
+        } catch {
           console.log('Could not apply styles to:', selector);
         }
       });
