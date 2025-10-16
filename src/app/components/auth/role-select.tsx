@@ -10,9 +10,7 @@ import { api } from '../../../../convex/_generated/api';
 import { toast } from '../ui/use-toast';
 import { 
   GraduationCap, 
-  BookOpen, 
-  Users,
-  Award,
+  BookOpen,
   Sparkles,
   ArrowRight,
   CheckCircle2

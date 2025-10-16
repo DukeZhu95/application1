@@ -13,9 +13,7 @@ import {
   BookOpen,
   FileText,
   Calendar,
-  TrendingUp,
-  Sparkles
-} from 'lucide-react';
+  TrendingUp} from 'lucide-react';
 
 export default function ClassDetailsPage() {
   const router = useRouter();

@@ -8,7 +8,7 @@ import { clerkAppearance } from '@/config/clerk-appearance';
 import '@/styles/clerk-custom-styles.css';
 
 export default function SignUpPage() {
-  const [showIdInput, setShowIdInput] = useState(false);
+  const [showIdInput] = useState(false);
   const { isLoaded, signUp } = useSignUp();
 
   // 🔥 使用 JavaScript 强制修改 DOM
