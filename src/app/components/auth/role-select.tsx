@@ -206,7 +206,7 @@ export function RoleSelect() {
 
         {/* 底部提示 */}
         <div className="glass-role-footer">
-          <p>Don't worry, you can always change this later in settings</p>
+          <p>Don&apos;t worry, you can always change this later in settings</p>
         </div>
       </div>
     </div>
