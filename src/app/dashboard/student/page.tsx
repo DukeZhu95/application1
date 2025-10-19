@@ -4,7 +4,7 @@ import { JoinClassForm } from '@/app/dashboard/student/join-class-form';
 import { AllTasksList } from '@/app/dashboard/student/all-tasks';
 import { RouteGuard } from '@/app/components/auth/route-guard';
 import {
-  BookOpen,
+  // BookOpen,
   Plus,
   GraduationCap,
   Sparkles,

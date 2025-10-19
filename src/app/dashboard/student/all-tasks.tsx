@@ -1,10 +1,11 @@
 'use client';
 
 import { useUser } from '@clerk/nextjs';
-import { useQuery } from 'convex/react';
-import { api } from '../../../../convex/_generated/api';
-import { formatDate } from '@/lib/utils';
-import { Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+// import { useQuery } from 'convex/react';
+//  import { api } from '../../../../convex/_generated/api';
+// import { formatDate } from '@/lib/utils';
+// import { Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Clock, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 // 临时模拟数据（因为需要创建新的 Convex 查询函数）

@@ -93,10 +93,10 @@
 .glass-student-main {
     position: relative;
     z-index: 1;
-    padding: 2rem 1rem;
     max-width: 1400px;
     margin: 0 auto;
-    padding-top: 6rem; /* 为固定导航栏留出空间 */
+    /* 为固定导航栏留出空间 */
+    padding: 6rem 1rem 2rem;
 }
 
 .glass-student-nav-content {
@@ -279,7 +279,7 @@
     color: rgba(0, 0, 0, 0.6);
     margin: 0 0 0.25rem 0;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
 }
 
 .glass-student-stat-mini-value {
