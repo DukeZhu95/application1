@@ -6,22 +6,50 @@ import { StudentProfileEditor } from './profile-editor';
 
 interface CustomUserMenuProps {
   afterSignOutUrl?: string;
+  profile?: {
+    firstName?: string;
+    lastName?: string;
+    avatar?: string | null;
+    bio?: string;
+    city?: string;
+    country?: string;
+    major?: string;
+    goal?: string;
+    [key: string]: any; // 允许 Convex 的额外字段如 _id, _creationTime 等
+  } | null | undefined;
 }
 
-export function CustomUserMenu({ afterSignOutUrl = '/auth/sign-in' }: CustomUserMenuProps) {
+export function CustomUserMenu({ afterSignOutUrl = '/auth/sign-in', profile }: CustomUserMenuProps) {
   useUser();
   const [isProfileEditorOpen, setIsProfileEditorOpen] = useState(false);
 
+  // 检查是否有有效的头像
+  const hasCustomAvatar = profile?.avatar && typeof profile.avatar === 'string' && profile.avatar.length > 0;
+
   return (
     <>
-      <div onClick={(e) => e.stopPropagation()}>
+      <div className="custom-user-menu-wrapper" onClick={(e) => e.stopPropagation()}>
+        {/* 如果有自定义头像，显示自定义头像覆盖层 */}
+        {hasCustomAvatar && (
+          <div className="custom-avatar-overlay">
+            <img
+              src={profile.avatar!}
+              alt="Profile Avatar"
+              className="custom-avatar-image"
+            />
+          </div>
+        )}
+
         <UserButton
           afterSignOutUrl={afterSignOutUrl}
           appearance={{
             elements: {
               userButtonPopoverActionButton__manageAccount: {
                 display: 'none'
-              }
+              },
+              userButtonAvatarBox: hasCustomAvatar ? {
+                opacity: '0'
+              } : {}
             }
           }}
         >
@@ -39,6 +67,60 @@ export function CustomUserMenu({ afterSignOutUrl = '/auth/sign-in' }: CustomUser
         isOpen={isProfileEditorOpen}
         onClose={() => setIsProfileEditorOpen(false)}
       />
+
+      {/* 内联样式 */}
+      <style jsx>{`
+          .custom-user-menu-wrapper {
+              position: relative;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              width: 40px;
+              height: 40px;
+          }
+
+          .custom-avatar-overlay {
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 40px;
+              height: 40px;
+              pointer-events: none;
+              z-index: 1;
+              border-radius: 50%;
+              overflow: hidden;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+          }
+
+          .custom-avatar-image {
+              width: 40px;
+              height: 40px;
+              object-fit: cover;
+              border-radius: 50%;
+          }
+
+          .custom-user-menu-wrapper :global(.cl-userButtonBox) {
+              width: 40px !important;
+              height: 40px !important;
+          }
+
+          .custom-user-menu-wrapper :global(.cl-userButtonTrigger) {
+              width: 40px !important;
+              height: 40px !important;
+          }
+
+          .custom-user-menu-wrapper :global(.cl-userButtonAvatarBox) {
+              width: 40px !important;
+              height: 40px !important;
+          }
+
+          .custom-user-menu-wrapper :global(.cl-userButtonAvatarImage) {
+              width: 40px !important;
+              height: 40px !important;
+          }
+      `}</style>
     </>
   );
 }

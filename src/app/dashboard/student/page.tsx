@@ -13,10 +13,24 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
+import { useQuery } from 'convex/react';
+import { api } from '../../../../convex/_generated/api';
 import { CustomUserMenu } from '@/app/dashboard/student/custom-user-menu';
+import { Toaster } from 'react-hot-toast';
 
 export default function StudentDashboard() {
   const { user } = useUser();
+
+  // 从 Convex 数据库获取学生的个人资料
+  const profile = useQuery(
+    api.students.getStudentProfile,
+    user?.id ? { studentId: user.id } : 'skip'
+  );
+
+  // 获取显示的名字（优先使用数据库中的名字）
+  const displayName = profile?.firstName
+    ? `${profile.firstName}${profile.lastName ? ' ' + profile.lastName : ''}`
+    : user?.firstName || 'Student';
 
   return (
     <RouteGuard>
@@ -42,7 +56,11 @@ export default function StudentDashboard() {
                 </div>
               </div>
               <div className="glass-student-user-section">
-                <CustomUserMenu afterSignOutUrl="/auth/sign-in" />
+                {/* 将 profile 传递给 CustomUserMenu 以显示自定义头像 */}
+                <CustomUserMenu
+                  afterSignOutUrl="/auth/sign-in"
+                  profile={profile}
+                />
               </div>
             </div>
           </div>
@@ -50,7 +68,7 @@ export default function StudentDashboard() {
 
         {/* 主要内容 */}
         <main className="container glass-student-main">
-          {/* 欢迎区域 */}
+          {/* 欢迎区域 - 使用数据库中的名字 */}
           <div className="glass-student-welcome">
             <div className="glass-student-welcome-content">
               <div className="glass-student-sparkle-icon">
@@ -58,7 +76,7 @@ export default function StudentDashboard() {
               </div>
               <div>
                 <h2 className="glass-student-welcome-title">
-                  Welcome back, {user?.firstName || 'Student'}! 🎓
+                  Welcome back, {displayName}! 🎓
                 </h2>
                 <p className="glass-student-welcome-subtitle">
                   Ready to learn something new today? Join classes and track your progress.
@@ -143,6 +161,30 @@ export default function StudentDashboard() {
           </div>
         </main>
       </div>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#4ade80',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
     </RouteGuard>
   );
 }

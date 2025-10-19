@@ -7,10 +7,9 @@ import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
 import { Input } from '@/app/components/ui/input';
 import { Button } from '@/app/components/ui/button';
-import { toast } from '@/app/components/ui/use-toast';
+import toast from 'react-hot-toast';
 import { X, Upload } from 'lucide-react';
 import '@/styles/components/profile-editor.css';
-import Image from 'next/image';
 
 interface ProfileEditorProps {
   isOpen: boolean;
@@ -32,6 +31,8 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
   const { user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [originalData, setOriginalData] = useState<StudentProfile | null>(null);
   const [formData, setFormData] = useState<StudentProfile>({
     firstName: '',
     lastName: '',
@@ -57,7 +58,7 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
 
   useEffect(() => {
     if (profile) {
-      setFormData({
+      const data = {
         firstName: profile.firstName || '',
         lastName: profile.lastName || '',
         bio: profile.bio || '',
@@ -66,21 +67,71 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
         major: profile.major || '',
         goal: profile.goal || '',
         avatar: profile.avatar || null,
-      });
+      };
+      setFormData(data);
+      setOriginalData(data);
       setAvatarPreview(profile.avatar || null);
+      setHasChanges(false); // 重置修改状态
     }
   }, [profile, isOpen]);
+
+  // 检测表单是否有修改
+  useEffect(() => {
+    if (originalData) {
+      const changed =
+        formData.firstName !== originalData.firstName ||
+        formData.lastName !== originalData.lastName ||
+        formData.bio !== originalData.bio ||
+        formData.city !== originalData.city ||
+        formData.country !== originalData.country ||
+        formData.major !== originalData.major ||
+        formData.goal !== originalData.goal ||
+        formData.avatar !== originalData.avatar;
+      setHasChanges(changed);
+    }
+  }, [formData, originalData]);
+
+  // 晃动模态窗
+  const shakeModal = () => {
+    const modal = document.querySelector('.profile-editor-modal');
+    if (modal) {
+      modal.classList.add('shake');
+      setTimeout(() => {
+        modal.classList.remove('shake');
+      }, 500);
+    }
+  };
+
+  // 处理点击外部区域
+  const handleOverlayClick = () => {
+    if (hasChanges) {
+      // 如果有未保存的修改，显示确认对话框
+      const confirmed = window.confirm(
+        'You have unsaved changes. Are you sure you want to close without saving?'
+      );
+      if (confirmed) {
+        setHasChanges(false);
+        onClose();
+      } else {
+        // 用户选择不关闭，晃动提示
+        shakeModal();
+      }
+    } else {
+      // 没有修改，晃动提示用户应该使用按钮关闭
+      shakeModal();
+      toast('Please use the CANCEL or X button to close', {
+        icon: '👈',
+        duration: 2000,
+      });
+    }
+  };
 
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (file.size > 2 * 1024 * 1024) {
-      toast({
-        title: 'Error',
-        description: 'Image size must be less than 2MB',
-        variant: 'destructive',
-      });
+      toast.error('Image size must be less than 2MB');
       return;
     }
 
@@ -97,47 +148,27 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
     e.preventDefault();
 
     if (!user?.id) {
-      toast({
-        title: 'Error',
-        description: 'User not authenticated',
-        variant: 'destructive',
-      });
+      toast.error('User not authenticated');
       return;
     }
 
     if (!formData.firstName.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Please enter your first name',
-        variant: 'destructive',
-      });
+      toast.error('Please enter your first name');
       return;
     }
 
     if (!formData.lastName.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Please enter your last name',
-        variant: 'destructive',
-      });
+      toast.error('Please enter your last name');
       return;
     }
 
     if (!formData.city.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Please enter your city',
-        variant: 'destructive',
-      });
+      toast.error('Please enter your city');
       return;
     }
 
     if (!formData.country.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Please enter your country',
-        variant: 'destructive',
-      });
+      toast.error('Please enter your country');
       return;
     }
 
@@ -158,21 +189,16 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
         avatar: avatarToSend,
       });
 
-      toast({
-        title: 'Success',
-        description: 'Profile updated successfully',
-      });
+      toast.success('Profile updated successfully! 🎉');
+
+      setHasChanges(false); // 重置修改状态
 
       setTimeout(() => {
         onClose();
       }, 1000);
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to update profile. Please try again.',
-        variant: 'destructive',
-      });
+      toast.error('Failed to update profile. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -181,7 +207,7 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
   if (!isOpen || !mounted) return null;
 
   const modalContent = (
-    <div className="profile-editor-overlay" onClick={onClose}>
+    <div className="profile-editor-overlay" onClick={handleOverlayClick}>
       <div className="profile-editor-modal" onClick={(e) => e.stopPropagation()}>
         <div className="profile-editor-header">
           <h2>Edit Profile</h2>
@@ -195,18 +221,11 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
         </div>
 
         <form onSubmit={handleSubmit} className="profile-editor-form">
-          {/* 所有表单内容保持不变 */}
           <div className="profile-editor-avatar-section">
             <div className="profile-editor-avatar-container">
               <div className="profile-editor-avatar">
                 {avatarPreview ? (
-                  <Image
-                    src={avatarPreview}
-                    alt="Avatar"
-                    width={100}
-                    height={100}
-                    className="profile-avatar-image"
-                  />
+                  <img src={avatarPreview} alt="Avatar" />
                 ) : (
                   <span>👤</span>
                 )}
