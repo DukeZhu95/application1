@@ -167,3 +167,28 @@ export const getStudentClasses = query({
     return studentClasses.length > 0 ? studentClasses : manuallyFiltered;
   },
 });
+
+// 获取课程
+export const getClassByCode = query({
+  args: { code: v.string() },
+  handler: async (ctx, args) => {
+    const classroom = await ctx.db
+      .query('classrooms')
+      .filter((q) => q.eq(q.field('code'), args.code))
+      .first();
+
+    if (!classroom) {
+      return null;
+    }
+
+    return {
+      _id: classroom._id,
+      code: classroom.code,
+      name: classroom.name,
+      description: classroom.description,
+      teacherId: classroom.teacherId,
+      teacherName: classroom.teacherName,
+      createdAt: classroom._creationTime,
+    };
+  },
+});

@@ -14,14 +14,16 @@ export default defineSchema({
   // 已有的 classrooms 表
   classrooms: defineTable({
     code: v.string(),
-    teacherId: v.string(),
     name: v.optional(v.string()),
+    description: v.optional(v.string()),      // 新增 ✨
+    teacherId: v.string(),
+    teacherName: v.optional(v.string()),      // 新增 ✨
     createdAt: v.number(),
     students: v.array(
       v.object({
         studentId: v.string(),
         joinedAt: v.number(),
-        status: v.string(), // "active" | "inactive"
+        status: v.string(),
       })
     ),
   })

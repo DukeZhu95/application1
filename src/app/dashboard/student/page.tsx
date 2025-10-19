@@ -1,7 +1,7 @@
 'use client';
 
 import { JoinClassForm } from '@/app/dashboard/student/join-class-form';
-import { StudentClassList } from '@/app/dashboard/student/class-list';
+import { AllTasksList } from '@/app/dashboard/student/all-tasks';
 import { RouteGuard } from '@/app/components/auth/route-guard';
 import {
   BookOpen,
@@ -10,16 +10,19 @@ import {
   Sparkles,
   Library,
   Calendar,
-  TrendingUp
+  TrendingUp,
+  CheckSquare
 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { useQuery } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
 import { CustomUserMenu } from '@/app/dashboard/student/custom-user-menu';
 import { Toaster } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 export default function StudentDashboard() {
   const { user } = useUser();
+  const router = useRouter();
 
   // 从 Convex 数据库获取学生的个人资料
   const profile = useQuery(
@@ -31,6 +34,35 @@ export default function StudentDashboard() {
   const displayName = profile?.firstName
     ? `${profile.firstName}${profile.lastName ? ' ' + profile.lastName : ''}`
     : user?.firstName || 'Student';
+
+  // 计算当前是学期的第几周（假设学期从2025年2月1日开始）
+  const calculateWeekNumber = () => {
+    const semesterStart = new Date('2025-02-01'); // 可以根据实际情况调整
+    const today = new Date();
+    const diffTime = Math.abs(today.getTime() - semesterStart.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const weekNumber = Math.ceil(diffDays / 7);
+    return weekNumber;
+  };
+
+  const currentWeek = calculateWeekNumber();
+
+  // 跳转到所有班级页面
+  const viewAllClasses = () => {
+    router.push('/dashboard/student/classes');
+  };
+
+  // 查看课程表（占位功能）
+  const viewTimetable = () => {
+    alert('Timetable feature coming soon! 📅\nWeek ' + currentWeek + ' of semester');
+    // TODO: 实现课程表功能或跳转到课程表页面
+  };
+
+  // 查看成绩（占位功能）
+  const viewGrades = () => {
+    alert('Grades feature coming soon! 📊\nView all your grades and progress here');
+    // TODO: 实现成绩查看功能或跳转到成绩页面
+  };
 
   return (
     <RouteGuard>
@@ -87,7 +119,11 @@ export default function StudentDashboard() {
 
           {/* 快速统计卡片 */}
           <div className="glass-student-quick-stats">
-            <div className="glass-student-stat-mini glass-student-stat-1">
+            <div
+              className="glass-student-stat-mini glass-student-stat-1"
+              onClick={viewAllClasses}
+              style={{ cursor: 'pointer' }}
+            >
               <div className="glass-student-stat-mini-icon">
                 <Library size={24} strokeWidth={2} />
               </div>
@@ -97,23 +133,31 @@ export default function StudentDashboard() {
               </div>
             </div>
 
-            <div className="glass-student-stat-mini glass-student-stat-2">
+            <div
+              className="glass-student-stat-mini glass-student-stat-2"
+              onClick={viewTimetable}
+              style={{ cursor: 'pointer' }}
+            >
               <div className="glass-student-stat-mini-icon">
                 <Calendar size={24} strokeWidth={2} />
               </div>
               <div className="glass-student-stat-mini-content">
-                <p className="glass-student-stat-mini-label">This Week</p>
-                <p className="glass-student-stat-mini-value">Active</p>
+                <p className="glass-student-stat-mini-label">Time Table</p>
+                <p className="glass-student-stat-mini-value">Week {currentWeek}</p>
               </div>
             </div>
 
-            <div className="glass-student-stat-mini glass-student-stat-3">
+            <div
+              className="glass-student-stat-mini glass-student-stat-3"
+              onClick={viewGrades}
+              style={{ cursor: 'pointer' }}
+            >
               <div className="glass-student-stat-mini-icon">
                 <TrendingUp size={24} strokeWidth={2} />
               </div>
               <div className="glass-student-stat-mini-content">
-                <p className="glass-student-stat-mini-label">Progress</p>
-                <p className="glass-student-stat-mini-value">On Track</p>
+                <p className="glass-student-stat-mini-label">Grade</p>
+                <p className="glass-student-stat-mini-value">View All</p>
               </div>
             </div>
           </div>
@@ -139,23 +183,23 @@ export default function StudentDashboard() {
               </div>
             </section>
 
-            {/* 班级列表部分 */}
-            <section className="glass-student-section glass-student-classes-section">
+            {/* 所有任务部分 - 替换原来的班级列表 */}
+            <section className="glass-student-section glass-student-tasks-section">
               <div className="glass-student-section-header">
                 <div className="glass-student-section-title-group">
                   <div className="glass-student-section-icon">
-                    <BookOpen size={24} strokeWidth={2.5} />
+                    <CheckSquare size={24} strokeWidth={2.5} />
                   </div>
                   <div>
-                    <h2>My classes</h2>
+                    <h2>Current Tasks</h2>
                     <p className="glass-student-section-subtitle">
-                      View all your enrolled classes
+                      Track your upcoming assignments and deadlines
                     </p>
                   </div>
                 </div>
               </div>
-              <div className="glass-student-classes-wrapper">
-                <StudentClassList />
+              <div className="glass-student-tasks-wrapper">
+                <AllTasksList />
               </div>
             </section>
           </div>
