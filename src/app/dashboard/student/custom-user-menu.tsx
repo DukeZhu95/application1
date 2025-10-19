@@ -23,7 +23,7 @@ interface CustomUserMenuProps {
 }
 
 export function CustomUserMenu({ afterSignOutUrl = '/auth/sign-in', profile }: CustomUserMenuProps) {
-  const { user } = useUser();
+  useUser();
   const [isProfileEditorOpen, setIsProfileEditorOpen] = useState(false);
 
   // 检查是否有有效的头像
