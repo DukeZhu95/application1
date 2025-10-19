@@ -15,12 +15,15 @@ interface CustomUserMenuProps {
     country?: string;
     major?: string;
     goal?: string;
-    [key: string]: any; // 允许 Convex 的额外字段如 _id, _creationTime 等
+    _id?: string;
+    _creationTime?: number;
+    updatedAt?: number;
+    studentId?: string;
   } | null | undefined;
 }
 
 export function CustomUserMenu({ afterSignOutUrl = '/auth/sign-in', profile }: CustomUserMenuProps) {
-  useUser();
+  const { user } = useUser();
   const [isProfileEditorOpen, setIsProfileEditorOpen] = useState(false);
 
   // 检查是否有有效的头像
