@@ -10,6 +10,7 @@ import { Button } from '@/app/components/ui/button';
 import { toast } from '@/app/components/ui/use-toast';
 import { X, Upload } from 'lucide-react';
 import '@/styles/components/profile-editor.css';
+import Image from 'next/image';
 
 interface ProfileEditorProps {
   isOpen: boolean;
@@ -199,7 +200,13 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
             <div className="profile-editor-avatar-container">
               <div className="profile-editor-avatar">
                 {avatarPreview ? (
-                  <img src={avatarPreview} alt="Avatar" />
+                  <Image
+                    src={avatarPreview}
+                    alt="Avatar"
+                    width={100}
+                    height={100}
+                    className="profile-avatar-image"
+                  />
                 ) : (
                   <span>👤</span>
                 )}

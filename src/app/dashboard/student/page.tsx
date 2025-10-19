@@ -1,6 +1,5 @@
 'use client';
 
-import { UserButton } from '@clerk/nextjs';
 import { JoinClassForm } from '@/app/dashboard/student/join-class-form';
 import { StudentClassList } from '@/app/dashboard/student/class-list';
 import { RouteGuard } from '@/app/components/auth/route-guard';

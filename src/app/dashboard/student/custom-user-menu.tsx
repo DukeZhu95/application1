@@ -9,7 +9,7 @@ interface CustomUserMenuProps {
 }
 
 export function CustomUserMenu({ afterSignOutUrl = '/auth/sign-in' }: CustomUserMenuProps) {
-  const { user } = useUser();
+  useUser();
   const [isProfileEditorOpen, setIsProfileEditorOpen] = useState(false);
 
   return (
