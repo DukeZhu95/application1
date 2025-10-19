@@ -4,9 +4,9 @@ import { UserButton } from '@clerk/nextjs';
 import { JoinClassForm } from '@/app/dashboard/student/join-class-form';
 import { StudentClassList } from '@/app/dashboard/student/class-list';
 import { RouteGuard } from '@/app/components/auth/route-guard';
-import { 
-  BookOpen, 
-  Plus, 
+import {
+  BookOpen,
+  Plus,
   GraduationCap,
   Sparkles,
   Library,
@@ -14,6 +14,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
+import { CustomUserMenu } from '@/app/dashboard/student/custom-user-menu';
 
 export default function StudentDashboard() {
   const { user } = useUser();
@@ -42,7 +43,7 @@ export default function StudentDashboard() {
                 </div>
               </div>
               <div className="glass-student-user-section">
-                <UserButton afterSignOutUrl="/auth/sign-in" />
+                <CustomUserMenu afterSignOutUrl="/auth/sign-in" />
               </div>
             </div>
           </div>

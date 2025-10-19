@@ -62,4 +62,20 @@ export default defineSchema({
     .index('by_task_student', ['taskId', 'studentId'])
     .index('by_task', ['taskId'])
     .index('by_student', ['studentId']),
+
+  // 学生个人资料表
+  studentProfiles: defineTable({
+    studentId: v.string(),          // Clerk 用户 ID
+    firstName: v.string(),
+    lastName: v.string(),
+    bio: v.optional(v.string()),
+    city: v.string(),
+    country: v.string(),
+    major: v.optional(v.string()),
+    goal: v.optional(v.string()),
+    avatar: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_studentId", ["studentId"]),
 });
