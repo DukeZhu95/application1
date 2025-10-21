@@ -38,9 +38,12 @@
     max-width: 600px;
     max-height: 90vh;
     flex-shrink: 0;
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -64,7 +67,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     position: sticky;
     top: 0;
@@ -117,6 +120,7 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
+    background: white;
 }
 
 .profile-editor-avatar-section {
@@ -135,12 +139,12 @@
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 48px;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
     overflow: hidden;
     flex-shrink: 0;
 }
@@ -158,18 +162,18 @@
     width: 36px;
     height: 36px;
     background: white;
-    border: 2px solid #667eea;
+    border: 2px solid #4facfe;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: #667eea;
+    color: #4facfe;
     transition: all 0.2s ease;
 }
 
 .profile-editor-avatar-upload:hover {
-    background: #667eea;
+    background: #4facfe;
     color: white;
     transform: scale(1.1);
 }
@@ -262,8 +266,8 @@
 .profile-editor-form-group textarea:focus,
 .profile-editor-select:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #4facfe;
+    box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
 }
 
 .profile-editor-form-group input:disabled,
@@ -293,8 +297,10 @@
     display: flex;
     gap: 12px;
     padding: 24px;
-    border-top: 1px solid #e5e7eb;
-    background: white;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(255, 255, 255, 0.75);
     flex-shrink: 0;
 }
 
@@ -317,14 +323,14 @@
 }
 
 .profile-editor-btn-submit {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     color: white;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
 }
 
 .profile-editor-btn-submit:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
 }
 
 .profile-editor-btn-submit:active:not(:disabled) {
@@ -462,60 +468,7 @@
     }
 }
 
-@media (prefers-color-scheme: dark) {
-    .profile-editor-modal {
-        background: #1f2937;
-        color: #e5e7eb;
-    }
-
-    .profile-editor-header {
-        border-bottom-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .profile-editor-form-group label {
-        color: #e5e7eb;
-    }
-
-    .profile-editor-form-group input,
-    .profile-editor-form-group textarea,
-    .profile-editor-select {
-        background: #111827;
-        color: #e5e7eb;
-        border-color: #374151;
-    }
-
-    .profile-editor-email-display {
-        background: #111827;
-        border-color: #374151;
-    }
-
-    .profile-editor-email-value {
-        color: #e5e7eb;
-    }
-
-    .profile-editor-actions {
-        background: #1f2937;
-        border-top-color: #374151;
-    }
-
-    .profile-editor-btn-cancel {
-        background: #374151;
-        color: #e5e7eb;
-        border-color: #4b5563;
-    }
-
-    .profile-editor-btn-cancel:hover:not(:disabled) {
-        background: #4b5563;
-    }
-
-    .profile-editor-form::-webkit-scrollbar-thumb {
-        background: #4b5563;
-    }
-
-    .profile-editor-form::-webkit-scrollbar-thumb:hover {
-        background: #6b7280;
-    }
-}
+/* 暗色主题已禁用，始终使用亮色主题 */
 
 body.modal-open {
     overflow: hidden;
@@ -536,5 +489,5 @@ body.modal-open {
 .profile-editor-modal.shake {
     animation: shake 0.5s ease-in-out;
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4),
-    0 0 0 2px rgba(102, 126, 234, 0.5);
+    0 0 0 2px rgba(79, 172, 254, 0.5);
 }

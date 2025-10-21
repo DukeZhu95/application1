@@ -128,8 +128,8 @@ export default function StudentDashboard() {
                 <Library size={24} strokeWidth={2} />
               </div>
               <div className="glass-student-stat-mini-content">
-                <p className="glass-student-stat-mini-label">Enrolled</p>
-                <p className="glass-student-stat-mini-value">Classes</p>
+                <p className="glass-student-stat-mini-label">Enrolled classes</p>
+                <p className="glass-student-stat-mini-value">View All</p>
               </div>
             </div>
 
