@@ -68,7 +68,7 @@ export function AllTasksList() {
   // );
 
   // 暂时使用模拟数据
-  let tasks = mockTasks;
+  const tasks = mockTasks;
 
   if (!user?.id) {
     return (
