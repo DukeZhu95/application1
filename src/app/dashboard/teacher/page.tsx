@@ -1,6 +1,6 @@
 'use client';
 
-import { UserButton, useUser } from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
 import { useState } from 'react';
 import { useMutation, useQuery } from 'convex/react';
 import { useRouter } from 'next/navigation';
@@ -8,11 +8,13 @@ import { api } from '../../../../convex/_generated/api';
 import { ClassCodeInput } from '@/app/components/shared/class-code-input';
 import { Button } from '@/app/components/ui/button';
 import { CreateTaskForm } from '@/app/dashboard/teacher/create-task-form';
-import { 
-  GraduationCap, 
-  Users, 
-  Plus, 
-  Eye, 
+import { Toaster } from 'react-hot-toast';
+import { CustomUserMenu } from '@/app/dashboard/teacher/custom-user-menu'; // ✨ 新增导入
+import {
+  GraduationCap,
+  Users,
+  Plus,
+  Eye,
   FileText,
   BookOpen,
   CheckCircle,
@@ -27,9 +29,17 @@ export default function TeacherDashboard() {
   const { user } = useUser();
   const [currentClass, setCurrentClass] = useState<string | null>(null);
   const router = useRouter();
+
   const classes = useQuery(api.classes.getTeacherClasses, {
     teacherId: user?.id || '',
   });
+
+  // ✨ 新增：获取教师资料
+  const profile = useQuery(
+    api.teachers.getTeacherProfile,
+    user?.id ? { teacherId: user.id } : 'skip'
+  );
+
   const [className, setClassName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [feedback, setFeedback] = useState<{
@@ -73,6 +83,7 @@ export default function TeacherDashboard() {
 
   return (
     <div className="glass-dashboard-container">
+      <Toaster position="top-center" />
       {/* 动态背景 */}
       <div className="glass-background">
         <div className="glass-bg-gradient-1"></div>
@@ -94,7 +105,11 @@ export default function TeacherDashboard() {
               </div>
             </div>
             <div className="glass-user-section">
-              <UserButton />
+              {/* ✨ 替换为自定义用户菜单 */}
+              <CustomUserMenu
+                afterSignOutUrl="/auth/sign-in"
+                profile={profile}
+              />
             </div>
           </div>
         </div>
@@ -109,7 +124,8 @@ export default function TeacherDashboard() {
             </div>
             <div>
               <h2 className="glass-welcome-title">
-                Welcome back, {user?.firstName || 'Teacher'}! 👋
+                {/* ✨ 优先显示资料中的名字 */}
+                Welcome back, {profile?.firstName || user?.firstName || 'Teacher'}! 👋
               </h2>
               <p className="glass-welcome-subtitle">
                 Ready to inspire minds today? Manage your classes and create engaging content.
@@ -182,7 +198,7 @@ export default function TeacherDashboard() {
                 </div>
               </div>
             </div>
-            
+
             {feedback && (
               <div className={`glass-feedback ${feedback.type}`}>
                 <div className="glass-feedback-icon">
@@ -195,7 +211,7 @@ export default function TeacherDashboard() {
                 <span>{feedback.message}</span>
               </div>
             )}
-            
+
             <div className="glass-form-wrapper">
               <ClassCodeInput
                 userRole="teacher"
@@ -237,13 +253,13 @@ export default function TeacherDashboard() {
             ) : (
               <div className="glass-class-grid">
                 {classes.map((classItem, index) => (
-                  <div 
-                    key={classItem._id} 
+                  <div
+                    key={classItem._id}
                     className="glass-class-card"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <div className="glass-card-glow"></div>
-                    
+
                     <div className="glass-class-header">
                       <div className="glass-class-icon-wrapper">
                         <BookOpen size={32} strokeWidth={2} />

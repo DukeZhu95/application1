@@ -16,6 +16,7 @@ import type {
 import type * as classes from "../classes.js";
 import type * as students from "../students.js";
 import type * as tasks from "../tasks.js";
+import type * as teachers from "../teachers.js";
 import type * as users from "../users.js";
 
 /**
@@ -30,6 +31,7 @@ declare const fullApi: ApiFromModules<{
   classes: typeof classes;
   students: typeof students;
   tasks: typeof tasks;
+  teachers: typeof teachers;
   users: typeof users;
 }>;
 export declare const api: FilterApi<

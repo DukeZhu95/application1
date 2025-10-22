@@ -9,38 +9,38 @@ import { Input } from '@/app/components/ui/input';
 import { Button } from '@/app/components/ui/button';
 import toast from 'react-hot-toast';
 import { X, Upload } from 'lucide-react';
-import '@/styles/components/student-profile-editor.css';
+import '@/styles/components/teacher-profile-editor.css';
 
 interface ProfileEditorProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-interface StudentProfile {
+interface TeacherProfile {
   firstName: string;
   lastName: string;
   bio: string;
   city: string;
   country: string;
-  major: string;
-  goal: string;
+  specialization: string;
+  teachingPhilosophy: string;
   avatar: string | null;
 }
 
-export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
+export function TeacherProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
   const { user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
-  const [originalData, setOriginalData] = useState<StudentProfile | null>(null);
-  const [formData, setFormData] = useState<StudentProfile>({
+  const [originalData, setOriginalData] = useState<TeacherProfile | null>(null);
+  const [formData, setFormData] = useState<TeacherProfile>({
     firstName: '',
     lastName: '',
     bio: '',
     city: '',
     country: '',
-    major: '',
-    goal: '',
+    specialization: '',
+    teachingPhilosophy: '',
     avatar: null,
   });
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -50,11 +50,11 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
   }, []);
 
   const profile = useQuery(
-    api.students.getStudentProfile,
-    user?.id ? { studentId: user.id } : 'skip'
+    api.teachers.getTeacherProfile,
+    user?.id ? { teacherId: user.id } : 'skip'
   );
 
-  const updateProfile = useMutation(api.students.updateStudentProfile);
+  const updateProfile = useMutation(api.teachers.updateTeacherProfile);
 
   useEffect(() => {
     if (profile) {
@@ -64,14 +64,14 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
         bio: profile.bio || '',
         city: profile.city || '',
         country: profile.country || '',
-        major: profile.major || '',
-        goal: profile.goal || '',
+        specialization: profile.specialization || '',
+        teachingPhilosophy: profile.teachingPhilosophy || '',
         avatar: profile.avatar || null,
       };
       setFormData(data);
       setOriginalData(data);
       setAvatarPreview(profile.avatar || null);
-      setHasChanges(false); // 重置修改状态
+      setHasChanges(false);
     }
   }, [profile, isOpen]);
 
@@ -84,8 +84,8 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
         formData.bio !== originalData.bio ||
         formData.city !== originalData.city ||
         formData.country !== originalData.country ||
-        formData.major !== originalData.major ||
-        formData.goal !== originalData.goal ||
+        formData.specialization !== originalData.specialization ||
+        formData.teachingPhilosophy !== originalData.teachingPhilosophy ||
         formData.avatar !== originalData.avatar;
       setHasChanges(changed);
     }
@@ -105,7 +105,6 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
   // 处理点击外部区域
   const handleOverlayClick = () => {
     if (hasChanges) {
-      // 如果有未保存的修改，显示确认对话框
       const confirmed = window.confirm(
         'You have unsaved changes. Are you sure you want to close without saving?'
       );
@@ -113,14 +112,12 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
         setHasChanges(false);
         onClose();
       } else {
-        // 用户选择不关闭，晃动提示
         shakeModal();
       }
     } else {
-      // 没有修改，晃动提示用户应该使用按钮关闭
       shakeModal();
       toast('Please use the CANCEL or X button to close', {
-        icon: '👈',
+        icon: '👇',
         duration: 2000,
       });
     }
@@ -178,20 +175,20 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
       const avatarToSend = formData.avatar ? formData.avatar : undefined;
 
       await updateProfile({
-        studentId: user.id,
+        teacherId: user.id,
         firstName: formData.firstName,
         lastName: formData.lastName,
         bio: formData.bio,
         city: formData.city,
         country: formData.country,
-        major: formData.major,
-        goal: formData.goal,
+        specialization: formData.specialization,
+        teachingPhilosophy: formData.teachingPhilosophy,
         avatar: avatarToSend,
       });
 
       toast.success('Profile updated successfully! 🎉');
 
-      setHasChanges(false); // 重置修改状态
+      setHasChanges(false);
 
       setTimeout(() => {
         onClose();
@@ -355,14 +352,14 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
           </div>
 
           <div className="profile-editor-form-group">
-            <label htmlFor="major">Major/Field of Study</label>
+            <label htmlFor="specialization">Specialization/Subject</label>
             <select
-              id="major"
-              value={formData.major}
+              id="specialization"
+              value={formData.specialization}
               onChange={(e) =>
                 setFormData((prev) => ({
                   ...prev,
-                  major: e.target.value,
+                  specialization: e.target.value,
                 }))
               }
               disabled={isLoading}
@@ -372,22 +369,25 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
               <option value="Guitar">Guitar</option>
               <option value="Ukulele">Ukulele</option>
               <option value="Music Theory">Music Theory</option>
+              <option value="Piano">Piano</option>
+              <option value="Vocal">Vocal</option>
+              <option value="Drums">Drums</option>
               <option value="Others">Other</option>
             </select>
-            <small>Select your field of study</small>
+            <small>Select your teaching specialization</small>
           </div>
 
           <div className="profile-editor-form-group">
-            <label htmlFor="goal">Learning Goal</label>
+            <label htmlFor="teachingPhilosophy">Teaching Philosophy</label>
             <textarea
-              id="goal"
-              placeholder="What are your learning goals?"
-              value={formData.goal}
+              id="teachingPhilosophy"
+              placeholder="What's your teaching philosophy?"
+              value={formData.teachingPhilosophy}
               onChange={(e) => {
                 if (e.target.value.length <= 300) {
                   setFormData((prev) => ({
                     ...prev,
-                    goal: e.target.value,
+                    teachingPhilosophy: e.target.value,
                   }));
                 }
               }}
@@ -396,7 +396,7 @@ export function StudentProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
               className="profile-editor-textarea"
             />
             <div className="profile-editor-char-count">
-              {formData.goal.length}/300
+              {formData.teachingPhilosophy.length}/300
             </div>
             <small>Maximum 300 characters</small>
           </div>

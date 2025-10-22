@@ -65,6 +65,19 @@ export default defineSchema({
     .index('by_task', ['taskId'])
     .index('by_student', ['studentId']),
 
+  // 教师表 ✨ 新增
+  teachers: defineTable({
+    teacherId: v.string(),
+    firstName: v.string(),
+    lastName: v.string(),
+    bio: v.string(),
+    city: v.string(),
+    country: v.string(),
+    specialization: v.string(),
+    teachingPhilosophy: v.string(),
+    avatar: v.optional(v.string()),
+  }).index("by_teacherId", ["teacherId"]),
+
   // 学生个人资料表
   studentProfiles: defineTable({
     studentId: v.string(),          // Clerk 用户 ID
