@@ -13,7 +13,29 @@ import {
   Mail
 } from 'lucide-react';
 import '@/styles/components/teacher-dashboard-glass.css';
-import { Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from 'react';
+
+// 定义类型接口
+interface ClassItem {
+  _id: string;
+  _creationTime: number;
+  name?: string;
+  description?: string;
+  teacherName?: string;
+  code: string;
+  teacherId: string;
+  createdAt: number;
+  students: Array<{
+    studentId: string;
+    joinedAt: number;
+    status: string;
+  }>;
+}
+
+interface StudentWithClasses {
+  studentId: string;
+  joinedAt: number;
+  classes: ClassItem[];
+}
 
 export default function AllStudentsPage() {
   const router = useRouter();
@@ -30,10 +52,10 @@ export default function AllStudentsPage() {
   );
 
   // 汇总所有学生信息
-  const getAllStudents = () => {
+  const getAllStudents = (): StudentWithClasses[] => {
     if (!classes) return [];
 
-    const studentMap = new Map();
+    const studentMap = new Map<string, StudentWithClasses>();
 
     classes.forEach((classItem) => {
       classItem.students.forEach((student) => {
@@ -45,7 +67,9 @@ export default function AllStudentsPage() {
           });
         } else {
           const existing = studentMap.get(student.studentId);
-          existing.classes.push(classItem);
+          if (existing) {
+            existing.classes.push(classItem);
+          }
         }
       });
     });
@@ -210,8 +234,7 @@ export default function AllStudentsPage() {
                       <span>Enrolled Classes ({student.classes.length})</span>
                     </div>
                     <div className="student-classes-list">
-                      {student.classes.map(
-                        (classItem: { _id: Key | null | undefined; name: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; }) => (
+                      {student.classes.map((classItem: ClassItem) => (
                         <div
                           key={classItem._id}
                           className="student-class-badge"
