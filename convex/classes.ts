@@ -7,6 +7,8 @@ export const createClass = mutation({
     code: v.string(),
     teacherId: v.string(),
     name: v.optional(v.string()),
+    description: v.optional(v.string()),
+    teacherName: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     // 检查班级代码格式
@@ -30,7 +32,11 @@ export const createClass = mutation({
 
     // 创建班级
     return await ctx.db.insert('classrooms', {
-      ...args,
+      code: args.code,
+      teacherId: args.teacherId,
+      name: args.name,
+      description: args.description,
+      teacherName: args.teacherName,
       createdAt: Date.now(),
       students: [],
     });

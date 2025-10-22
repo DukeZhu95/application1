@@ -1,29 +1,25 @@
 'use client';
 
 import { useUser } from '@clerk/nextjs';
-import { useState } from 'react';
-import { useMutation, useQuery } from 'convex/react';
+import { useQuery } from 'convex/react';
 import { useRouter } from 'next/navigation';
 import { api } from '../../../../convex/_generated/api';
 import { ClassCodeInput } from '@/app/components/shared/class-code-input';
 import { TasksTracking } from '@/app/dashboard/teacher/tasks-tracking';
 import '@/styles/components/teacher-dashboard-glass.css';
 import { Toaster } from 'react-hot-toast';
-import { CustomUserMenu } from '@/app/dashboard/teacher/custom-user-menu'; // ✨ 新增导入
+import { CustomUserMenu } from '@/app/dashboard/teacher/custom-user-menu';
 import {
   GraduationCap,
   Users,
   Plus,
   BookOpen,
-  CheckCircle,
-  AlertCircle,
   TrendingUp,
   Award,
   Clock,
   Sparkles,
   CheckSquare
 } from 'lucide-react';
-import toast from 'react-hot-toast';
 
 export default function TeacherDashboard() {
   const { user } = useUser();
@@ -39,54 +35,10 @@ export default function TeacherDashboard() {
     user?.id ? { teacherId: user.id } : 'skip'
   );
 
-  const [className, setClassName] = useState('');
-  const [isCreating, setIsCreating] = useState(false);
-  const [feedback, setFeedback] = useState<{
-    type: 'success' | 'error';
-    message: string;
-  } | null>(null);
-
-  const createClass = useMutation(api.classes.createClass);
-
   // 获取显示的名字
   const displayName = profile?.firstName
     ? `${profile.firstName}${profile.lastName ? ' ' + profile.lastName : ''}`
     : user?.firstName || 'Teacher';
-
-  const handleClassCreated = async (code: string) => {
-    if (!user || !className.trim()) {
-      setFeedback({
-        type: 'error',
-        message: 'Please enter a class name',
-      });
-      toast.error('Please enter a class name');
-      return;
-    }
-
-    setIsCreating(true);
-    try {
-      await createClass({
-        code,
-        teacherId: user.id,
-        name: className.trim(),
-      });
-
-      setFeedback({
-        type: 'success',
-        message: `Class "${className}" created successfully with code: ${code}`,
-      });
-      toast.success(`Class "${className}" created! 🎉`);
-      setClassName('');
-    } catch {
-      setFeedback({
-        type: 'error',
-        message: 'Failed to create class. Please try again.',
-      });
-      toast.error('Failed to create class');
-    } finally {
-      setIsCreating(false);
-    }
-  };
 
   // 跳转到所有课程页面
   const viewAllClasses = () => {
@@ -185,7 +137,7 @@ export default function TeacherDashboard() {
               </p>
               <div className="glass-stat-trend">
                 <Award size={16} />
-                <span>View All</span> {/* 改为 View All */}
+                <span>View All</span>
               </div>
             </div>
             <div className="glass-stat-decoration"></div>
@@ -227,25 +179,8 @@ export default function TeacherDashboard() {
               </div>
             </div>
 
-            {feedback && (
-              <div className={`glass-feedback ${feedback.type}`}>
-                <div className="glass-feedback-icon">
-                  {feedback.type === 'success' ? (
-                    <CheckCircle size={20} strokeWidth={2.5} />
-                  ) : (
-                    <AlertCircle size={20} strokeWidth={2.5} />
-                  )}
-                </div>
-                <span>{feedback.message}</span>
-              </div>
-            )}
-
             <div className="glass-form-wrapper">
-              <ClassCodeInput
-                userRole="teacher"
-                onClassCreated={handleClassCreated}
-                isDisabled={isCreating}
-              />
+              <ClassCodeInput userRole="teacher" />
             </div>
           </section>
 
