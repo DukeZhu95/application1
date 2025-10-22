@@ -14,7 +14,7 @@ interface TeacherProfile {
 
 interface CustomUserMenuProps {
   afterSignOutUrl?: string;
-  profile?: TeacherProfile; // 改为具体类型
+  profile?: TeacherProfile | null; // 改为具体类型
 }
 
 export function CustomUserMenu({ afterSignOutUrl, profile }: CustomUserMenuProps) {
