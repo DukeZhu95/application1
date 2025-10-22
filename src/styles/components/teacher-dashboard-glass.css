@@ -139,6 +139,8 @@
   padding: 2rem 1rem;
   max-width: 1400px;
   margin: 0 auto;
+  max-height: none;
+  overflow: visible;
 }
 
 /* 欢迎区域 */
@@ -341,9 +343,10 @@
 
 /* 章节 */
 .glass-sections {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
 }
 
 .glass-section {
@@ -680,6 +683,10 @@
 @media (max-width: 1024px) {
   .glass-class-grid {
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+
+  .glass-sections {
+      grid-template-columns: 1fr; /* 小屏幕改为上下排列 */
   }
 }
 

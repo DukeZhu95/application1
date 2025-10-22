@@ -268,3 +268,53 @@ export const generateUploadUrl = mutation({
     return await ctx.storage.generateUploadUrl();
   },
 });
+
+/**
+ * 获取教师的所有任务
+ * 用于 Tasks Tracking 组件
+ */
+export const getTeacherTasks = query({
+  args: {
+    teacherId: v.string()
+  },
+  handler: async (ctx, args) => {
+    // 1. 获取教师的所有课程
+    const classrooms = await ctx.db
+      .query("classrooms")
+      .filter((q) => q.eq(q.field("teacherId"), args.teacherId))
+      .collect();
+
+    // 2. 获取所有课程的任务
+    const allTasks = [];
+    for (const classroom of classrooms) {
+      const tasks = await ctx.db
+        .query("tasks")
+        .withIndex("by_classroom", (q) => q.eq("classroomId", classroom._id))
+        .collect();
+
+      // 为每个任务添加课程信息和提交统计
+      for (const task of tasks) {
+        // 获取该任务的所有提交
+        const submissions = await ctx.db
+          .query("taskSubmissions")
+          .withIndex("by_task", (q) => q.eq("taskId", task._id))
+          .collect();
+
+        allTasks.push({
+          ...task,
+          classId: classroom._id, // 为了兼容组件
+          submissions: submissions, // 添加提交数组
+        });
+      }
+    }
+
+    // 3. 按截止日期排序（最近的在前）
+    allTasks.sort((a, b) => {
+      if (!a.dueDate) return 1;
+      if (!b.dueDate) return -1;
+      return a.dueDate - b.dueDate;
+    });
+
+    return allTasks;
+  },
+});

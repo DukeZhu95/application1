@@ -1,13 +1,9 @@
 /* src/styles/global/base.css */
 body {
     min-height: 100vh;
-    /* ✅ 移除了 display: flex 和 flex-direction: column */
-    /* 这两个属性导致所有子元素都受 flexbox 影响 */
 }
 
-/* ✅ 只对需要 flex 布局的页面应用 */
-/* 如果你的 dashboard 等页面需要 flex 布局，可以添加特定的类 */
-body:not(:has(.auth-page-container)) main {
+body:not(:has(.auth-page-container)):not(:has(.teacher-dashboard)) main {
     display: flex;
     flex-direction: column;
     min-height: 100vh;

@@ -6,35 +6,34 @@ import { useMutation, useQuery } from 'convex/react';
 import { useRouter } from 'next/navigation';
 import { api } from '../../../../convex/_generated/api';
 import { ClassCodeInput } from '@/app/components/shared/class-code-input';
-import { Button } from '@/app/components/ui/button';
-import { CreateTaskForm } from '@/app/dashboard/teacher/create-task-form';
+import { TasksTracking } from '@/app/dashboard/teacher/tasks-tracking';
+import '@/styles/components/teacher-dashboard-glass.css';
 import { Toaster } from 'react-hot-toast';
 import { CustomUserMenu } from '@/app/dashboard/teacher/custom-user-menu'; // ✨ 新增导入
 import {
   GraduationCap,
   Users,
   Plus,
-  Eye,
-  FileText,
   BookOpen,
   CheckCircle,
   AlertCircle,
   TrendingUp,
   Award,
   Clock,
-  Sparkles
+  Sparkles,
+  CheckSquare
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function TeacherDashboard() {
   const { user } = useUser();
-  const [currentClass, setCurrentClass] = useState<string | null>(null);
   const router = useRouter();
 
   const classes = useQuery(api.classes.getTeacherClasses, {
     teacherId: user?.id || '',
   });
 
-  // ✨ 新增：获取教师资料
+  // 获取教师资料
   const profile = useQuery(
     api.teachers.getTeacherProfile,
     user?.id ? { teacherId: user.id } : 'skip'
@@ -49,12 +48,18 @@ export default function TeacherDashboard() {
 
   const createClass = useMutation(api.classes.createClass);
 
+  // 获取显示的名字
+  const displayName = profile?.firstName
+    ? `${profile.firstName}${profile.lastName ? ' ' + profile.lastName : ''}`
+    : user?.firstName || 'Teacher';
+
   const handleClassCreated = async (code: string) => {
     if (!user || !className.trim()) {
       setFeedback({
         type: 'error',
         message: 'Please enter a class name',
       });
+      toast.error('Please enter a class name');
       return;
     }
 
@@ -70,20 +75,32 @@ export default function TeacherDashboard() {
         type: 'success',
         message: `Class "${className}" created successfully with code: ${code}`,
       });
+      toast.success(`Class "${className}" created! 🎉`);
       setClassName('');
     } catch {
       setFeedback({
         type: 'error',
         message: 'Failed to create class. Please try again.',
       });
+      toast.error('Failed to create class');
     } finally {
       setIsCreating(false);
     }
   };
 
+  // 跳转到所有课程页面
+  const viewAllClasses = () => {
+    router.push('/dashboard/teacher/classes');
+  };
+
+  // 计算最近的课程（占位功能）
+  const getRecentLessons = () => {
+    // TODO: 实现获取最近课程的逻辑
+    return 'Today';
+  };
+
   return (
-    <div className="glass-dashboard-container">
-      <Toaster position="top-center" />
+    <div className="glass-dashboard-container teacher-dashboard">
       {/* 动态背景 */}
       <div className="glass-background">
         <div className="glass-bg-gradient-1"></div>
@@ -105,7 +122,6 @@ export default function TeacherDashboard() {
               </div>
             </div>
             <div className="glass-user-section">
-              {/* ✨ 替换为自定义用户菜单 */}
               <CustomUserMenu
                 afterSignOutUrl="/auth/sign-in"
                 profile={profile}
@@ -124,8 +140,7 @@ export default function TeacherDashboard() {
             </div>
             <div>
               <h2 className="glass-welcome-title">
-                {/* ✨ 优先显示资料中的名字 */}
-                Welcome back, {profile?.firstName || user?.firstName || 'Teacher'}! 👋
+                Welcome back, {displayName}! 👋
               </h2>
               <p className="glass-welcome-subtitle">
                 Ready to inspire minds today? Manage your classes and create engaging content.
@@ -134,9 +149,13 @@ export default function TeacherDashboard() {
           </div>
         </div>
 
-        {/* 统计卡片网格 */}
+        {/* 快速统计卡片 - 可点击 */}
         <div className="glass-stats-grid">
-          <div className="glass-stat-card glass-stat-card-1">
+          <div
+            className="glass-stat-card glass-stat-card-1"
+            onClick={viewAllClasses}
+            style={{ cursor: 'pointer' }}
+          >
             <div className="glass-stat-icon-wrapper">
               <BookOpen size={28} strokeWidth={2} />
             </div>
@@ -145,7 +164,7 @@ export default function TeacherDashboard() {
               <p className="glass-stat-value">{classes?.length || 0}</p>
               <div className="glass-stat-trend">
                 <TrendingUp size={16} />
-                <span>Active</span>
+                <span>View All</span>
               </div>
             </div>
             <div className="glass-stat-decoration"></div>
@@ -173,19 +192,20 @@ export default function TeacherDashboard() {
               <Clock size={28} strokeWidth={2} />
             </div>
             <div className="glass-stat-content">
-              <p className="glass-stat-label">Recent Activity</p>
-              <p className="glass-stat-value">Live</p>
+              <p className="glass-stat-label">Recent Lessons</p>
+              <p className="glass-stat-value">{getRecentLessons()}</p>
               <div className="glass-stat-trend">
                 <div className="glass-pulse"></div>
-                <span>Online</span>
+                <span>Active</span>
               </div>
             </div>
             <div className="glass-stat-decoration"></div>
           </div>
         </div>
 
+        {/* 主要内容区域 - 两栏布局 */}
         <div className="glass-sections">
-          {/* 创建班级部分 */}
+          {/* 创建班级部分 - 左侧 */}
           <section className="glass-section">
             <div className="glass-section-header">
               <div className="glass-section-title-group">
@@ -221,101 +241,52 @@ export default function TeacherDashboard() {
             </div>
           </section>
 
-          {/* 班级列表部分 */}
+          {/* 任务追踪部分 - 右侧 */}
           <section className="glass-section">
             <div className="glass-section-header">
               <div className="glass-section-title-group">
                 <div className="glass-section-icon">
-                  <BookOpen size={24} strokeWidth={2.5} />
+                  <CheckSquare size={24} strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h2>Your Classes</h2>
-                  <p className="glass-section-subtitle">Manage and organize your teaching spaces</p>
+                  <h2>Tasks Tracking</h2>
+                  <p className="glass-section-subtitle">
+                    Monitor student progress and upcoming deadlines
+                  </p>
                 </div>
               </div>
             </div>
-
-            {classes === undefined ? (
-              <div className="glass-loading">
-                <div className="glass-loading-spinner"></div>
-                <p>Loading your classes...</p>
-              </div>
-            ) : classes.length === 0 ? (
-              <div className="glass-empty-state">
-                <div className="glass-empty-icon">
-                  <BookOpen size={72} strokeWidth={1.5} />
-                </div>
-                <h3 className="glass-empty-title">No classes yet</h3>
-                <p className="glass-empty-subtitle">
-                  Create your first class above to start teaching!
-                </p>
-              </div>
-            ) : (
-              <div className="glass-class-grid">
-                {classes.map((classItem, index) => (
-                  <div
-                    key={classItem._id}
-                    className="glass-class-card"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <div className="glass-card-glow"></div>
-
-                    <div className="glass-class-header">
-                      <div className="glass-class-icon-wrapper">
-                        <BookOpen size={32} strokeWidth={2} />
-                        <div className="glass-icon-glow"></div>
-                      </div>
-                      <div className="glass-class-info">
-                        <h3 className="glass-class-name">{classItem.name}</h3>
-                        <div className="glass-class-meta">
-                          <span className="glass-badge glass-badge-code">
-                            {classItem.code}
-                          </span>
-                          <span className="glass-badge glass-badge-students">
-                            <Users size={14} strokeWidth={2.5} />
-                            {classItem.students.length}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="glass-class-actions">
-                      <Button
-                        onClick={() =>
-                          router.push(
-                            `/dashboard/teacher/class/${classItem._id}`
-                          )
-                        }
-                        variant="outline"
-                        className="glass-action-btn glass-btn-view"
-                      >
-                        <Eye size={18} strokeWidth={2} />
-                        <span>View Details</span>
-                      </Button>
-                      <Button
-                        onClick={() => setCurrentClass(classItem._id)}
-                        className="glass-action-btn glass-btn-create"
-                      >
-                        <FileText size={18} strokeWidth={2} />
-                        <span>Create Task</span>
-                      </Button>
-                    </div>
-
-                    {currentClass === classItem._id && (
-                      <div className="glass-task-form-wrapper">
-                        <CreateTaskForm
-                          classId={classItem._id}
-                          onClose={() => setCurrentClass(null)}
-                        />
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="glass-tasks-wrapper">
+              <TasksTracking />
+            </div>
           </section>
         </div>
       </main>
+
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#a78bfa',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
     </div>
   );
 }
