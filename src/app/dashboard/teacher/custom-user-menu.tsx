@@ -5,9 +5,16 @@ import { useUser, useClerk } from '@clerk/nextjs';
 import { TeacherProfileEditor } from './profile-editor';
 import { Settings, LogOut } from 'lucide-react';
 
+// 定义 profile 类型
+interface TeacherProfile {
+  firstName?: string;
+  lastName?: string;
+  avatar?: string;
+}
+
 interface CustomUserMenuProps {
   afterSignOutUrl?: string;
-  profile?: any;
+  profile?: TeacherProfile; // 改为具体类型
 }
 
 export function CustomUserMenu({ afterSignOutUrl, profile }: CustomUserMenuProps) {
