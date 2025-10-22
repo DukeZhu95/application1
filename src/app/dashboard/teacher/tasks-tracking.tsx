@@ -6,6 +6,18 @@ import { api } from '../../../../convex/_generated/api';
 import { Clock, Users, CheckCircle2, AlertCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
+interface Task {
+  _id: string;
+  title: string;
+  classId: string;
+  dueDate?: number;
+  submissions?: Array<{
+    _id: string;
+    studentId: string;
+    [key: string]: unknown;
+  }>;
+}
+
 export function TasksTracking() {
   const { user } = useUser();
 
@@ -46,7 +58,7 @@ export function TasksTracking() {
   }
 
   // 计算任务完成情况
-  const getTaskCompletion = (task: any) => {
+  const getTaskCompletion = (task: Task) => {
     const classInfo = classes?.find((c) => c._id === task.classId);
     const totalStudents = classInfo?.students.length || 0;
     const completedCount = task.submissions?.length || 0;
