@@ -1,0 +1,130 @@
+/* 学生网格布局 */
+.student-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* 学生卡片 */
+.student-card {
+    position: relative;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 20px;
+    padding: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.student-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+    background: rgba(255, 255, 255, 0.85);
+}
+
+/* 学生头像 */
+.student-avatar-wrapper {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.student-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+    border-radius: 50%;
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    box-shadow: 0 8px 16px rgba(86, 171, 47, 0.3);
+}
+
+/* 学生信息 */
+.student-info {
+    text-align: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.student-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 0.5rem 0;
+}
+
+.student-id {
+    font-size: 0.875rem;
+    color: rgba(0, 0, 0, 0.6);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* 课程列表 */
+.student-classes {
+    margin-bottom: 1rem;
+}
+
+.student-classes-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.7);
+    margin-bottom: 0.75rem;
+}
+
+.student-classes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.student-class-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(102, 126, 234, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 10px;
+    color: #667eea;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.student-class-badge:hover {
+    background: rgba(102, 126, 234, 0.2);
+    border-color: #667eea;
+    transform: translateX(4px);
+}
+
+/* 加入日期 */
+.student-joined {
+    text-align: center;
+    font-size: 0.75rem;
+    color: rgba(0, 0, 0, 0.5);
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .student-grid {
+        grid-template-columns: 1fr;
+    }
+}

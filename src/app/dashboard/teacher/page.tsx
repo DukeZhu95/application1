@@ -170,7 +170,11 @@ export default function TeacherDashboard() {
             <div className="glass-stat-decoration"></div>
           </div>
 
-          <div className="glass-stat-card glass-stat-card-2">
+          <div
+            className="glass-stat-card glass-stat-card-2"
+            onClick={() => router.push('/dashboard/teacher/students')}
+            style={{ cursor: 'pointer' }}
+          >
             <div className="glass-stat-icon-wrapper">
               <Users size={28} strokeWidth={2} />
             </div>
@@ -181,13 +185,17 @@ export default function TeacherDashboard() {
               </p>
               <div className="glass-stat-trend">
                 <Award size={16} />
-                <span>Enrolled</span>
+                <span>View All</span> {/* 改为 View All */}
               </div>
             </div>
             <div className="glass-stat-decoration"></div>
           </div>
 
-          <div className="glass-stat-card glass-stat-card-3">
+          <div
+            className="glass-stat-card glass-stat-card-3"
+            onClick={() => router.push('/dashboard/teacher/schedule')}
+            style={{ cursor: 'pointer' }}
+          >
             <div className="glass-stat-icon-wrapper">
               <Clock size={28} strokeWidth={2} />
             </div>
@@ -196,7 +204,7 @@ export default function TeacherDashboard() {
               <p className="glass-stat-value">{getRecentLessons()}</p>
               <div className="glass-stat-trend">
                 <div className="glass-pulse"></div>
-                <span>Active</span>
+                <span>View Schedule</span>
               </div>
             </div>
             <div className="glass-stat-decoration"></div>
