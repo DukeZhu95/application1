@@ -318,3 +318,77 @@ export const getTeacherTasks = query({
     return allTasks;
   },
 });
+
+/**
+ * 获取学生的所有任务
+ * 用于学生Dashboard的任务列表
+ */
+export const getStudentTasks = query({
+  args: {
+    userId: v.string()
+  },
+  handler: async (ctx, args) => {
+    // 1. 获取所有课程
+    const allClassrooms = await ctx.db.query("classrooms").collect();
+
+    // 2. 筛选出学生加入的课程
+    const studentClassrooms = allClassrooms.filter(classroom =>
+      classroom.students.some(student => student.studentId === args.userId)
+    );
+
+    if (studentClassrooms.length === 0) {
+      return [];
+    }
+
+    // 3. 获取这些课程的所有任务
+    const allTasks = [];
+
+    for (const classroom of studentClassrooms) {
+      // 获取该课程的所有激活任务
+      const tasks = await ctx.db
+        .query("tasks")
+        .withIndex("by_classroom", (q) => q.eq("classroomId", classroom._id))
+        .filter((q) => q.eq(q.field("status"), "active"))
+        .collect();
+
+      // 为每个任务添加课程信息和提交状态
+      for (const task of tasks) {
+        // 检查学生是否已提交
+        const submission = await ctx.db
+          .query("taskSubmissions")
+          .withIndex("by_task_student", (q) =>
+            q.eq("taskId", task._id).eq("studentId", args.userId)
+          )
+          .first();
+
+        allTasks.push({
+          ...task,
+          className: classroom.name || "Unnamed Class",
+          classCode: classroom.code,
+          isSubmitted: !!submission,
+          submissionStatus: submission?.status || null,
+          grade: submission?.grade || null,
+          feedback: submission?.feedback || null,
+        });
+      }
+    }
+
+    // 4. 按截止日期排序
+    allTasks.sort((a, b) => {
+      if (!a.dueDate && !b.dueDate) return 0;
+      if (!a.dueDate) return 1;
+      if (!b.dueDate) return -1;
+
+      const now = Date.now();
+      const aOverdue = a.dueDate < now;
+      const bOverdue = b.dueDate < now;
+
+      if (aOverdue && !bOverdue) return -1;
+      if (!aOverdue && bOverdue) return 1;
+
+      return a.dueDate - b.dueDate;
+    });
+
+    return allTasks;
+  },
+});

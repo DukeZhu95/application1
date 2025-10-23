@@ -1,74 +1,20 @@
 'use client';
 
 import { useUser } from '@clerk/nextjs';
-// import { useQuery } from 'convex/react';
-// import { api } from '../../../../convex/_generated/api';
-// import { formatDate } from '@/lib/utils';
-// import { Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { useQuery } from 'convex/react';
+import { api } from '../../../../convex/_generated/api';
 import { Clock, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-
-// 临时模拟数据（因为需要创建新的 Convex 查询函数）
-const mockTasks = [
-  {
-    _id: '1',
-    title: 'Guitar Practice: Chord Transitions',
-    description: 'Practice smooth transitions between G, C, and D chords',
-    dueDate: Date.now() + 3 * 24 * 60 * 60 * 1000, // 3天后
-    classCode: 'COM555',
-    className: 'Guitar Basics',
-    status: 'pending',
-  },
-  {
-    _id: '2',
-    title: 'Music Theory Assignment',
-    description: 'Complete Chapter 3 exercises on scales',
-    dueDate: Date.now() + 5 * 24 * 60 * 60 * 1000, // 5天后
-    classCode: 'TES123',
-    className: 'Music Theory 101',
-    status: 'in-progress',
-  },
-  {
-    _id: '3',
-    title: 'Submit Practice Recording',
-    description: 'Record and submit your practice session',
-    dueDate: Date.now() - 1 * 24 * 60 * 60 * 1000, // 1天前（逾期）
-    classCode: 'GTR100',
-    className: 'Advanced Guitar',
-    status: 'overdue',
-  },
-  {
-    _id: '4',
-    title: 'Scale Practice Exercise',
-    description: 'Practice major and minor scales',
-    dueDate: Date.now() + 1 * 24 * 60 * 60 * 1000, // 1天后
-    classCode: 'COM555',
-    className: 'Guitar Basics',
-    status: 'pending',
-  },
-  {
-    _id: '5',
-    title: 'Rhythm Training',
-    description: 'Complete rhythm exercises 1-10',
-    dueDate: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7天后
-    classCode: 'TES123',
-    className: 'Music Theory 101',
-    status: 'pending',
-  },
-];
 
 export function AllTasksList() {
   const { user } = useUser();
   const router = useRouter();
 
-  // TODO: 创建 Convex 查询函数来获取所有任务
-  // const tasks = useQuery(
-  //   api.tasks.getStudentAllTasks,
-  //   user?.id ? { studentId: user.id } : 'skip'
-  // );
-
-  // 暂时使用模拟数据
-  const tasks = mockTasks;
+  // 从数据库获取真实任务
+  const tasks = useQuery(
+    api.tasks.getStudentTasks,
+    user?.id ? { userId: user.id } : 'skip'
+  );
 
   if (!user?.id) {
     return (
@@ -78,6 +24,33 @@ export function AllTasksList() {
         color: '#6b7280'
       }}>
         Please sign in to view your tasks.
+      </div>
+    );
+  }
+
+  // 加载状态
+  if (tasks === undefined) {
+    return (
+      <div style={{
+        padding: '3rem 2rem',
+        textAlign: 'center',
+        color: '#6b7280',
+      }}>
+        <div style={{
+          width: '48px',
+          height: '48px',
+          border: '4px solid rgba(79, 172, 254, 0.2)',
+          borderTopColor: '#4facfe',
+          borderRadius: '50%',
+          margin: '0 auto 1rem',
+          animation: 'spin 1s linear infinite',
+        }} />
+        <p>Loading tasks...</p>
+        <style jsx>{`
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+        `}</style>
       </div>
     );
   }
@@ -95,6 +68,11 @@ export function AllTasksList() {
 
   // 按截止日期排序（越紧急的越靠前）
   const sortedTasks = [...tasks].sort((a, b) => {
+    // 如果没有截止日期，排在最后
+    if (!a.dueDate && !b.dueDate) return 0;
+    if (!a.dueDate) return 1;
+    if (!b.dueDate) return -1;
+
     const daysA = getDaysRemaining(a.dueDate);
     const daysB = getDaysRemaining(b.dueDate);
 
@@ -110,7 +88,17 @@ export function AllTasksList() {
   });
 
   // 获取状态样式
-  const getStatusStyle = (dueDate: number) => {
+  const getStatusStyle = (dueDate?: number) => {
+    if (!dueDate) {
+      return {
+        color: '#6b7280',
+        text: 'No deadline',
+        icon: <Clock size={18} style={{ color: '#6b7280' }} />,
+        bgColor: 'rgba(255, 255, 255, 0.6)',
+        borderColor: 'rgba(255, 255, 255, 0.3)',
+      };
+    }
+
     const days = getDaysRemaining(dueDate);
     if (days < 0) {
       return {
@@ -173,15 +161,13 @@ export function AllTasksList() {
         flexDirection: 'column',
       }}
     >
-      {/* 可滚动的任务列表容器 */}
       <div
         className="tasks-scroll-container"
         style={{
-          maxHeight: '355px', // 恰好显示 2 个任务的高度
-          overflowY: 'auto',  // 启用垂直滚动
+          maxHeight: '355px',
+          overflowY: 'auto',
           overflowX: 'hidden',
-          paddingRight: '0.5rem', // 为滚动条留出空间
-          // 自定义滚动条样式
+          paddingRight: '0.5rem',
         }}
       >
         <div
@@ -207,7 +193,8 @@ export function AllTasksList() {
                   cursor: 'pointer',
                 }}
                 onClick={() => {
-                  router.push(`/dashboard/student/classroom/${task.classCode}/task/${task._id}`);
+                  // 导航到任务详情页
+                  router.push(`/dashboard/student/task/${task._id}`);
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = 'rgba(255, 255, 255, 0.85)';
@@ -259,7 +246,8 @@ export function AllTasksList() {
                     color: '#6b7280',
                     fontWeight: '500',
                   }}>
-                    {task.className} ({task.classCode})
+                    {/* 显示课程名称 - 如果有的话 */}
+                    {task.className || 'Classroom'}
                   </span>
 
                   <span style={{
@@ -276,7 +264,6 @@ export function AllTasksList() {
         </div>
       </div>
 
-      {/* 任务数量提示 */}
       <div
         style={{
           marginTop: '1rem',
@@ -293,36 +280,30 @@ export function AllTasksList() {
           fontWeight: '600',
         }}>
           {sortedTasks.length} {sortedTasks.length === 1 ? 'task' : 'tasks'} total
-          {sortedTasks.filter(t => getDaysRemaining(t.dueDate) < 0).length > 0 && (
+          {sortedTasks.filter(t => t.dueDate && getDaysRemaining(t.dueDate) < 0).length > 0 && (
             <span style={{ color: '#ef4444', marginLeft: '0.5rem' }}>
-              • {sortedTasks.filter(t => getDaysRemaining(t.dueDate) < 0).length} overdue
+              • {sortedTasks.filter(t => t.dueDate && getDaysRemaining(t.dueDate) < 0).length} overdue
             </span>
           )}
         </p>
       </div>
 
-      {/* CSS for custom scrollbar */}
       <style jsx>{`
           .tasks-scroll-container::-webkit-scrollbar {
               width: 8px;
           }
-
           .tasks-scroll-container::-webkit-scrollbar-track {
               background: rgba(0, 0, 0, 0.05);
               border-radius: 10px;
           }
-
           .tasks-scroll-container::-webkit-scrollbar-thumb {
               background: rgba(79, 172, 254, 0.3);
               border-radius: 10px;
               transition: background 0.3s;
           }
-
           .tasks-scroll-container::-webkit-scrollbar-thumb:hover {
               background: rgba(79, 172, 254, 0.5);
           }
-
-          /* Firefox scrollbar */
           .tasks-scroll-container {
               scrollbar-width: thin;
               scrollbar-color: rgba(79, 172, 254, 0.3) rgba(0, 0, 0, 0.05);
