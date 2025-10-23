@@ -210,7 +210,7 @@ export default function AllClassesPage() {
                       className="glass-action-btn glass-btn-view"
                     >
                       <Eye size={18} strokeWidth={2} />
-                      <span>View Details</span>
+                      <span>View</span>
                     </Button>
                     <Button
                       onClick={() =>
