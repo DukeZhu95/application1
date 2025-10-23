@@ -10,13 +10,6 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { CheckCircle2, AlertCircle, BookOpen, User, Info } from 'lucide-react';
 
-interface ConvexError {
-  message: string;
-  code?: string;
-  data?: unknown;
-  stack?: string;
-}
-
 export function JoinClassForm() {
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -56,42 +49,69 @@ export function JoinClassForm() {
   const handleJoinClass = async () => {
     if (!user || !code.trim()) return;
 
-    console.log('Attempting to join class with code:', code);
-    console.log('User ID:', user.id);
-
     try {
       setIsLoading(true);
+
+      // 调用 mutation - 不会抛出错误，返回状态对象
       const result = await joinClass({
         code: code.toUpperCase(),
         studentId: user.id,
       });
 
-      console.log('Join class result:', result);
+      // 检查返回的结果
+      if (!result.success) {
+        // 处理错误，但不会有控制台报错
+        let errorMessage = result.error || 'Failed to join class';
 
-      toast.success('Successfully joined the class! 🎉');
+        if (result.code === 'ALREADY_JOINED') {
+          errorMessage = '⚠️ You have already joined this class';
+        } else if (result.code === 'NOT_FOUND') {
+          errorMessage = '❌ Class not found. Please check the code';
+        }
+
+        toast.error(errorMessage, {
+          duration: 4000,
+          style: {
+            background: '#ef4444',
+            color: '#fff',
+            fontSize: '14px',
+            fontWeight: '600',
+          },
+        });
+
+        return; // 提前返回，不执行后续代码
+      }
+
+      // 成功加入
+      toast.success('Successfully joined the class! 🎉', {
+        duration: 3000,
+        style: {
+          background: '#10b981',
+          color: '#fff',
+          fontSize: '14px',
+          fontWeight: '600',
+        },
+      });
 
       // 清空输入
       setCode('');
       setShowPreview(false);
 
-      // 使用 router.push 到当前路径来触发页面刷新
+      // 刷新页面
       const currentPath = window.location.pathname;
       router.push(currentPath);
+
     } catch (error) {
-      console.error('Error joining class:', error);
-
-      const convexError = error as ConvexError;
-      let errorMessage = 'Failed to join class';
-
-      if (convexError.message) {
-        if (convexError.message.includes('already a member')) {
-          errorMessage = 'You are already a member of this class';
-        } else if (convexError.message.includes('not found')) {
-          errorMessage = 'Class not found. Please check the code and try again';
-        }
-      }
-
-      toast.error(errorMessage);
+      // 这里不应该执行了，因为后端不再抛出错误
+      // 但保留作为后备
+      console.error('Unexpected error:', error);
+      toast.error('An unexpected error occurred', {
+        duration: 4000,
+        style: {
+          background: '#ef4444',
+          color: '#fff',
+        },
+      });
     } finally {
       setIsLoading(false);
     }
@@ -321,16 +341,16 @@ export function JoinClassForm() {
       )}
 
       <style jsx>{`
-        @keyframes slideInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
+          @keyframes slideInUp {
+              from {
+                  opacity: 0;
+                  transform: translateY(20px);
+              }
+              to {
+                  opacity: 1;
+                  transform: translateY(0);
+              }
           }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
       `}</style>
     </div>
   );

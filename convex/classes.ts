@@ -43,7 +43,7 @@ export const createClass = mutation({
   },
 });
 
-// 学生加入班级
+// 学生加入班级 - 修改为返回状态而不是抛出错误
 export const joinClass = mutation({
   args: {
     code: v.string(),
@@ -57,7 +57,11 @@ export const joinClass = mutation({
       .first();
 
     if (!classroom) {
-      throw new Error('Classroom not found');
+      return {
+        success: false,
+        error: 'Classroom not found',
+        code: 'NOT_FOUND'
+      };
     }
 
     // 检查学生是否已经加入
@@ -66,7 +70,11 @@ export const joinClass = mutation({
     );
 
     if (isAlreadyJoined) {
-      throw new Error('Already joined this class');
+      return {
+        success: false,
+        error: 'Already joined this class',
+        code: 'ALREADY_JOINED'
+      };
     }
 
     // 添加学生到课程
@@ -81,7 +89,11 @@ export const joinClass = mutation({
       ],
     });
 
-    return classroom;
+    return {
+      success: true,
+      classroom: classroom,
+      classroomId: classroom._id
+    };
   },
 });
 
