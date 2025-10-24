@@ -19,6 +19,110 @@ body {
     background: var(--background);
     font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ============================================
+   Dialog 浅色主题样式
+   ============================================ */
+
+[data-radix-dialog-overlay] {
+    background: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(4px) !important;
+}
+
+[data-radix-dialog-content],
+[role="dialog"] {
+    background: #ffffff !important;
+    border: 1px solid rgba(139, 92, 246, 0.2) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+    color: #1f2937 !important;
+}
+
+/* Dialog 标题 */
+[data-radix-dialog-content] h2,
+[role="dialog"] h2 {
+    color: #1f2937 !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+}
+
+/* Dialog 标签 */
+[data-radix-dialog-content] label,
+[role="dialog"] label {
+    color: #6b7280 !important;
+    font-weight: 600 !important;
+}
+
+/* Dialog 输入框 */
+[data-radix-dialog-content] input,
+[data-radix-dialog-content] textarea,
+[role="dialog"] input,
+[role="dialog"] textarea {
+    background: rgba(139, 92, 246, 0.05) !important;
+    border: 2px solid rgba(139, 92, 246, 0.2) !important;
+    border-radius: 12px !important;
+    color: #1f2937 !important;
+}
+
+[data-radix-dialog-content] input:focus,
+[data-radix-dialog-content] textarea:focus,
+[role="dialog"] input:focus,
+[role="dialog"] textarea:focus {
+    background: rgba(139, 92, 246, 0.08) !important;
+    border-color: rgba(139, 92, 246, 0.5) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1) !important;
+}
+
+[data-radix-dialog-content] input::placeholder,
+[data-radix-dialog-content] textarea::placeholder,
+[role="dialog"] input::placeholder,
+[role="dialog"] textarea::placeholder {
+    color: #9ca3af !important;
+}
+
+/* Dialog 提交按钮 */
+[data-radix-dialog-content] button[type="submit"],
+[role="dialog"] button[type="submit"] {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa) !important;
+    border: none !important;
+    color: #ffffff !important;
+}
+
+[data-radix-dialog-content] button[type="submit"]:hover,
+[role="dialog"] button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;
+}
+
+/* Dialog 取消按钮 */
+[data-radix-dialog-content] button[type="button"]:not([aria-label="Close"]),
+[role="dialog"] button[type="button"]:not([aria-label="Close"]) {
+    background: transparent !important;
+    border: 2px solid rgba(139, 92, 246, 0.2) !important;
+    color: #8b5cf6 !important;
+}
+
+[data-radix-dialog-content] button[type="button"]:hover:not([aria-label="Close"]),
+[role="dialog"] button[type="button"]:hover:not([aria-label="Close"]) {
+    background: rgba(139, 92, 246, 0.05) !important;
+    border-color: rgba(139, 92, 246, 0.4) !important;
+}
+
+/* Dialog 关闭按钮 */
+[data-radix-dialog-content] button[aria-label="Close"],
+[role="dialog"] button[aria-label="Close"] {
+    color: #6b7280 !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+[data-radix-dialog-content] button[aria-label="Close"]:hover,
+[role="dialog"] button[aria-label="Close"]:hover {
+    background: rgba(107, 114, 128, 0.1) !important;
+    color: #1f2937 !important;
+}
+
 /* ============================================
    强制覆盖 Input 黑色背景
    ============================================ */

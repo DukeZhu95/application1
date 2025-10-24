@@ -33,7 +33,7 @@ export default defineSchema({
       filterFields: ['students'],
     }),
 
-  // 已有的 tasks 表
+  // tasks 表
   tasks: defineTable({
     title: v.string(),
     description: v.string(),
@@ -41,7 +41,17 @@ export default defineSchema({
     teacherId: v.string(),
     dueDate: v.optional(v.number()),
     createdAt: v.number(),
-    status: v.string(), // 'active' | 'archived'
+    status: v.string(),
+
+    // 旧字段（单个文件）- 保留兼容
+    storageId: v.optional(v.string()),
+    attachmentName: v.optional(v.string()),
+    attachmentUrl: v.optional(v.string()),
+
+    // 新字段（多文件）- 数组
+    storageIds: v.optional(v.array(v.string())),
+    attachmentNames: v.optional(v.array(v.string())),
+    attachmentUrls: v.optional(v.array(v.string())),
   })
     .index('by_classroom', ['classroomId'])
     .index('by_teacher', ['teacherId']),

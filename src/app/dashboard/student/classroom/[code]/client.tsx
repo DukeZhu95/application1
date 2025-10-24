@@ -4,12 +4,9 @@ import { useQuery } from 'convex/react';
 import { api } from '../../../../../../convex/_generated/api';
 import { StudentTaskList } from '@/app/dashboard/student/task-list';
 import { ClassroomHeader } from '@/app/dashboard/student/classroom-header';
-import { 
-  BookOpen, 
-  Calendar, 
+import {
+  BookOpen,
   Users,
-  TrendingUp,
-  Clock,
   CheckCircle,
   FileText
 } from 'lucide-react';
@@ -19,9 +16,15 @@ interface ClassroomPageClientProps {
 }
 
 export default function ClassroomPageClient({
-  code,
-}: ClassroomPageClientProps) {
+                                              code,
+                                            }: ClassroomPageClientProps) {
   const classroom = useQuery(api.classes.getClassInfo, { code });
+
+  // 查询教师资料以获取真实姓名
+  const teacher = useQuery(
+    api.teachers.getTeacherProfile,
+    classroom?.teacherId ? { teacherId: classroom.teacherId } : 'skip'
+  );
 
   if (!classroom) {
     return (
@@ -38,6 +41,11 @@ export default function ClassroomPageClient({
       </div>
     );
   }
+
+  // 获取教师显示名称
+  const teacherDisplayName = teacher
+    ? `${teacher.firstName} ${teacher.lastName}`.trim()
+    : classroom.teacherName || 'Instructor';
 
   return (
     <div className="glass-student-classroom-container">
@@ -58,7 +66,7 @@ export default function ClassroomPageClient({
             <BookOpen size={48} strokeWidth={2} />
             <div className="glass-student-classroom-icon-glow"></div>
           </div>
-          
+
           <div className="glass-student-classroom-content">
             <div className="glass-student-classroom-header-content">
               <h1 className="glass-student-classroom-title">{classroom.name}</h1>
@@ -81,7 +89,7 @@ export default function ClassroomPageClient({
                 <div>
                   <p className="glass-student-classroom-meta-label">Teacher</p>
                   <p className="glass-student-classroom-meta-value">
-                    {classroom.teacherId || 'Instructor'}
+                    {teacherDisplayName}
                   </p>
                 </div>
               </div>
@@ -97,40 +105,7 @@ export default function ClassroomPageClient({
           </div>
         </div>
 
-        {/* 快速统计 */}
-        <div className="glass-student-classroom-stats">
-          <div className="glass-student-classroom-stat-card glass-student-stat-1">
-            <div className="glass-student-classroom-stat-icon">
-              <Calendar size={24} strokeWidth={2} />
-            </div>
-            <div className="glass-student-classroom-stat-content">
-              <p className="glass-student-classroom-stat-label">This Week</p>
-              <p className="glass-student-classroom-stat-value">Tasks</p>
-            </div>
-          </div>
-
-          <div className="glass-student-classroom-stat-card glass-student-stat-2">
-            <div className="glass-student-classroom-stat-icon">
-              <Clock size={24} strokeWidth={2} />
-            </div>
-            <div className="glass-student-classroom-stat-content">
-              <p className="glass-student-classroom-stat-label">Pending</p>
-              <p className="glass-student-classroom-stat-value">Review</p>
-            </div>
-          </div>
-
-          <div className="glass-student-classroom-stat-card glass-student-stat-3">
-            <div className="glass-student-classroom-stat-icon">
-              <TrendingUp size={24} strokeWidth={2} />
-            </div>
-            <div className="glass-student-classroom-stat-content">
-              <p className="glass-student-classroom-stat-label">Progress</p>
-              <p className="glass-student-classroom-stat-value">On Track</p>
-            </div>
-          </div>
-        </div>
-
-        {/* 任务列表部分 */}
+        {/* 任务列表部分 - 直接显示，不需要中间的统计卡片 */}
         <div className="glass-student-classroom-section">
           <div className="glass-student-classroom-section-header">
             <div className="glass-student-classroom-section-icon">

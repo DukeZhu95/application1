@@ -213,20 +213,93 @@ export const updateTask = mutation({
     title: v.string(),
     description: v.string(),
     dueDate: v.optional(v.number()),
+    storageIds: v.optional(v.array(v.string())),
+    fileNames: v.optional(v.array(v.string())),
+    keepExistingFiles: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
-    // 验证任务是否存在
     const task = await ctx.db.get(args.taskId);
     if (!task) {
       throw new Error('Task not found');
     }
 
-    // 更新任务
-    await ctx.db.patch(args.taskId, {
+    const updateData: any = {
       title: args.title,
       description: args.description,
       dueDate: args.dueDate,
-    });
+    };
+
+    const allStorageIds: string[] = [];
+    const allFileNames: string[] = [];
+    const allFileUrls: string[] = [];
+
+    // 1. 读取现有文件（兼容旧格式和新格式）
+    let existingStorageIds: string[] = [];
+    let existingFileNames: string[] = [];
+    let existingFileUrls: string[] = [];
+
+    if (task.storageIds && task.storageIds.length > 0) {
+      // 新格式（数组）
+      existingStorageIds = task.storageIds;
+      existingFileNames = task.attachmentNames || [];
+      existingFileUrls = task.attachmentUrls || [];
+    } else if (task.storageId) {
+      // 旧格式（单个）转换为数组
+      existingStorageIds = [task.storageId];
+      existingFileNames = task.attachmentName ? [task.attachmentName] : [];
+      existingFileUrls = task.attachmentUrl ? [task.attachmentUrl] : [];
+    }
+
+    // 2. 保留指定的现有文件
+    if (args.keepExistingFiles && args.keepExistingFiles.length > 0) {
+      for (let i = 0; i < existingFileNames.length; i++) {
+        if (args.keepExistingFiles.includes(existingFileNames[i])) {
+          allStorageIds.push(existingStorageIds[i]);
+          allFileNames.push(existingFileNames[i]);
+          allFileUrls.push(existingFileUrls[i]);
+        } else {
+          // 删除不保留的文件
+          try {
+            await ctx.storage.delete(existingStorageIds[i]);
+          } catch (error) {
+            console.error('Failed to delete file:', error);
+          }
+        }
+      }
+    } else {
+      // 如果没有指定保留，删除所有旧文件
+      for (const storageId of existingStorageIds) {
+        try {
+          await ctx.storage.delete(storageId);
+        } catch (error) {
+          console.error('Failed to delete file:', error);
+        }
+      }
+    }
+
+    // 3. 添加新上传的文件
+    if (args.storageIds && args.fileNames) {
+      for (let i = 0; i < args.storageIds.length; i++) {
+        const url = await ctx.storage.getUrl(args.storageIds[i]);
+        if (url) {
+          allStorageIds.push(args.storageIds[i]);
+          allFileNames.push(args.fileNames[i]);
+          allFileUrls.push(url);
+        }
+      }
+    }
+
+    // 4. 更新任务 - 使用新格式（数组）
+    updateData.storageIds = allStorageIds;
+    updateData.attachmentNames = allFileNames;
+    updateData.attachmentUrls = allFileUrls;
+
+    // 清除旧格式字段（可选，帮助迁移）
+    updateData.storageId = undefined;
+    updateData.attachmentName = undefined;
+    updateData.attachmentUrl = undefined;
+
+    await ctx.db.patch(args.taskId, updateData);
 
     return task;
   },
