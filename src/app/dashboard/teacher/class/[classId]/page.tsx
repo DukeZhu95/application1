@@ -6,10 +6,10 @@ import { Button } from '@/app/components/ui/button';
 import { Id } from '../../../../../../convex/_generated/dataModel';
 import { TaskForm } from '@/app/dashboard/teacher/task-form';
 import { TaskList } from '@/app/dashboard/teacher/task-list';
-import { 
-  ArrowLeft, 
-  Users, 
-  Code2, 
+import {
+  ArrowLeft,
+  Users,
+  Code2,
   BookOpen,
   FileText,
   Calendar,
@@ -42,6 +42,28 @@ export default function ClassDetailsPage() {
 
   return (
     <div className="glass-class-detail-container">
+      {/* 自定义滚动条样式 */}
+      <style jsx>{`
+        .glass-detail-tasks-wrapper::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .glass-detail-tasks-wrapper::-webkit-scrollbar-track {
+          background: rgba(139, 92, 246, 0.1);
+          border-radius: 10px;
+        }
+        
+        .glass-detail-tasks-wrapper::-webkit-scrollbar-thumb {
+          background: rgba(139, 92, 246, 0.5);
+          border-radius: 10px;
+          transition: background 0.3s;
+        }
+        
+        .glass-detail-tasks-wrapper::-webkit-scrollbar-thumb:hover {
+          background: rgba(139, 92, 246, 0.7);
+        }
+      `}</style>
+
       {/* 动态背景 */}
       <div className="glass-detail-background">
         <div className="glass-detail-gradient-1"></div>
@@ -68,7 +90,7 @@ export default function ClassDetailsPage() {
             <BookOpen size={48} strokeWidth={2} />
             <div className="glass-detail-icon-glow"></div>
           </div>
-          
+
           <div className="glass-detail-class-content">
             <div className="glass-detail-class-main">
               <h1 className="glass-detail-class-title">{classroom.name}</h1>
@@ -140,7 +162,15 @@ export default function ClassDetailsPage() {
                 </p>
               </div>
             </div>
-            <div className="glass-detail-tasks-wrapper">
+            <div
+              className="glass-detail-tasks-wrapper"
+              style={{
+                maxHeight: '400px',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                paddingRight: '8px',
+              }}
+            >
               <TaskList classId={classroom._id} />
             </div>
           </div>
