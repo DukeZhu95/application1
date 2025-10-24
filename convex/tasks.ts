@@ -1,6 +1,7 @@
 // convex/tasks.ts
 import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
+import { Id } from './_generated/dataModel';
 
 // 创建新任务
 export const createTask = mutation({
@@ -9,6 +10,8 @@ export const createTask = mutation({
     description: v.string(),
     classroomId: v.id('classrooms'),
     dueDate: v.optional(v.number()),
+    storageIds: v.optional(v.array(v.id('_storage'))),
+    attachmentNames: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -22,13 +25,31 @@ export const createTask = mutation({
       );
     }
 
-    // 创建任务
-    return await ctx.db.insert('tasks', {
-      ...args,
+    // 准备任务数据
+    const taskData: any = {
+      title: args.title,
+      description: args.description,
+      classroomId: args.classroomId,
+      dueDate: args.dueDate,
       teacherId: identity.subject,
       createdAt: Date.now(),
       status: 'active',
-    });
+    };
+
+    // 如果有附件，添加附件信息
+    if (args.storageIds && args.storageIds.length > 0) {
+      taskData.storageIds = args.storageIds;
+      taskData.attachmentNames = args.attachmentNames || [];
+
+      // 生成附件 URLs
+      const attachmentUrls = await Promise.all(
+        args.storageIds.map(id => ctx.storage.getUrl(id))
+      );
+      taskData.attachmentUrls = attachmentUrls.filter((url): url is string => url !== null);
+    }
+
+    // 创建任务
+    return await ctx.db.insert('tasks', taskData);
   },
 });
 
@@ -74,14 +95,14 @@ type TaskSubmissionData = {
   status: string;
   attachmentUrl?: string;
   attachmentName?: string;
-  storageId?: string;
+  storageId?: Id<"_storage">;
 };
 
 export const submitTask = mutation({
   args: {
     taskId: v.id('tasks'),
     content: v.string(),
-    storageId: v.optional(v.string()),
+    storageId: v.optional(v.id('_storage')),
     fileName: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -213,7 +234,7 @@ export const updateTask = mutation({
     title: v.string(),
     description: v.string(),
     dueDate: v.optional(v.number()),
-    storageIds: v.optional(v.array(v.string())),
+    storageIds: v.optional(v.array(v.id('_storage'))),
     fileNames: v.optional(v.array(v.string())),
     keepExistingFiles: v.optional(v.array(v.string())),
   },
