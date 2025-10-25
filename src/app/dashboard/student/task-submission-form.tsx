@@ -37,10 +37,10 @@ interface TaskSubmissionFormProps {
 }
 
 export function TaskSubmissionForm({
-  taskId,
-  isOpen,
-  onClose,
-}: TaskSubmissionFormProps) {
+                                     taskId,
+                                     isOpen,
+                                     onClose,
+                                   }: TaskSubmissionFormProps) {
   const submit = useMutation(api.tasks.submitTask);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -61,7 +61,7 @@ export function TaskSubmissionForm({
   const onSubmit = async (values: FormValues) => {
     try {
       setIsSubmitting(true);
-      let storageId: string | undefined;
+      let storageId: Id<'_storage'> | undefined;
       let fileName: string | undefined;
 
       if (file) {
@@ -80,7 +80,7 @@ export function TaskSubmissionForm({
         }
 
         const { storageId: newStorageId } = await result.json();
-        storageId = newStorageId;
+        storageId = newStorageId as Id<'_storage'>;
         fileName = file.name;
       }
 
