@@ -27,7 +27,7 @@ type TaskFormData = z.infer<typeof taskSchema>;
 
 interface UploadedFile {
   file: File;
-  storageId: string;
+  storageId: Id<'_storage'>;
   previewUrl?: string;
 }
 
@@ -128,7 +128,7 @@ export function EditTaskDialog({ task, onClose }: EditTaskDialogProps) {
         body: file,
       });
       const { storageId } = await result.json();
-      setUploadedFiles((prev) => [...prev, { file, storageId, previewUrl }]);
+      setUploadedFiles((prev) => [...prev, { file, storageId: storageId as Id<'_storage'>, previewUrl }]);
       toast({
         title: 'Success',
         description: `${file.name} uploaded successfully`,
