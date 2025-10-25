@@ -90,17 +90,17 @@ export default defineSchema({
 
   // 学生个人资料表
   studentProfiles: defineTable({
-    studentId: v.string(),          // Clerk 用户 ID
-    firstName: v.string(),
-    lastName: v.string(),
+    studentId: v.string(),
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
+    email: v.optional(v.string()),
     bio: v.optional(v.string()),
-    city: v.string(),
-    country: v.string(),
+    city: v.optional(v.string()),
+    country: v.optional(v.string()),
     major: v.optional(v.string()),
     goal: v.optional(v.string()),
     avatar: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
-  })
-    .index("by_studentId", ["studentId"]),
+  }).index('by_student_id', ['studentId']),
 });

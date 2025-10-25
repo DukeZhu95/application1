@@ -165,7 +165,7 @@ export default function ClassDetailsPage() {
             <div
               className="glass-detail-tasks-wrapper"
               style={{
-                maxHeight: '400px',
+                maxHeight: '500px',
                 overflowY: 'auto',
                 overflowX: 'hidden',
                 paddingRight: '8px',

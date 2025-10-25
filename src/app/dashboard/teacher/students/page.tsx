@@ -5,12 +5,11 @@ import { useQuery } from 'convex/react';
 import { useRouter } from 'next/navigation';
 import { api } from '../../../../../convex/_generated/api';
 import { CustomUserMenu } from '@/app/dashboard/teacher/custom-user-menu';
+import { StudentCard } from '../StudentCard';
 import {
   GraduationCap,
   ArrowLeft,
-  Users,
-  BookOpen,
-  Mail
+  Users
 } from 'lucide-react';
 import '@/styles/components/teacher-dashboard-glass.css';
 
@@ -204,54 +203,13 @@ export default function AllStudentsPage() {
           ) : (
             <div className="student-grid">
               {studentsWithProfiles.map((student, index) => (
-                <div
+                <StudentCard
                   key={student.studentId}
-                  className="student-card"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  {/* 学生头像 */}
-                  <div className="student-avatar-wrapper">
-                    <div className="student-avatar">
-                      {student.studentId.charAt(0).toUpperCase()}
-                    </div>
-                  </div>
-
-                  {/* 学生信息 */}
-                  <div className="student-info">
-                    <h3 className="student-name">
-                      Student {student.studentId.slice(0, 8)}
-                    </h3>
-                    <p className="student-id">
-                      <Mail size={14} />
-                      ID: {student.studentId.slice(0, 12)}...
-                    </p>
-                  </div>
-
-                  {/* 课程列表 */}
-                  <div className="student-classes">
-                    <div className="student-classes-header">
-                      <BookOpen size={16} />
-                      <span>Enrolled Classes ({student.classes.length})</span>
-                    </div>
-                    <div className="student-classes-list">
-                      {student.classes.map((classItem: ClassItem) => (
-                        <div
-                          key={classItem._id}
-                          className="student-class-badge"
-                          onClick={() => router.push(`/dashboard/teacher/class/${classItem._id}`)}
-                        >
-                          <BookOpen size={12} />
-                          <span>{classItem.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* 加入日期 */}
-                  <div className="student-joined">
-                    Joined: {new Date(student.joinedAt).toLocaleDateString()}
-                  </div>
-                </div>
+                  studentId={student.studentId}
+                  joinedAt={student.joinedAt}
+                  classes={student.classes}
+                  index={index}
+                />
               ))}
             </div>
           )}

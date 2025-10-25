@@ -14,6 +14,7 @@ export const getStudentProfile = query({
       studentId: args.studentId,
       firstName: '',
       lastName: '',
+      email: '',
       bio: '',
       city: '',
       country: '',
@@ -32,6 +33,7 @@ export const updateStudentProfile = mutation({
     studentId: v.string(),
     firstName: v.string(),
     lastName: v.string(),
+    email: v.optional(v.string()),
     bio: v.optional(v.string()),
     city: v.string(),
     country: v.string(),
@@ -50,6 +52,7 @@ export const updateStudentProfile = mutation({
       studentId: args.studentId,
       firstName: args.firstName.trim(),
       lastName: args.lastName.trim(),
+      email: args.email?.trim() || '',
       bio: args.bio?.trim() || '',
       city: args.city.trim(),
       country: args.country.trim(),
@@ -86,6 +89,7 @@ export const getStudentBasicInfo = query({
     if (!profile) {
       return {
         name: 'Student',
+        email: '',
         city: '',
         avatar: null,
       };
@@ -93,6 +97,7 @@ export const getStudentBasicInfo = query({
 
     return {
       name: `${profile.firstName} ${profile.lastName}`.trim() || 'Student',
+      email: profile.email || '',
       city: profile.city,
       avatar: profile.avatar,
     };

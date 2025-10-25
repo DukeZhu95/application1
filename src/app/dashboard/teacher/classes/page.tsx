@@ -5,14 +5,11 @@ import { useQuery } from 'convex/react';
 import { useRouter } from 'next/navigation';
 import { api } from '../../../../../convex/_generated/api';
 import { CustomUserMenu } from '@/app/dashboard/teacher/custom-user-menu';
-import { Button } from '@/app/components/ui/button';
 import {
   GraduationCap,
   ArrowLeft,
   BookOpen,
-  Users,
-  Eye,
-  FileText
+  Users
 } from 'lucide-react';
 import '@/styles/components/teacher-dashboard-glass.css';
 
@@ -176,7 +173,24 @@ export default function AllClassesPage() {
                 <div
                   key={classItem._id}
                   className="glass-class-card"
-                  style={{ animationDelay: `${index * 0.1}s` }}
+                  style={{
+                    animationDelay: `${index * 0.1}s`,
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                  }}
+                  onClick={() =>
+                    router.push(
+                      `/dashboard/teacher/class/${classItem._id}`
+                    )
+                  }
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-8px) scale(1.02)';
+                    e.currentTarget.style.boxShadow = '0 20px 40px rgba(102, 126, 234, 0.25)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                    e.currentTarget.style.boxShadow = '';
+                  }}
                 >
                   <div className="glass-card-glow"></div>
 
@@ -199,31 +213,7 @@ export default function AllClassesPage() {
                     </div>
                   </div>
 
-                  <div className="glass-class-actions">
-                    <Button
-                      onClick={() =>
-                        router.push(
-                          `/dashboard/teacher/class/${classItem._id}`
-                        )
-                      }
-                      variant="outline"
-                      className="glass-action-btn glass-btn-view"
-                    >
-                      <Eye size={18} strokeWidth={2} />
-                      <span>View</span>
-                    </Button>
-                    <Button
-                      onClick={() =>
-                        router.push(
-                          `/dashboard/teacher/class/${classItem._id}/create-task`
-                        )
-                      }
-                      className="glass-action-btn glass-btn-create"
-                    >
-                      <FileText size={18} strokeWidth={2} />
-                      <span>Create Task</span>
-                    </Button>
-                  </div>
+                  {/* 按钮已移除 - 点击整个卡片进入详情页面 */}
                 </div>
               ))}
             </div>
