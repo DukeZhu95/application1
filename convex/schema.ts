@@ -103,4 +103,17 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index('by_student_id', ['studentId']),
+
+  // 教师课程表
+  teacherSchedules: defineTable({
+    teacherId: v.string(),      // Clerk user ID
+    courseName: v.string(),     // 课程名称，如 "ACG100"
+    dayOfWeek: v.number(),      // 0-6 (Sunday-Saturday)
+    startTime: v.string(),      // HH:MM 格式，如 "17:30"
+    endTime: v.string(),        // HH:MM 格式，如 "18:00"
+    color: v.string(),          // 颜色代码，如 "#8b5cf6"
+    createdAt: v.number(),      // 创建时间戳
+  })
+    .index('by_teacher', ['teacherId'])
+    .index('by_teacher_and_day', ['teacherId', 'dayOfWeek']),
 });

@@ -9,6 +9,7 @@ import { TasksTracking } from '@/app/dashboard/teacher/tasks-tracking';
 import '@/styles/components/teacher-dashboard-glass.css';
 import { Toaster } from 'react-hot-toast';
 import { CustomUserMenu } from '@/app/dashboard/teacher/custom-user-menu';
+import { TodaySchedule } from './Todayschedule';
 import {
   GraduationCap,
   Users,
@@ -204,6 +205,31 @@ export default function TeacherDashboard() {
             </div>
           </section>
         </div>
+
+        {/* 今日课程区域 - 全宽 */}
+        <section className="glass-section" style={{ marginTop: '24px' }}>
+          <div className="glass-section-header">
+            <div className="glass-section-title-group">
+              <div className="glass-section-icon">
+                <Clock size={24} strokeWidth={2.5} />
+              </div>
+              <div>
+                <h2>Today's Schedule</h2>
+                <p className="glass-section-subtitle">
+                  {new Date().toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div style={{ padding: '0 20px 20px 20px' }}>
+            {user?.id && <TodaySchedule teacherId={user.id} />}
+          </div>
+        </section>
       </main>
 
       <Toaster

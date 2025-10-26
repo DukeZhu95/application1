@@ -5,18 +5,20 @@
 :root {
     --background: #ffffff;
     --foreground: #171717;
+    --btn-color: #8b5cf6; /* 默认颜色，实际会被内联样式覆盖 */
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
         --background: #0a0a0a;
         --foreground: #ededed;
+        --btn-color: #8b5cf6;
     }
 }
 
 body {
     color: var(--foreground);
-    background: var(--background);
+    background-color: var(--background);
     font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -96,15 +98,15 @@ body {
 }
 
 /* Dialog 取消按钮 */
-[data-radix-dialog-content] button[type="button"]:not([aria-label="Close"]),
-[role="dialog"] button[type="button"]:not([aria-label="Close"]) {
+[data-radix-dialog-content] button[type="button"]:not([aria-label="Close"]):not(.color-picker-btn),
+[role="dialog"] button[type="button"]:not([aria-label="Close"]):not(.color-picker-btn) {
     background: transparent !important;
     border: 2px solid rgba(139, 92, 246, 0.2) !important;
     color: #8b5cf6 !important;
 }
 
-[data-radix-dialog-content] button[type="button"]:hover:not([aria-label="Close"]),
-[role="dialog"] button[type="button"]:hover:not([aria-label="Close"]) {
+[data-radix-dialog-content] button[type="button"]:hover:not([aria-label="Close"]):not(.color-picker-btn),
+[role="dialog"] button[type="button"]:hover:not([aria-label="Close"]):not(.color-picker-btn) {
     background: rgba(139, 92, 246, 0.05) !important;
     border-color: rgba(139, 92, 246, 0.4) !important;
 }
@@ -131,7 +133,6 @@ input[type="text"],
 input[type="datetime-local"],
 input {
     background: rgba(139, 92, 246, 0.05) !important;
-    background-color: rgba(139, 92, 246, 0.05) !important;
     border: 2px solid rgba(139, 92, 246, 0.2) !important;
     border-radius: 12px !important;
     color: #1f2937 !important;
@@ -169,15 +170,27 @@ button[type="submit"]:active:not(:disabled) {
 }
 
 /* 取消按钮样式 */
-button[type="button"] {
+button[type="button"]:not(.color-picker-btn) {
     background: transparent !important;
     border: 2px solid rgba(139, 92, 246, 0.2) !important;
     color: #8b5cf6 !important;
 }
 
-button[type="button"]:hover:not(:disabled) {
+button[type="button"]:hover:not(:disabled):not(.color-picker-btn) {
     background: rgba(139, 92, 246, 0.05) !important;
     border-color: rgba(139, 92, 246, 0.4) !important;
+}
+
+/* ============================================
+   颜色选择按钮 - 特殊处理
+   ============================================ */
+button.color-picker-btn[type="button"] {
+    background: var(--btn-color) !important;
+    border: 2px solid #d1d5db !important;
+}
+
+button.color-picker-btn[type="button"]:hover {
+    border-color: #6b7280 !important;
 }
 
 /* 移动端适配 */
