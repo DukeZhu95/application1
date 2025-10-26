@@ -63,7 +63,7 @@ export default function TeacherDashboard() {
     const currentTime = today.getHours() * 60 + today.getMinutes();
 
     // 获取今天的课程
-    const todayCourses = schedules.filter((s: any) => s.dayOfWeek === dayOfWeek);
+    const todayCourses = schedules.filter((s) => s.dayOfWeek === dayOfWeek);
 
     if (todayCourses.length === 0) {
       return { text: 'No Classes Today', status: 'off' };
@@ -76,7 +76,7 @@ export default function TeacherDashboard() {
     };
 
     // 查找正在进行的课程
-    const ongoingCourse = todayCourses.find((course: any) => {
+    const ongoingCourse = todayCourses.find((course) => {
       const startTime = parseTime(course.startTime);
       const endTime = parseTime(course.endTime);
       return currentTime >= startTime && currentTime <= endTime;
@@ -88,8 +88,8 @@ export default function TeacherDashboard() {
 
     // 查找下一节课
     const upcomingCourses = todayCourses
-      .filter((course: any) => parseTime(course.startTime) > currentTime)
-      .sort((a: any, b: any) => parseTime(a.startTime) - parseTime(b.startTime));
+      .filter((course) => parseTime(course.startTime) > currentTime)
+      .sort((a, b) => parseTime(a.startTime) - parseTime(b.startTime));
 
     if (upcomingCourses.length > 0) {
       const nextCourse = upcomingCourses[0];
@@ -285,7 +285,7 @@ export default function TeacherDashboard() {
                 <Clock size={24} strokeWidth={2.5} />
               </div>
               <div>
-                <h2>Today's Schedule</h2>
+                <h2>Today&apos;s Schedule</h2>
                 <p className="glass-section-subtitle">
                   {new Date().toLocaleDateString('en-US', {
                     weekday: 'long',

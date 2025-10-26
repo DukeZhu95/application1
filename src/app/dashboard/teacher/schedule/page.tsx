@@ -55,7 +55,6 @@ export default function TeacherSchedulePage() {
   ) as CourseSchedule[] | undefined;
 
   const deleteSchedule = useMutation(api.schedule.deleteTeacherSchedule);
-  const updateSchedule = useMutation(api.schedule.updateTeacherSchedule);
 
   // 获取当月的所有日期
   const getMonthDates = () => {
@@ -119,7 +118,7 @@ export default function TeacherSchedulePage() {
         description: 'Course deleted successfully',
       });
       setSelectedDay(null);
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to delete course',

@@ -127,7 +127,7 @@ export function ScheduleCourseDialog({
         });
       }
       onClose();
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: editingSchedule
@@ -253,13 +253,13 @@ export function ScheduleCourseDialog({
                       backgroundColor: presetColor,
                       background: presetColor,
                       backgroundImage: 'none',
-                      ['--btn-color' as any]: presetColor,
+                      '--btn-color': presetColor,
                       borderColor: color === presetColor ? '#1f2937' : '#d1d5db',
                       borderWidth: '2px',
                       borderStyle: 'solid',
                       transform: color === presetColor ? 'scale(1.1)' : 'scale(1)',
                       boxShadow: color === presetColor ? '0 4px 6px rgba(0, 0, 0, 0.1)' : 'none',
-                    }}
+                    } as React.CSSProperties}
                     title={presetColor}
                   />
                 ))}
