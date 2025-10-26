@@ -36,6 +36,12 @@ export default function TeacherDashboard() {
     user?.id ? { teacherId: user.id } : 'skip'
   );
 
+  // 获取课程安排
+  const schedules = useQuery(
+    api.schedule.getTeacherSchedules,
+    user?.id ? { teacherId: user.id } : 'skip'
+  );
+
   // 获取显示的名字
   const displayName = profile?.firstName
     ? `${profile.firstName}${profile.lastName ? ' ' + profile.lastName : ''}`
@@ -46,11 +52,55 @@ export default function TeacherDashboard() {
     router.push('/dashboard/teacher/classes');
   };
 
-  // 计算最近的课程（占位功能）
+  // 计算最近的课程
   const getRecentLessons = () => {
-    // TODO: 实现获取最近课程的逻辑
-    return 'Today';
+    if (!schedules || schedules.length === 0) {
+      return { text: 'No Classes', status: 'none' };
+    }
+
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const currentTime = today.getHours() * 60 + today.getMinutes();
+
+    // 获取今天的课程
+    const todayCourses = schedules.filter((s: any) => s.dayOfWeek === dayOfWeek);
+
+    if (todayCourses.length === 0) {
+      return { text: 'No Classes Today', status: 'off' };
+    }
+
+    // 解析时间
+    const parseTime = (timeStr: string) => {
+      const [hours, minutes] = timeStr.split(':').map(Number);
+      return hours * 60 + minutes;
+    };
+
+    // 查找正在进行的课程
+    const ongoingCourse = todayCourses.find((course: any) => {
+      const startTime = parseTime(course.startTime);
+      const endTime = parseTime(course.endTime);
+      return currentTime >= startTime && currentTime <= endTime;
+    });
+
+    if (ongoingCourse) {
+      return { text: ongoingCourse.courseName, status: 'ongoing', color: ongoingCourse.color };
+    }
+
+    // 查找下一节课
+    const upcomingCourses = todayCourses
+      .filter((course: any) => parseTime(course.startTime) > currentTime)
+      .sort((a: any, b: any) => parseTime(a.startTime) - parseTime(b.startTime));
+
+    if (upcomingCourses.length > 0) {
+      const nextCourse = upcomingCourses[0];
+      return { text: nextCourse.courseName, status: 'upcoming', color: nextCourse.color };
+    }
+
+    // 今天的课程都结束了
+    return { text: 'All Done Today', status: 'done' };
   };
+
+  const recentLesson = getRecentLessons();
 
   return (
     <div className="glass-dashboard-container teacher-dashboard">
@@ -147,17 +197,38 @@ export default function TeacherDashboard() {
           <div
             className="glass-stat-card glass-stat-card-3"
             onClick={() => router.push('/dashboard/teacher/schedule')}
-            style={{ cursor: 'pointer' }}
+            style={{
+              cursor: 'pointer',
+              background: recentLesson.color
+                ? `linear-gradient(135deg, ${recentLesson.color}20, ${recentLesson.color}10)`
+                : undefined
+            }}
           >
             <div className="glass-stat-icon-wrapper">
               <Clock size={28} strokeWidth={2} />
             </div>
             <div className="glass-stat-content">
               <p className="glass-stat-label">Recent Lessons</p>
-              <p className="glass-stat-value">{getRecentLessons()}</p>
+              <p className="glass-stat-value">{recentLesson.text}</p>
               <div className="glass-stat-trend">
-                <div className="glass-pulse"></div>
-                <span>View Schedule</span>
+                {recentLesson.status === 'ongoing' && (
+                  <>
+                    <div className="glass-pulse"></div>
+                    <span style={{ color: '#10b981' }}>In Progress</span>
+                  </>
+                )}
+                {recentLesson.status === 'upcoming' && (
+                  <>
+                    <Clock size={16} />
+                    <span style={{ color: '#3b82f6' }}>Next Class</span>
+                  </>
+                )}
+                {(recentLesson.status === 'done' || recentLesson.status === 'off' || recentLesson.status === 'none') && (
+                  <>
+                    <TrendingUp size={16} />
+                    <span>View Schedule</span>
+                  </>
+                )}
               </div>
             </div>
             <div className="glass-stat-decoration"></div>
