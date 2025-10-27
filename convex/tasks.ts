@@ -486,3 +486,31 @@ export const getStudentTasks = query({
     return allTasks;
   },
 });
+
+// 获取任务详情（包含文件 URLs）
+export const getTaskById = query({
+  args: {
+    taskId: v.id('tasks'),
+  },
+  handler: async (ctx, args) => {
+    const task = await ctx.db.get(args.taskId);
+
+    if (!task) {
+      return null;
+    }
+
+    // 获取所有附件的 URLs
+    const attachmentUrls = task.storageIds
+      ? await Promise.all(
+        task.storageIds.map(async (storageId) => {
+          return await ctx.storage.getUrl(storageId);
+        })
+      )
+      : [];
+
+    return {
+      ...task,
+      attachmentUrls, // 添加 URLs 到返回对象
+    };
+  },
+});

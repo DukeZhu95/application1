@@ -42,12 +42,19 @@ export default defineSchema({
     dueDate: v.optional(v.number()),
     createdAt: v.number(),
     status: v.string(),
-
+    attachments: v.optional(
+      v.array(
+        v.object({
+          name: v.string(),
+          url: v.string(),
+          size: v.number(),
+        })
+      )
+    ),
     // 旧字段（单个文件）- 保留兼容
     storageId: v.optional(v.id('_storage')),
     attachmentName: v.optional(v.string()),
     attachmentUrl: v.optional(v.string()),
-
     // 新字段（多文件）- 数组
     storageIds: v.optional(v.array(v.id('_storage'))),
     attachmentNames: v.optional(v.array(v.string())),
@@ -116,4 +123,33 @@ export default defineSchema({
   })
     .index('by_teacher', ['teacherId'])
     .index('by_teacher_and_day', ['teacherId', 'dayOfWeek']),
+
+  // 学生提交表
+  submissions: defineTable({
+    taskId: v.id('tasks'),
+    studentId: v.string(),
+    submissionText: v.string(),
+    submissionFiles: v.optional(
+      v.array(
+        v.object({
+          name: v.string(),
+          storageId: v.string(),     // ✅ 改为 storageId
+          size: v.number(),
+        })
+      )
+    ),
+    submittedAt: v.number(),
+    status: v.union(
+      v.literal('submitted'),
+      v.literal('graded'),
+      v.literal('late')
+    ),
+    grade: v.optional(v.number()),
+    feedback: v.optional(v.string()),
+    gradedAt: v.optional(v.number()),
+    gradedBy: v.optional(v.string()),
+  })
+    .index('by_task', ['taskId'])
+    .index('by_student', ['studentId'])
+    .index('by_task_and_student', ['taskId', 'studentId']),
 });
