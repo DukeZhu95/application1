@@ -192,49 +192,14 @@ export default function TeacherTaskSubmissionsPage({ params }: PageProps) {
                     </div>
                   </div>
 
-                  {/* Files */}
                   {submission.submissionFiles && submission.submissionFiles.length > 0 && (
                     <div className="mb-4">
                       <h4 className="text-sm font-semibold text-gray-700 mb-2">
                         Attachments ({submission.submissionFiles.length}):
                       </h4>
                       <div className="grid gap-2">
-                        {submission.submissionFiles.map((file: any, idx: number) => (
-                          <div
-                            key={idx}
-                            className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200"
-                          >
-                            <div className="flex items-center gap-3">
-                              <FileText className="w-5 h-5 text-blue-600" />
-                              <div>
-                                <p className="text-sm font-medium text-gray-900">
-                                  {file.name}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  {(file.size / 1024).toFixed(1)} KB
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex gap-2">
-                              <a
-                                href={file.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-1 px-3 py-1 text-sm text-purple-600 hover:bg-purple-50 rounded-md transition-colors"
-                              >
-                                <Eye className="w-4 h-4" />
-                                View
-                              </a>
-                              <a
-                                href={file.url}
-                                download={file.name}
-                                className="flex items-center gap-1 px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                              >
-                                <Download className="w-4 h-4" />
-                                Download
-                              </a>
-                            </div>
-                          </div>
+                        {submission.submissionFiles.map((file, idx: number) => (
+                          <StudentFileDisplay key={idx} file={file} />
                         ))}
                       </div>
                     </div>
@@ -320,6 +285,52 @@ export default function TeacherTaskSubmissionsPage({ params }: PageProps) {
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ✅ 新增：显示学生提交文件的组件（使用 storageId）
+function StudentFileDisplay({ file }: { file: { name: string; storageId: string; size: number } }) {
+  const fileUrl = useQuery(api.files.getFileUrl, { storageId: file.storageId });
+
+  return (
+    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+      <div className="flex items-center gap-3">
+        <FileText className="w-5 h-5 text-blue-600" />
+        <div>
+          <p className="text-sm font-medium text-gray-900">
+            {file.name}
+          </p>
+          <p className="text-xs text-gray-500">
+            {(file.size / 1024).toFixed(1)} KB
+          </p>
+        </div>
+      </div>
+      <div className="flex gap-2">
+        {fileUrl ? (
+          <>
+            <a
+              href={fileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 px-3 py-1 text-sm text-purple-600 hover:bg-purple-50 rounded-md transition-colors"
+            >
+              <Eye className="w-4 h-4" />
+              View
+            </a>
+            <a
+              href={fileUrl}
+              download={file.name}
+              className="flex items-center gap-1 px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              Download
+            </a>
+          </>
+        ) : (
+          <span className="text-xs text-gray-500 px-3 py-1">Loading...</span>
+        )}
       </div>
     </div>
   );

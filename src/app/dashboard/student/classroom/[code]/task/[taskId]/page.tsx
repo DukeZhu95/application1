@@ -369,7 +369,7 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
                   Your Uploaded Files ({submission.submissionFiles.length}):
                 </h3>
                 <div className="space-y-2">
-                  {submission.submissionFiles.map((file: any, idx: number) => (
+                  {submission.submissionFiles.map((file: { name: string; storageId: string; size: number }, idx: number) => (
                     <FileDisplay key={idx} file={file} />
                   ))}
                 </div>

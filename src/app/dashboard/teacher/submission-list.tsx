@@ -85,7 +85,7 @@ export function SubmissionList({ taskId }: SubmissionListProps) {
                         Attachments ({submission.submissionFiles.length}):
                       </h4>
                       <div className="space-y-2">
-                        {submission.submissionFiles.map((file: any, idx: number) => (
+                        {submission.submissionFiles.map((file: { name: string; storageId: string; size: number }, idx: number) => (
                           <FileDownloadCard key={idx} file={file} />
                         ))}
                       </div>
