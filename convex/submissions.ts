@@ -9,12 +9,9 @@ export const getStudentSubmission = query({
   },
   handler: async (ctx, args) => {
     const submission = await ctx.db
-      .query('submissions')
-      .filter((q) =>
-        q.and(
-          q.eq(q.field('taskId'), args.taskId),
-          q.eq(q.field('studentId'), args.studentId)
-        )
+      .query('taskSubmissions')
+      .withIndex('by_task_student', (q) =>
+        q.eq('taskId', args.taskId).eq('studentId', args.studentId)
       )
       .first();
 
@@ -27,71 +24,80 @@ export const getTaskSubmissions = query({
   args: { taskId: v.id('tasks') },
   handler: async (ctx, args) => {
     const submissions = await ctx.db
-      .query('submissions')
-      .filter((q) => q.eq(q.field('taskId'), args.taskId))
+      .query('taskSubmissions')
+      .withIndex('by_task', (q) => q.eq('taskId', args.taskId))
       .collect();
 
     return submissions;
   },
 });
 
-// 学生提交任务 - 更新为支持 storageId
+// 学生提交任务 - ✅ 添加防止已评分作业被修改的逻辑
 export const submitTask = mutation({
   args: {
     taskId: v.id('tasks'),
     studentId: v.string(),
-    submissionText: v.string(),
-    submissionFiles: v.optional(
-      v.array(
-        v.object({
-          name: v.string(),
-          storageId: v.string(),  // ✅ 使用 storageId 而不是 url
-          size: v.number(),
-        })
-      )
-    ),
+    content: v.string(),
+    storageId: v.optional(v.id('_storage')),
+    fileName: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     // 检查是否已经提交过
     const existingSubmission = await ctx.db
-      .query('submissions')
-      .filter((q) =>
-        q.and(
-          q.eq(q.field('taskId'), args.taskId),
-          q.eq(q.field('studentId'), args.studentId)
-        )
+      .query('taskSubmissions')
+      .withIndex('by_task_student', (q) =>
+        q.eq('taskId', args.taskId).eq('studentId', args.studentId)
       )
       .first();
 
+    // ✅ 防止修改已评分的作业
+    if (existingSubmission && existingSubmission.status === 'graded') {
+      throw new Error('Cannot modify a graded submission');
+    }
+
+    const submissionData: any = {
+      content: args.content,
+      submittedAt: Date.now(),
+      status: 'submitted',
+    };
+
+    // 处理文件附件
+    if (args.storageId) {
+      submissionData.storageId = args.storageId;
+      const attachmentUrl = await ctx.storage.getUrl(args.storageId);
+      if (attachmentUrl) {
+        submissionData.attachmentUrl = attachmentUrl;
+      }
+      submissionData.attachmentName = args.fileName;
+    }
+
     if (existingSubmission) {
+      // 删除旧文件
+      if (existingSubmission.storageId) {
+        await ctx.storage.delete(existingSubmission.storageId);
+      }
+
       // 更新现有提交
-      await ctx.db.patch(existingSubmission._id, {
-        submissionText: args.submissionText,
-        submissionFiles: args.submissionFiles || [],
-        submittedAt: Date.now(),
-        status: 'submitted',
-      });
+      await ctx.db.patch(existingSubmission._id, submissionData);
       return existingSubmission._id;
     }
 
     // 创建新提交
-    const submissionId = await ctx.db.insert('submissions', {
+    const submissionId = await ctx.db.insert('taskSubmissions', {
+      ...submissionData,
       taskId: args.taskId,
       studentId: args.studentId,
-      submissionText: args.submissionText,
-      submissionFiles: args.submissionFiles || [],
-      submittedAt: Date.now(),
-      status: 'submitted',
     });
 
     return submissionId;
   },
 });
 
-// 教师批改任务
+// 教师批改任务 - ✅ 修改为使用 taskSubmissions 表
 export const gradeSubmission = mutation({
   args: {
-    submissionId: v.id('submissions'),
+    taskId: v.id('tasks'),
+    studentId: v.string(),
     grade: v.number(),
     feedback: v.optional(v.string()),
   },
@@ -101,7 +107,19 @@ export const gradeSubmission = mutation({
       throw new Error('Not authenticated');
     }
 
-    await ctx.db.patch(args.submissionId, {
+    // 根据 taskId 和 studentId 查找 submission
+    const submission = await ctx.db
+      .query('taskSubmissions')
+      .withIndex('by_task_student', (q) =>
+        q.eq('taskId', args.taskId).eq('studentId', args.studentId)
+      )
+      .first();
+
+    if (!submission) {
+      throw new Error('Submission not found');
+    }
+
+    await ctx.db.patch(submission._id, {
       grade: args.grade,
       feedback: args.feedback,
       gradedAt: Date.now(),
@@ -109,7 +127,7 @@ export const gradeSubmission = mutation({
       status: 'graded',
     });
 
-    return args.submissionId;
+    return submission._id;
   },
 });
 
@@ -118,7 +136,7 @@ export const getStudentSubmissions = query({
   args: { studentId: v.string() },
   handler: async (ctx, args) => {
     const submissions = await ctx.db
-      .query('submissions')
+      .query('taskSubmissions')
       .filter((q) => q.eq(q.field('studentId'), args.studentId))
       .collect();
 
@@ -133,22 +151,23 @@ export const getClassSubmissionStats = query({
     // 获取班级的所有任务
     const tasks = await ctx.db
       .query('tasks')
-      .filter((q) => q.eq(q.field('classroomId'), args.classroomId))
+      .withIndex('by_classroom', (q) => q.eq('classroomId', args.classroomId))
       .collect();
 
     const stats = [];
 
     for (const task of tasks) {
       const submissions = await ctx.db
-        .query('submissions')
-        .filter((q) => q.eq(q.field('taskId'), task._id))
+        .query('taskSubmissions')
+        .withIndex('by_task', (q) => q.eq('taskId', task._id))
         .collect();
 
       stats.push({
         taskId: task._id,
         taskTitle: task.title,
         totalSubmissions: submissions.length,
-        gradedSubmissions: submissions.filter((s) => s.grade !== undefined).length,
+        gradedSubmissions: submissions.filter((s) => s.grade !== undefined)
+          .length,
       });
     }
 

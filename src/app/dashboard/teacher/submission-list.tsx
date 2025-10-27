@@ -18,7 +18,7 @@ interface SubmissionListProps {
 }
 
 export function SubmissionList({ taskId }: SubmissionListProps) {
-  // 使用正确的 API
+  // ✅ 使用正确的 API - 从 taskSubmissions 表获取
   const submissions = useQuery(api.submissions.getTaskSubmissions, { taskId });
 
   if (!submissions) {
@@ -69,26 +69,26 @@ export function SubmissionList({ taskId }: SubmissionListProps) {
                     </p>
                   </div>
 
-                  {/* Submission Content - 使用 submissionText */}
+                  {/* ✅ Submission Content - 使用 content 字段 */}
                   <div>
                     <h4 className="font-medium">Response:</h4>
                     <p className="mt-1 text-gray-600 whitespace-pre-wrap">
-                      {submission.submissionText}
+                      {submission.content}
                     </p>
                   </div>
 
-                  {/* Attachments - 使用 submissionFiles 数组 */}
-                  {submission.submissionFiles && submission.submissionFiles.length > 0 && (
+                  {/* ✅ 附件 - 使用单个文件字段 */}
+                  {submission.storageId && submission.attachmentName && (
                     <div className="mt-4">
                       <h4 className="font-medium mb-2 flex items-center gap-2">
                         <FileIcon className="w-4 h-4" />
-                        Attachments ({submission.submissionFiles.length}):
+                        Attachment:
                       </h4>
-                      <div className="space-y-2">
-                        {submission.submissionFiles.map((file: { name: string; storageId: string; size: number }, idx: number) => (
-                          <FileDownloadCard key={idx} file={file} />
-                        ))}
-                      </div>
+                      <FileDownloadCard
+                        storageId={submission.storageId}
+                        fileName={submission.attachmentName}
+                        fileUrl={submission.attachmentUrl}
+                      />
                     </div>
                   )}
 
@@ -126,18 +126,29 @@ export function SubmissionList({ taskId }: SubmissionListProps) {
   );
 }
 
-// Component to handle file display with download links
-function FileDownloadCard({ file }: { file: { name: string; storageId: string; size: number } }) {
-  // Get the actual file URL from Convex Storage
-  const fileUrl = useQuery(api.files.getFileUrl, { storageId: file.storageId });
+// ✅ 修复：处理单个文件的组件
+function FileDownloadCard({
+                            storageId,
+                            fileName,
+                            fileUrl: providedUrl,
+                          }: {
+  storageId: string;
+  fileName: string;
+  fileUrl?: string;
+}) {
+  // 如果已经有 URL 就使用，否则从 Convex 获取
+  const fetchedUrl = useQuery(
+    api.files.getFileUrl,
+    providedUrl ? 'skip' : { storageId }
+  );
+  const fileUrl = providedUrl || fetchedUrl;
 
   return (
     <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
       <div className="flex items-center gap-3">
         <FileIcon className="w-5 h-5 text-blue-600" />
         <div>
-          <p className="text-sm font-medium text-gray-900">{file.name}</p>
-          <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</p>
+          <p className="text-sm font-medium text-gray-900">{fileName}</p>
         </div>
       </div>
       <div className="flex gap-2">
@@ -154,7 +165,7 @@ function FileDownloadCard({ file }: { file: { name: string; storageId: string; s
             </a>
             <a
               href={fileUrl}
-              download={file.name}
+              download={fileName}
               className="flex items-center gap-1 px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
             >
               <Download className="w-4 h-4" />

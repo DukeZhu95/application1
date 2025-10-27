@@ -16,7 +16,8 @@ import {
   AlertCircle,
   Paperclip,
   X,
-  Eye
+  Eye,
+  Star
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -33,7 +34,7 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
   const { user } = useUser();
   const router = useRouter();
   const [submissionText, setSubmissionText] = useState('');
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 获取任务详情
@@ -47,7 +48,7 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
 
   // Mutations
   const submitTask = useMutation(api.submissions.submitTask);
-  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
+  const generateUploadUrl = useMutation(api.tasks.generateUploadUrl);
 
   // 格式化日期
   const formatDate = (timestamp: number | undefined): string => {
@@ -59,92 +60,89 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
     });
   };
 
-  // 处理文件选择
+  // 处理文件选择（单个文件）
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setUploadedFiles((prev) => [...prev, ...files]);
-    toast.success(`${files.length} file(s) selected`);
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploadedFile(file);
+      toast.success('File selected');
+    }
   };
 
   // 移除文件
-  const removeFile = (index: number) => {
-    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+  const removeFile = () => {
+    setUploadedFile(null);
   };
 
-  // 提交任务 - 使用 Convex Storage
+  // 提交任务
   const handleSubmit = async () => {
     if (!user?.id) return;
 
-    if (!submissionText.trim() && uploadedFiles.length === 0) {
-      toast.error('Please add some content or files to submit');
+    if (!submissionText.trim() && !uploadedFile) {
+      toast.error('Please add some content or a file to submit');
+      return;
+    }
+
+    // 检查是否已评分
+    if (submission?.status === 'graded') {
+      toast.error('Cannot modify a graded submission');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // 上传所有文件到 Convex Storage
-      const submissionFiles = [];
+      let storageId: Id<'_storage'> | undefined;
+      let fileName: string | undefined;
 
-      for (const file of uploadedFiles) {
-        try {
-          toast.loading(`Uploading ${file.name}...`);
+      // 上传文件
+      if (uploadedFile) {
+        toast.loading('Uploading file...');
+        const uploadUrl = await generateUploadUrl();
 
-          // 1. 获取上传 URL
-          const uploadUrl = await generateUploadUrl();
+        const result = await fetch(uploadUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': uploadedFile.type },
+          body: uploadedFile,
+        });
 
-          // 2. 上传文件到 Convex Storage
-          const result = await fetch(uploadUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': file.type },
-            body: file,
-          });
-
-          if (!result.ok) {
-            throw new Error(`Upload failed: ${result.statusText}`);
-          }
-
-          const { storageId } = await result.json();
-
-          // 3. 保存文件信息（使用 storageId）
-          submissionFiles.push({
-            name: file.name,
-            storageId: storageId,
-            size: file.size,
-          });
-
-          toast.dismiss();
-          toast.success(`${file.name} uploaded`);
-        } catch (error) {
-          console.error('File upload error:', error);
-          toast.dismiss();
-          toast.error(`Failed to upload ${file.name}`);
+        if (!result.ok) {
+          throw new Error(`Upload failed: ${result.statusText}`);
         }
+
+        const { storageId: newStorageId } = await result.json();
+        storageId = newStorageId as Id<'_storage'>;
+        fileName = uploadedFile.name;
+
+        toast.dismiss();
+        toast.success('File uploaded');
       }
 
-      // 4. 提交任务
+      // 提交任务
       await submitTask({
         taskId,
         studentId: user.id,
-        submissionText,
-        submissionFiles,
+        content: submissionText,
+        storageId,
+        fileName,
       });
 
       toast.success('Task submitted successfully!');
       setSubmissionText('');
-      setUploadedFiles([]);
+      setUploadedFile(null);
     } catch (error) {
       console.error('Submission error:', error);
-      toast.error('Failed to submit task');
+      toast.error(error instanceof Error ? error.message : 'Failed to submit task');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // 检查是否已提交
-  const isSubmitted = !!(submission && submission.status === 'submitted');
+  // 状态检查
+  const isSubmitted = !!submission;
+  const isGraded = submission?.status === 'graded';
   const isOverdue = !!(task?.dueDate && Date.now() > task.dueDate);
-  const overdueStatus = isOverdue && !isSubmitted;
+  const canSubmit = !isGraded && (!isOverdue || isSubmitted);
 
   if (!task) {
     return (
@@ -191,8 +189,15 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
                 )}
               </div>
             </div>
-            {isSubmitted && (
+            {/* 状态徽章 */}
+            {isGraded && (
               <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg">
+                <Star className="w-5 h-5 fill-current" />
+                <span className="font-semibold">Graded: {submission.grade}/100</span>
+              </div>
+            )}
+            {isSubmitted && !isGraded && (
+              <div className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg">
                 <CheckCircle2 className="w-5 h-5" />
                 <span className="font-semibold">Submitted</span>
               </div>
@@ -204,59 +209,61 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
             <p className="text-gray-700">{task.description}</p>
           </div>
 
-          {/* ✅ 显示教师上传的附件 - 使用 attachmentUrls */}
+          {/* 教师附件 - 修复类型问题 */}
           {task.attachmentUrls && task.attachmentUrls.length > 0 && (
             <div className="mt-6 pt-6 border-t border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
                 <Paperclip className="w-5 h-5" />
-                Teacher&apos;s Attachments ({task.attachmentUrls.length})
+                Teacher&apos;s Attachments ({task.attachmentUrls.filter((url: string | null) => url !== null).length})
               </h3>
               <div className="space-y-2">
-                {task.attachmentUrls.filter((url): url is string => url !== null && url !== undefined).map((url, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200"
-                  >
-                    <div className="flex items-center gap-3">
-                      <FileText className="w-5 h-5 text-purple-600" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {task.attachmentNames?.[idx] || `Attachment ${idx + 1}`}
-                        </p>
+                {task.attachmentUrls
+                  .map((url: string | null, idx: number) => ({ url, idx }))
+                  .filter(({ url }) => url !== null)
+                  .map(({ url, idx }) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200"
+                    >
+                      <div className="flex items-center gap-3">
+                        <FileText className="w-5 h-5 text-purple-600" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            {task.attachmentNames?.[idx] || `Attachment ${idx + 1}`}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <a
+                          href={url!}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 px-3 py-1 text-sm text-purple-600 hover:bg-purple-100 rounded-md transition-colors"
+                        >
+                          <Eye className="w-4 h-4" />
+                          View
+                        </a>
+                        <a
+                          href={url!}
+                          download={task.attachmentNames?.[idx]}
+                          className="flex items-center gap-1 px-3 py-1 text-sm text-purple-600 hover:bg-purple-100 rounded-md transition-colors"
+                        >
+                          <Download className="w-4 h-4" />
+                          Download
+                        </a>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <a
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1 px-3 py-1 text-sm text-purple-600 hover:bg-purple-100 rounded-md transition-colors"
-                      >
-                        <Eye className="w-4 h-4" />
-                        View
-                      </a>
-                      <a
-                        href={url}
-                        download={task.attachmentNames?.[idx]}
-                        className="flex items-center gap-1 px-3 py-1 text-sm text-purple-600 hover:bg-purple-100 rounded-md transition-colors"
-                      >
-                        <Download className="w-4 h-4" />
-                        Download
-                      </a>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           )}
         </div>
 
-        {/* Submission Form or Submitted Content */}
+        {/* 提交表单或已提交内容 */}
         {!isSubmitted ? (
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Submission</h2>
 
-            {/* Text Input */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Your Answer <span className="text-red-500">*</span>
@@ -270,15 +277,14 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
               />
             </div>
 
-            {/* File Upload */}
+            {/* 单个文件上传 */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Attachments (Optional)
+                Attachment (Optional)
               </label>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
                 <input
                   type="file"
-                  multiple
                   onChange={handleFileSelect}
                   className="hidden"
                   id="file-upload"
@@ -289,7 +295,7 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
                 >
                   <Upload className="w-12 h-12 text-gray-400 mb-2" />
                   <span className="text-sm font-medium text-gray-700">
-                    Click to upload files
+                    Click to upload a file
                   </span>
                   <span className="text-xs text-gray-500 mt-1">
                     PDF, DOC, images, or any file type
@@ -297,98 +303,138 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
                 </label>
               </div>
 
-              {/* Selected Files List */}
-              {uploadedFiles.length > 0 && (
-                <div className="mt-4 space-y-2">
-                  {uploadedFiles.map((file: File, index: number) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200"
-                    >
-                      <FileText className="w-5 h-5 text-gray-500" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {file.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {(file.size / 1024).toFixed(1)} KB
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => removeFile(index)}
-                        className="p-1 hover:bg-gray-200 rounded transition-colors"
-                      >
-                        <X className="w-4 h-4 text-gray-500" />
-                      </button>
+              {uploadedFile && (
+                <div className="mt-4">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <FileText className="w-5 h-5 text-gray-500" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {uploadedFile.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {(uploadedFile.size / 1024).toFixed(1)} KB
+                      </p>
                     </div>
-                  ))}
+                    <button
+                      onClick={removeFile}
+                      className="p-1 hover:bg-gray-200 rounded transition-colors"
+                    >
+                      <X className="w-4 h-4 text-gray-500" />
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* Submit Button */}
             <button
               onClick={handleSubmit}
-              disabled={isSubmitting || overdueStatus}
+              disabled={isSubmitting || !canSubmit}
               className={`w-full py-3 rounded-lg font-semibold transition-all ${
-                overdueStatus
+                !canSubmit
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
               } ${isSubmitting ? 'opacity-50 cursor-wait' : ''}`}
             >
-              {isSubmitting ? 'Submitting...' : overdueStatus ? 'Submission Closed' : 'Submit Task'}
+              {isSubmitting ? 'Submitting...' : !canSubmit ? 'Submission Closed' : 'Submit Task'}
             </button>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                <CheckCircle2 className="w-6 h-6 text-green-600" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">Task Submitted</h2>
-                <p className="text-sm text-gray-600">
-                  Submitted on {formatDate(submission.submittedAt)}
-                </p>
-              </div>
-            </div>
-
-            {/* Display Submission Content */}
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Your Submission:</h3>
-              <p className="text-gray-800 whitespace-pre-wrap">
-                {submission.submissionText}
-              </p>
-            </div>
-
-            {/* Display Submitted Files */}
-            {submission.submissionFiles && submission.submissionFiles.length > 0 && (
-              <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                  <Paperclip className="w-4 h-4" />
-                  Your Uploaded Files ({submission.submissionFiles.length}):
-                </h3>
-                <div className="space-y-2">
-                  {submission.submissionFiles.map((file: { name: string; storageId: string; size: number }, idx: number) => (
-                    <FileDisplay key={idx} file={file} />
-                  ))}
+          <div className="space-y-6">
+            {/* 已评分 - 评分卡片 */}
+            {isGraded && (
+              <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-green-200">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <Star className="w-6 h-6 text-green-600 fill-current" />
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-xl font-bold text-gray-900">Grade Received</h2>
+                    <p className="text-sm text-gray-600">
+                      Graded on {formatDate(submission.gradedAt)}
+                    </p>
+                  </div>
+                  <div className="text-3xl font-bold text-green-600">
+                    {submission.grade}/100
+                  </div>
                 </div>
-              </div>
-            )}
 
-            {/* Grade Display */}
-            {submission.grade !== undefined && (
-              <div className="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
-                <h3 className="text-sm font-semibold text-gray-700 mb-2">Grade:</h3>
-                <p className="text-2xl font-bold text-green-600">{submission.grade}/100</p>
                 {submission.feedback && (
-                  <div className="mt-3">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-1">Feedback:</h4>
-                    <p className="text-gray-700">{submission.feedback}</p>
+                  <div className="mt-4 p-4 bg-green-50 rounded-lg">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-2">Teacher&apos;s Feedback:</h3>
+                    <p className="text-gray-800 whitespace-pre-wrap">{submission.feedback}</p>
                   </div>
                 )}
               </div>
             )}
+
+            {/* 提交内容 */}
+            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  isGraded ? 'bg-green-100' : 'bg-blue-100'
+                }`}>
+                  <CheckCircle2 className={`w-6 h-6 ${
+                    isGraded ? 'text-green-600' : 'text-blue-600'
+                  }`} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Your Submission</h2>
+                  <p className="text-sm text-gray-600">
+                    Submitted on {formatDate(submission.submittedAt)}
+                  </p>
+                </div>
+              </div>
+
+              {/* 使用 content 字段 */}
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">Your Answer:</h3>
+                <p className="text-gray-800 whitespace-pre-wrap">
+                  {submission.content}
+                </p>
+              </div>
+
+              {/* 单个文件显示 */}
+              {submission.storageId && submission.attachmentName && (
+                <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <Paperclip className="w-4 h-4" />
+                    Your Uploaded File:
+                  </h3>
+                  <FileDisplay
+                    storageId={submission.storageId}
+                    fileName={submission.attachmentName}
+                  />
+                </div>
+              )}
+
+              {/* 锁定提示 */}
+              {isGraded && (
+                <div className="mt-4 p-4 bg-gray-100 rounded-lg border border-gray-300 flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-gray-600 flex-shrink-0" />
+                  <p className="text-sm text-gray-700">
+                    This submission has been graded and can no longer be modified.
+                  </p>
+                </div>
+              )}
+
+              {/* 未评分时允许更新 */}
+              {!isGraded && (
+                <div className="mt-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                  <p className="text-sm text-gray-700 mb-3">
+                    You can update your submission until it&apos;s graded.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSubmissionText(submission.content);
+                      window.location.reload();
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                  >
+                    Update Submission
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -396,17 +442,16 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
   );
 }
 
-// Component to display file with download link (学生上传的文件)
-function FileDisplay({ file }: { file: { name: string; storageId: string; size: number } }) {
-  const fileUrl = useQuery(api.files.getFileUrl, { storageId: file.storageId });
+// 文件显示组件
+function FileDisplay({ storageId, fileName }: { storageId: string; fileName: string }) {
+  const fileUrl = useQuery(api.files.getFileUrl, { storageId });
 
   return (
     <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-200">
       <div className="flex items-center gap-3">
         <FileText className="w-5 h-5 text-blue-600" />
         <div>
-          <p className="text-sm font-medium text-gray-900">{file.name}</p>
-          <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</p>
+          <p className="text-sm font-medium text-gray-900">{fileName}</p>
         </div>
       </div>
       <div className="flex items-center gap-2">
@@ -423,7 +468,7 @@ function FileDisplay({ file }: { file: { name: string; storageId: string; size: 
             </a>
             <a
               href={fileUrl}
-              download={file.name}
+              download={fileName}
               className="flex items-center gap-1 px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
             >
               <Download className="w-4 h-4" />

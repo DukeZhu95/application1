@@ -28,7 +28,7 @@ interface PageProps {
 export default function TeacherTaskSubmissionsPage({ params }: PageProps) {
   const { classId, taskId } = use(params);
   const router = useRouter();
-  const [gradingSubmissionId, setGradingSubmissionId] = useState<Id<'submissions'> | null>(null);
+  const [gradingSubmissionId, setGradingSubmissionId] = useState<string | null>(null);
   const [gradeValue, setGradeValue] = useState('');
   const [feedbackValue, setFeedbackValue] = useState('');
 
@@ -37,7 +37,7 @@ export default function TeacherTaskSubmissionsPage({ params }: PageProps) {
     taskId: taskId as Id<'tasks'>
   });
 
-  // 获取所有提交
+  // ✅ 获取所有提交 - 使用 taskSubmissions 表
   const submissions = useQuery(api.submissions.getTaskSubmissions, {
     taskId: taskId as Id<'tasks'>
   });
@@ -56,7 +56,7 @@ export default function TeacherTaskSubmissionsPage({ params }: PageProps) {
   };
 
   // 提交批改
-  const handleGradeSubmit = async (submissionId: Id<'submissions'>) => {
+  const handleGradeSubmit = async (submission: any) => {
     const grade = parseInt(gradeValue);
     if (isNaN(grade) || grade < 0 || grade > 100) {
       alert('Please enter a valid grade (0-100)');
@@ -65,7 +65,8 @@ export default function TeacherTaskSubmissionsPage({ params }: PageProps) {
 
     try {
       await gradeSubmission({
-        submissionId,
+        taskId: submission.taskId,
+        studentId: submission.studentId,
         grade,
         feedback: feedbackValue.trim() || undefined,
       });
@@ -180,28 +181,28 @@ export default function TeacherTaskSubmissionsPage({ params }: PageProps) {
                     )}
                   </div>
 
-                  {/* Submission Content */}
+                  {/* ✅ Submission Content - 使用 content 字段 */}
                   <div className="mb-4">
                     <h4 className="text-sm font-semibold text-gray-700 mb-2">
                       Submission:
                     </h4>
                     <div className="bg-gray-50 rounded-lg p-4">
                       <p className="text-gray-800 whitespace-pre-wrap">
-                        {submission.submissionText}
+                        {submission.content}
                       </p>
                     </div>
                   </div>
 
-                  {submission.submissionFiles && submission.submissionFiles.length > 0 && (
+                  {/* ✅ 附件 - 使用单个文件字段 */}
+                  {submission.storageId && submission.attachmentName && (
                     <div className="mb-4">
                       <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                        Attachments ({submission.submissionFiles.length}):
+                        Attachment:
                       </h4>
-                      <div className="grid gap-2">
-                        {submission.submissionFiles.map((file, idx: number) => (
-                          <StudentFileDisplay key={idx} file={file} />
-                        ))}
-                      </div>
+                      <StudentFileDisplay
+                        storageId={submission.storageId}
+                        fileName={submission.attachmentName}
+                      />
                     </div>
                   )}
 
@@ -249,7 +250,7 @@ export default function TeacherTaskSubmissionsPage({ params }: PageProps) {
                       </div>
                       <div className="flex gap-2">
                         <button
-                          onClick={() => handleGradeSubmit(submission._id)}
+                          onClick={() => handleGradeSubmit(submission)}
                           className="px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"
                         >
                           Submit Grade
@@ -290,9 +291,9 @@ export default function TeacherTaskSubmissionsPage({ params }: PageProps) {
   );
 }
 
-// ✅ 新增：显示学生提交文件的组件（使用 storageId）
-function StudentFileDisplay({ file }: { file: { name: string; storageId: string; size: number } }) {
-  const fileUrl = useQuery(api.files.getFileUrl, { storageId: file.storageId });
+// ✅ 修复：显示学生提交文件的组件
+function StudentFileDisplay({ storageId, fileName }: { storageId: string; fileName: string }) {
+  const fileUrl = useQuery(api.files.getFileUrl, { storageId });
 
   return (
     <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
@@ -300,10 +301,7 @@ function StudentFileDisplay({ file }: { file: { name: string; storageId: string;
         <FileText className="w-5 h-5 text-blue-600" />
         <div>
           <p className="text-sm font-medium text-gray-900">
-            {file.name}
-          </p>
-          <p className="text-xs text-gray-500">
-            {(file.size / 1024).toFixed(1)} KB
+            {fileName}
           </p>
         </div>
       </div>
@@ -321,7 +319,7 @@ function StudentFileDisplay({ file }: { file: { name: string; storageId: string;
             </a>
             <a
               href={fileUrl}
-              download={file.name}
+              download={fileName}
               className="flex items-center gap-1 px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
             >
               <Download className="w-4 h-4" />

@@ -150,47 +150,6 @@ export const submitTask = mutation({
   },
 });
 
-// 分数提交
-export const gradeSubmission = mutation({
-  args: {
-    taskId: v.id('tasks'),
-    studentId: v.string(),
-    grade: v.number(),
-    feedback: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error('Not authorized');
-
-    // 验证是否是教师
-    const task = await ctx.db.get(args.taskId);
-    if (!task || task.teacherId !== identity.subject) {
-      throw new Error('Not authorized to grade this task');
-    }
-
-    // 查找提交记录
-    const submission = await ctx.db
-      .query('taskSubmissions')
-      .withIndex('by_task_student', (q) =>
-        q.eq('taskId', args.taskId).eq('studentId', args.studentId)
-      )
-      .first();
-
-    if (!submission) {
-      throw new Error('Submission not found');
-    }
-
-    // 更新评分
-    return await ctx.db.patch(submission._id, {
-      grade: args.grade,
-      feedback: args.feedback,
-      status: 'graded',
-      gradedAt: Date.now(),
-      gradedBy: identity.subject,
-    });
-  },
-});
-
 // 获取任务的所有提交
 export const getTaskSubmissions = query({
   args: { taskId: v.id('tasks') },

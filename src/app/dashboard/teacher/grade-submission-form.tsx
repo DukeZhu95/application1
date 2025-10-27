@@ -29,7 +29,7 @@ export function GradeSubmissionForm({
   taskId,
   studentId,
 }: GradeSubmissionFormProps) {
-  const gradeSubmission = useMutation(api.tasks.gradeSubmission);
+  const gradeSubmission = useMutation(api.submissions.gradeSubmission);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
