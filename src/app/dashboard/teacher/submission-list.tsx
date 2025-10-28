@@ -17,6 +17,21 @@ interface SubmissionListProps {
   taskId: Id<'tasks'>;
 }
 
+interface Submission {
+  _id: string;
+  taskId: Id<'tasks'>;
+  studentId: string;
+  content: string;
+  submittedAt: number;
+  status?: string;
+  grade?: number;
+  feedback?: string;
+  gradedAt?: number;
+  storageId?: string;
+  attachmentName?: string;
+  attachmentUrl?: string;
+}
+
 export function SubmissionList({ taskId }: SubmissionListProps) {
   const submissions = useQuery(api.submissions.getTaskSubmissions, { taskId });
 
@@ -62,7 +77,7 @@ function SubmissionCard({
                           submission,
                           taskId
                         }: {
-  submission: any;
+  submission: Submission;
   taskId: Id<'tasks'>;
 }) {
   // 查询学生个人资料获取真实姓名

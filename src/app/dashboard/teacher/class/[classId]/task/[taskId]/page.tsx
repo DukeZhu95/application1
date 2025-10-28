@@ -25,6 +25,32 @@ interface PageProps {
   }>;
 }
 
+// 添加类型定义
+interface Submission {
+  _id: string;
+  taskId: Id<'tasks'>;
+  studentId: string;
+  content: string;
+  submittedAt: number;
+  grade?: number;
+  feedback?: string;
+  storageIds?: string[];
+  attachmentNames?: string[];
+}
+
+interface SubmissionCardProps {
+  submission: Submission;
+  formatDate: (timestamp: number) => string;
+  isGrading: boolean;
+  gradeValue: string;
+  feedbackValue: string;
+  onGradeValueChange: (value: string) => void;
+  onFeedbackValueChange: (value: string) => void;
+  onStartGrading: () => void;
+  onCancelGrading: () => void;
+  onSubmitGrade: () => void;
+}
+
 export default function TeacherTaskSubmissionsPage({ params }: PageProps) {
   const { classId, taskId } = use(params);
   const router = useRouter();
@@ -56,7 +82,7 @@ export default function TeacherTaskSubmissionsPage({ params }: PageProps) {
   };
 
   // 提交批改
-  const handleGradeSubmit = async (submission: any) => {
+  const handleGradeSubmit = async (submission: Submission) => {
     const grade = parseInt(gradeValue);
     if (isNaN(grade) || grade < 0 || grade > 100) {
       alert('Please enter a valid grade (0-100)');
@@ -192,7 +218,7 @@ function SubmissionCard({
                           onStartGrading,
                           onCancelGrading,
                           onSubmitGrade,
-                        }: any) {
+                        }: SubmissionCardProps) {
   // ✅ 获取学生资料
   const studentProfile = useQuery(api.studentProfiles.getStudentProfile, {
     studentId: submission.studentId,

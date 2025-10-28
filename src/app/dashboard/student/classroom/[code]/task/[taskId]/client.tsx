@@ -202,7 +202,7 @@ export default function TaskDetailClient({
                 {/* 允许重新提交（仅限未评分时） */}
                 <div className="mt-4 flex items-center justify-between bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <p className="text-sm text-gray-700">
-                    You can update your submission until it's graded.
+                    You can update your submission until it&apos;s graded.
                   </p>
                   <Button
                     variant="outline"
