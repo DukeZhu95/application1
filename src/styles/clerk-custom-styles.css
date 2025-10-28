@@ -98,18 +98,33 @@
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
 }
 
-/* Continue 按钮 */
+/* 🔥 Continue 按钮 - 白色边框样式（匹配Google按钮） */
 .cl-formButtonPrimary {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
-    border: none !important;
-    border-radius: 12px !important;
-    font-weight: 600 !important;
-    transition: all 0.3s ease !important;
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    border: 1.5px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    font-size: 0.9375rem !important;
+    padding: 0.875rem 1.5rem !important;
+    min-height: 48px !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
 }
 
 .cl-formButtonPrimary:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3) !important;
+    background: #f9fafb !important;
+    border-color: #d1d5db !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    transform: translateY(0) !important;
+}
+
+.cl-formButtonPrimary:active {
+    background: #f3f4f6 !important;
 }
 
 /* 响应式 */
