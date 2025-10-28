@@ -63,7 +63,7 @@ export default defineSchema({
     .index('by_classroom', ['classroomId'])
     .index('by_teacher', ['teacherId']),
 
-  // ✅ 统一使用 taskSubmissions 表
+  // ✅ taskSubmissions 表 - 支持多文件
   taskSubmissions: defineTable({
     taskId: v.id('tasks'),
     studentId: v.string(),
@@ -74,6 +74,11 @@ export default defineSchema({
     feedback: v.optional(v.string()),
     gradedAt: v.optional(v.number()),
     gradedBy: v.optional(v.string()),
+    // ✅ 支持多文件（数组）
+    attachmentUrls: v.optional(v.array(v.string())),
+    attachmentNames: v.optional(v.array(v.string())),
+    storageIds: v.optional(v.array(v.id('_storage'))),
+    // 保留旧的单文件字段（向后兼容）
     attachmentUrl: v.optional(v.string()),
     attachmentName: v.optional(v.string()),
     storageId: v.optional(v.id('_storage')),

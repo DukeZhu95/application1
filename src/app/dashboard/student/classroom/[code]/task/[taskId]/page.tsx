@@ -34,8 +34,9 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
   const { user } = useUser();
   const router = useRouter();
   const [submissionText, setSubmissionText] = useState('');
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]); // ✅ 多文件数组
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // ✅ 编辑模式状态
 
   // 获取任务详情
   const task = useQuery(api.tasks.getTaskById, { taskId });
@@ -60,26 +61,31 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
     });
   };
 
-  // 处理文件选择（单个文件）
+  // ✅ 处理文件选择（多文件，最多5个）
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setUploadedFile(file);
-      toast.success('File selected');
+    const files = Array.from(e.target.files || []);
+
+    if (uploadedFiles.length + files.length > 5) {
+      toast.error('Maximum 5 files allowed');
+      return;
     }
+
+    setUploadedFiles((prev) => [...prev, ...files]);
+    toast.success(`${files.length} file(s) added`);
   };
 
-  // 移除文件
-  const removeFile = () => {
-    setUploadedFile(null);
+  // ✅ 移除单个文件
+  const removeFile = (index: number) => {
+    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+    toast.success('File removed');
   };
 
-  // 提交任务
+  // ✅ 提交任务 - 多文件上传
   const handleSubmit = async () => {
     if (!user?.id) return;
 
-    if (!submissionText.trim() && !uploadedFile) {
-      toast.error('Please add some content or a file to submit');
+    if (!submissionText.trim() && uploadedFiles.length === 0) {
+      toast.error('Please add some content or files to submit');
       return;
     }
 
@@ -92,18 +98,18 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
     setIsSubmitting(true);
 
     try {
-      let storageId: Id<'_storage'> | undefined;
-      let fileName: string | undefined;
+      const storageIds: Id<'_storage'>[] = [];
+      const fileNames: string[] = [];
 
-      // 上传文件
-      if (uploadedFile) {
-        toast.loading('Uploading file...');
+      // 上传所有文件
+      for (const file of uploadedFiles) {
+        toast.loading(`Uploading ${file.name}...`);
         const uploadUrl = await generateUploadUrl();
 
         const result = await fetch(uploadUrl, {
           method: 'POST',
-          headers: { 'Content-Type': uploadedFile.type },
-          body: uploadedFile,
+          headers: { 'Content-Type': file.type },
+          body: file,
         });
 
         if (!result.ok) {
@@ -111,11 +117,11 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
         }
 
         const { storageId: newStorageId } = await result.json();
-        storageId = newStorageId as Id<'_storage'>;
-        fileName = uploadedFile.name;
+        storageIds.push(newStorageId as Id<'_storage'>);
+        fileNames.push(file.name);
 
         toast.dismiss();
-        toast.success('File uploaded');
+        toast.success(`${file.name} uploaded`);
       }
 
       // 提交任务
@@ -123,13 +129,14 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
         taskId,
         studentId: user.id,
         content: submissionText,
-        storageId,
-        fileName,
+        storageIds: storageIds.length > 0 ? storageIds : undefined,
+        fileNames: fileNames.length > 0 ? fileNames : undefined,
       });
 
       toast.success('Task submitted successfully!');
       setSubmissionText('');
-      setUploadedFile(null);
+      setUploadedFiles([]);
+      setIsEditing(false); // ✅ 退出编辑模式
     } catch (error) {
       console.error('Submission error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to submit task');
@@ -209,7 +216,7 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
             <p className="text-gray-700">{task.description}</p>
           </div>
 
-          {/* 教师附件 - 修复类型问题 */}
+          {/* 教师附件 */}
           {task.attachmentUrls && task.attachmentUrls.length > 0 && (
             <div className="mt-6 pt-6 border-t border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
@@ -260,9 +267,11 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
         </div>
 
         {/* 提交表单或已提交内容 */}
-        {!isSubmitted ? (
+        {!isSubmitted || isEditing ? (
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Submission</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              {isEditing ? 'Update Your Submission' : 'Your Submission'}
+            </h2>
 
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -277,51 +286,79 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
               />
             </div>
 
-            {/* 单个文件上传 */}
+            {/* ✅ 多文件上传 */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Attachment (Optional)
+                Attachments (Optional, max 5 files)
               </label>
+
+              {/* ✅ 显示现有已提交的文件（编辑模式） */}
+              {isEditing && submission?.storageIds && submission.storageIds.length > 0 && uploadedFiles.length === 0 && (
+                <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    Current Attachments (will be replaced if you upload new files):
+                  </p>
+                  <div className="space-y-2">
+                    {submission.storageIds.map((_storageId: string, index: number) => (
+                      <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                        <FileText className="w-4 h-4" />
+                        <span>{submission.attachmentNames?.[index] || `File ${index + 1}`}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
                 <input
                   type="file"
+                  multiple
                   onChange={handleFileSelect}
                   className="hidden"
                   id="file-upload"
+                  disabled={uploadedFiles.length >= 5}
                 />
                 <label
                   htmlFor="file-upload"
-                  className="cursor-pointer inline-flex flex-col items-center"
+                  className={`cursor-pointer inline-flex flex-col items-center ${
+                    uploadedFiles.length >= 5 ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
                   <Upload className="w-12 h-12 text-gray-400 mb-2" />
                   <span className="text-sm font-medium text-gray-700">
-                    Click to upload a file
+                    {uploadedFiles.length >= 5 ? 'Maximum files reached' : 'Click to upload files'}
                   </span>
                   <span className="text-xs text-gray-500 mt-1">
-                    PDF, DOC, images, or any file type
+                    {uploadedFiles.length}/5 files uploaded
                   </span>
                 </label>
               </div>
 
-              {uploadedFile && (
-                <div className="mt-4">
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <FileText className="w-5 h-5 text-gray-500" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {uploadedFile.name}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {(uploadedFile.size / 1024).toFixed(1)} KB
-                      </p>
-                    </div>
-                    <button
-                      onClick={removeFile}
-                      className="p-1 hover:bg-gray-200 rounded transition-colors"
+              {/* ✅ 已选择的文件列表 */}
+              {uploadedFiles.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  {uploadedFiles.map((file, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200"
                     >
-                      <X className="w-4 h-4 text-gray-500" />
-                    </button>
-                  </div>
+                      <FileText className="w-5 h-5 text-gray-500" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {file.name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {(file.size / 1024).toFixed(1)} KB
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => removeFile(index)}
+                        className="p-1 hover:bg-gray-200 rounded transition-colors"
+                      >
+                        <X className="w-4 h-4 text-gray-500" />
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -337,6 +374,20 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
             >
               {isSubmitting ? 'Submitting...' : !canSubmit ? 'Submission Closed' : 'Submit Task'}
             </button>
+
+            {/* ✅ 取消编辑按钮 */}
+            {isEditing && (
+              <button
+                onClick={() => {
+                  setIsEditing(false);
+                  setSubmissionText('');
+                  setUploadedFiles([]);
+                }}
+                className="w-full mt-2 py-3 rounded-lg font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all"
+              >
+                Cancel
+              </button>
+            )}
           </div>
         ) : (
           <div className="space-y-6">
@@ -393,17 +444,22 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
                 </p>
               </div>
 
-              {/* 单个文件显示 */}
-              {submission.storageId && submission.attachmentName && (
+              {/* ✅ 多文件显示 */}
+              {submission.storageIds && submission.storageIds.length > 0 && (
                 <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                   <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
                     <Paperclip className="w-4 h-4" />
-                    Your Uploaded File:
+                    Your Uploaded Files ({submission.storageIds.length}):
                   </h3>
-                  <FileDisplay
-                    storageId={submission.storageId}
-                    fileName={submission.attachmentName}
-                  />
+                  <div className="space-y-2">
+                    {submission.storageIds.map((storageId, index) => (
+                      <FileDisplay
+                        key={index}
+                        storageId={storageId}
+                        fileName={submission.attachmentNames?.[index] || `File ${index + 1}`}
+                      />
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -426,7 +482,7 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
                   <button
                     onClick={() => {
                       setSubmissionText(submission.content);
-                      window.location.reload();
+                      setIsEditing(true); // ✅ 进入编辑模式
                     }}
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                   >
@@ -442,7 +498,7 @@ export default function StudentTaskDetailPage({ params }: PageProps) {
   );
 }
 
-// 文件显示组件
+// ✅ 文件显示组件
 function FileDisplay({ storageId, fileName }: { storageId: string; fileName: string }) {
   const fileUrl = useQuery(api.files.getFileUrl, { storageId });
 

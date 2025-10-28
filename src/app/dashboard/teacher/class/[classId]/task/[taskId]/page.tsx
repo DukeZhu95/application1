@@ -37,7 +37,7 @@ export default function TeacherTaskSubmissionsPage({ params }: PageProps) {
     taskId: taskId as Id<'tasks'>
   });
 
-  // ✅ 获取所有提交 - 使用 taskSubmissions 表
+  // 获取所有提交
   const submissions = useQuery(api.submissions.getTaskSubmissions, {
     taskId: taskId as Id<'tasks'>
   });
@@ -150,138 +150,27 @@ export default function TeacherTaskSubmissionsPage({ params }: PageProps) {
           ) : (
             <div className="space-y-4">
               {submissions.map((submission) => (
-                <div
+                <SubmissionCard
                   key={submission._id}
-                  className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow"
-                >
-                  {/* Student Info */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                        <User className="w-5 h-5 text-purple-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">
-                          Student: {submission.studentId.substring(0, 20)}...
-                        </h3>
-                        <p className="text-sm text-gray-500 flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          Submitted: {formatDate(submission.submittedAt)}
-                        </p>
-                      </div>
-                    </div>
-
-                    {submission.grade !== undefined && (
-                      <div className="text-right">
-                        <div className="flex items-center gap-2 text-2xl font-bold text-green-600">
-                          <Award className="w-6 h-6" />
-                          {submission.grade}/100
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* ✅ Submission Content - 使用 content 字段 */}
-                  <div className="mb-4">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                      Submission:
-                    </h4>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-gray-800 whitespace-pre-wrap">
-                        {submission.content}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* ✅ 附件 - 使用单个文件字段 */}
-                  {submission.storageId && submission.attachmentName && (
-                    <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                        Attachment:
-                      </h4>
-                      <StudentFileDisplay
-                        storageId={submission.storageId}
-                        fileName={submission.attachmentName}
-                      />
-                    </div>
-                  )}
-
-                  {/* Feedback */}
-                  {submission.feedback && (
-                    <div className="mb-4">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1">
-                        <MessageSquare className="w-4 h-4" />
-                        Your Feedback:
-                      </h4>
-                      <div className="bg-blue-50 rounded-lg p-4">
-                        <p className="text-gray-800">{submission.feedback}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Grading Section */}
-                  {gradingSubmissionId === submission._id ? (
-                    <div className="border-t border-gray-200 pt-4 space-y-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Grade (0-100)
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          value={gradeValue}
-                          onChange={(e) => setGradeValue(e.target.value)}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          placeholder="Enter grade"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Feedback (Optional)
-                        </label>
-                        <textarea
-                          value={feedbackValue}
-                          onChange={(e) => setFeedbackValue(e.target.value)}
-                          rows={3}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-                          placeholder="Add feedback for the student..."
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleGradeSubmit(submission)}
-                          className="px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"
-                        >
-                          Submit Grade
-                        </button>
-                        <button
-                          onClick={() => {
-                            setGradingSubmissionId(null);
-                            setGradeValue('');
-                            setFeedbackValue('');
-                          }}
-                          className="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="border-t border-gray-200 pt-4">
-                      <button
-                        onClick={() => {
-                          setGradingSubmissionId(submission._id);
-                          setGradeValue(submission.grade?.toString() || '');
-                          setFeedbackValue(submission.feedback || '');
-                        }}
-                        className="px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"
-                      >
-                        {submission.grade !== undefined ? 'Update Grade' : 'Grade Submission'}
-                      </button>
-                    </div>
-                  )}
-                </div>
+                  submission={submission}
+                  formatDate={formatDate}
+                  isGrading={gradingSubmissionId === submission._id}
+                  gradeValue={gradeValue}
+                  feedbackValue={feedbackValue}
+                  onGradeValueChange={setGradeValue}
+                  onFeedbackValueChange={setFeedbackValue}
+                  onStartGrading={() => {
+                    setGradingSubmissionId(submission._id);
+                    setGradeValue(submission.grade?.toString() || '');
+                    setFeedbackValue(submission.feedback || '');
+                  }}
+                  onCancelGrading={() => {
+                    setGradingSubmissionId(null);
+                    setGradeValue('');
+                    setFeedbackValue('');
+                  }}
+                  onSubmitGrade={() => handleGradeSubmit(submission)}
+                />
               ))}
             </div>
           )}
@@ -291,7 +180,160 @@ export default function TeacherTaskSubmissionsPage({ params }: PageProps) {
   );
 }
 
-// ✅ 修复：显示学生提交文件的组件
+// ✅ 提交卡片组件 - 显示学生姓名
+function SubmissionCard({
+                          submission,
+                          formatDate,
+                          isGrading,
+                          gradeValue,
+                          feedbackValue,
+                          onGradeValueChange,
+                          onFeedbackValueChange,
+                          onStartGrading,
+                          onCancelGrading,
+                          onSubmitGrade,
+                        }: any) {
+  // ✅ 获取学生资料
+  const studentProfile = useQuery(api.studentProfiles.getStudentProfile, {
+    studentId: submission.studentId,
+  });
+
+  // ✅ 显示学生姓名
+  const studentName = studentProfile?.firstName && studentProfile?.lastName
+    ? `${studentProfile.firstName} ${studentProfile.lastName}`.trim()
+    : submission.studentId.substring(0, 20) + '...';
+
+  return (
+    <div className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+      {/* Student Info */}
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+            <User className="w-5 h-5 text-purple-600" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900">
+              {studentName}
+            </h3>
+            <p className="text-sm text-gray-500 flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              Submitted: {formatDate(submission.submittedAt)}
+            </p>
+          </div>
+        </div>
+
+        {submission.grade !== undefined && (
+          <div className="text-right">
+            <div className="flex items-center gap-2 text-2xl font-bold text-green-600">
+              <Award className="w-6 h-6" />
+              {submission.grade}/100
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Submission Content */}
+      <div className="mb-4">
+        <h4 className="text-sm font-semibold text-gray-700 mb-2">
+          Submission:
+        </h4>
+        <div className="bg-gray-50 rounded-lg p-4">
+          <p className="text-gray-800 whitespace-pre-wrap">
+            {submission.content}
+          </p>
+        </div>
+      </div>
+
+      {/* ✅ 多附件显示 */}
+      {submission.storageIds && submission.storageIds.length > 0 && (
+        <div className="mb-4">
+          <h4 className="text-sm font-semibold text-gray-700 mb-2">
+            Attachments ({submission.storageIds.length}):
+          </h4>
+          <div className="space-y-2">
+            {submission.storageIds.map((storageId: string, index: number) => (
+              <StudentFileDisplay
+                key={index}
+                storageId={storageId}
+                fileName={submission.attachmentNames?.[index] || `File ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Feedback */}
+      {submission.feedback && (
+        <div className="mb-4">
+          <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1">
+            <MessageSquare className="w-4 h-4" />
+            Your Feedback:
+          </h4>
+          <div className="bg-blue-50 rounded-lg p-4">
+            <p className="text-gray-800">{submission.feedback}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Grading Section */}
+      {isGrading ? (
+        <div className="border-t border-gray-200 pt-4 space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Grade (0-100)
+            </label>
+            <input
+              type="number"
+              min="0"
+              max="100"
+              value={gradeValue}
+              onChange={(e) => onGradeValueChange(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="Enter grade"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Feedback (Optional)
+            </label>
+            <textarea
+              value={feedbackValue}
+              onChange={(e) => onFeedbackValueChange(e.target.value)}
+              rows={3}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              placeholder="Add feedback for the student..."
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={onSubmitGrade}
+              className="px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"
+            >
+              Submit Grade
+            </button>
+            <button
+              onClick={onCancelGrading}
+              className="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="border-t border-gray-200 pt-4">
+          <button
+            onClick={onStartGrading}
+            className="px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            {submission.grade !== undefined ? 'Update Grade' : 'Grade Submission'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ✅ 文件显示组件
 function StudentFileDisplay({ storageId, fileName }: { storageId: string; fileName: string }) {
   const fileUrl = useQuery(api.files.getFileUrl, { storageId });
 

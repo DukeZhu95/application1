@@ -32,14 +32,14 @@ export const getTaskSubmissions = query({
   },
 });
 
-// 学生提交任务 - ✅ 添加防止已评分作业被修改的逻辑
+// ✅ 学生提交任务 - 支持多文件（最多5个）
 export const submitTask = mutation({
   args: {
     taskId: v.id('tasks'),
     studentId: v.string(),
     content: v.string(),
-    storageId: v.optional(v.id('_storage')),
-    fileName: v.optional(v.string()),
+    storageIds: v.optional(v.array(v.id('_storage'))),
+    fileNames: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     // 检查是否已经提交过
@@ -61,18 +61,36 @@ export const submitTask = mutation({
       status: 'submitted',
     };
 
-    // 处理文件附件
-    if (args.storageId) {
-      submissionData.storageId = args.storageId;
-      const attachmentUrl = await ctx.storage.getUrl(args.storageId);
-      if (attachmentUrl) {
-        submissionData.attachmentUrl = attachmentUrl;
+    // ✅ 处理多个文件附件
+    if (args.storageIds && args.storageIds.length > 0) {
+      // 验证文件数量
+      if (args.storageIds.length > 5) {
+        throw new Error('Maximum 5 files allowed');
       }
-      submissionData.attachmentName = args.fileName;
+
+      submissionData.storageIds = args.storageIds;
+      submissionData.attachmentNames = args.fileNames;
+
+      // 获取所有文件的 URL
+      const urls = await Promise.all(
+        args.storageIds.map(async (storageId) => {
+          const url = await ctx.storage.getUrl(storageId);
+          return url;
+        })
+      );
+      submissionData.attachmentUrls = urls.filter((url): url is string => url !== null);
     }
 
     if (existingSubmission) {
       // 删除旧文件
+      if (existingSubmission.storageIds) {
+        await Promise.all(
+          existingSubmission.storageIds.map((storageId) =>
+            ctx.storage.delete(storageId)
+          )
+        );
+      }
+      // 向后兼容：也删除单文件字段
       if (existingSubmission.storageId) {
         await ctx.storage.delete(existingSubmission.storageId);
       }
@@ -93,7 +111,7 @@ export const submitTask = mutation({
   },
 });
 
-// 教师批改任务 - ✅ 修改为使用 taskSubmissions 表
+// 教师批改任务
 export const gradeSubmission = mutation({
   args: {
     taskId: v.id('tasks'),

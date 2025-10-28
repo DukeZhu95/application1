@@ -16,6 +16,7 @@ import type {
 import type * as classes from "../classes.js";
 import type * as files from "../files.js";
 import type * as schedule from "../schedule.js";
+import type * as studentProfiles from "../studentProfiles.js";
 import type * as students from "../students.js";
 import type * as submissions from "../submissions.js";
 import type * as tasks from "../tasks.js";
@@ -34,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   classes: typeof classes;
   files: typeof files;
   schedule: typeof schedule;
+  studentProfiles: typeof studentProfiles;
   students: typeof students;
   submissions: typeof submissions;
   tasks: typeof tasks;

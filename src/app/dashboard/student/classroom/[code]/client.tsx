@@ -59,7 +59,8 @@ export default function ClassroomPageClient({
       {/* 使用现有的 Header 组件 */}
       <ClassroomHeader code={code} />
 
-      <main className="glass-student-classroom-main">
+      {/* 主内容 - 添加 paddingTop 避免被导航栏遮挡 */}
+      <main className="glass-student-classroom-main" style={{ paddingTop: '100px' }}>
         {/* 课程信息卡片 */}
         <div className="glass-student-classroom-info">
           <div className="glass-student-classroom-icon">
