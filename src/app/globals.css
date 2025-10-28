@@ -126,57 +126,59 @@ body {
 }
 
 /* ============================================
-   强制覆盖 Input 黑色背景
+   🔥 排除 Clerk 组件，只影响非 Clerk 的输入框和按钮
    ============================================ */
 
-input[type="text"],
-input[type="datetime-local"],
-input {
+/* 输入框 - 排除 Clerk */
+input[type="text"]:not([class*="cl-"]):not([id*="clerk"]),
+input[type="datetime-local"]:not([class*="cl-"]):not([id*="clerk"]),
+input:not([class*="cl-"]):not([id*="clerk"]):not([type="submit"]):not([type="button"]) {
     background: rgba(139, 92, 246, 0.05) !important;
     border: 2px solid rgba(139, 92, 246, 0.2) !important;
     border-radius: 12px !important;
     color: #1f2937 !important;
 }
 
-input:focus,
-input:focus-visible {
+input:not([class*="cl-"]):not([id*="clerk"]):focus,
+input:not([class*="cl-"]):not([id*="clerk"]):focus-visible {
     background: rgba(139, 92, 246, 0.08) !important;
     border: 2px solid rgba(139, 92, 246, 0.5) !important;
     outline: none !important;
     box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1) !important;
 }
 
-button[type="submit"] {
+/* 按钮 - 排除 Clerk */
+button[type="submit"]:not([class*="cl-"]):not([id*="clerk"]) {
     background: linear-gradient(135deg, #8b5cf6, #a78bfa) !important;
     color: white !important;
     border: none !important;
 }
 
-/* 悬停效果 */
-input:hover:not(:disabled),
-textarea:hover:not(:disabled) {
+/* 悬停效果 - 排除 Clerk */
+input:not([class*="cl-"]):hover:not(:disabled),
+textarea:not([class*="cl-"]):hover:not(:disabled) {
     border-color: rgba(139, 92, 246, 0.35) !important;
 }
 
-/* 按钮悬停效果 */
-button[type="submit"]:hover:not(:disabled) {
+/* 按钮悬停效果 - 排除 Clerk */
+button[type="submit"]:not([class*="cl-"]):hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;
     transition: all 0.3s ease;
 }
 
-button[type="submit"]:active:not(:disabled) {
+button[type="submit"]:not([class*="cl-"]):active:not(:disabled) {
     transform: translateY(0);
 }
 
-/* 取消按钮样式 */
-button[type="button"]:not(.color-picker-btn) {
+/* 取消按钮样式 - 排除 Clerk */
+button[type="button"]:not(.color-picker-btn):not([class*="cl-"]):not([id*="clerk"]) {
     background: transparent !important;
     border: 2px solid rgba(139, 92, 246, 0.2) !important;
     color: #8b5cf6 !important;
 }
 
-button[type="button"]:hover:not(:disabled):not(.color-picker-btn) {
+button[type="button"]:not([class*="cl-"]):hover:not(:disabled):not(.color-picker-btn) {
     background: rgba(139, 92, 246, 0.05) !important;
     border-color: rgba(139, 92, 246, 0.4) !important;
 }
@@ -195,7 +197,8 @@ button.color-picker-btn[type="button"]:hover {
 
 /* 移动端适配 */
 @media (max-width: 640px) {
-    input, textarea {
+    input:not([class*="cl-"]),
+    textarea:not([class*="cl-"]) {
         font-size: 16px !important; /* 防止iOS自动缩放 */
     }
 }

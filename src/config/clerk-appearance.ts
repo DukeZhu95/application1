@@ -7,7 +7,7 @@ export const clerkAppearance: Theme = {
   baseTheme: undefined, // 不使用预设主题,完全自定义
   variables: {
     // 颜色变量
-    colorPrimary: "#667eea", // 主色调 - 紫色
+    colorPrimary: "#6366f1", // 主色调 - 靛蓝色
     colorDanger: "#f5576c", // 错误/危险色
     colorSuccess: "#10b981", // 成功色
     colorWarning: "#f59e0b", // 警告色
@@ -29,7 +29,7 @@ export const clerkAppearance: Theme = {
     rootBox: {
       width: "100%",
       maxWidth: "440px",
-      overflow: "hidden", // 🔥 确保圆角不被子元素破坏
+      overflow: "hidden", // 确保圆角不被子元素破坏
     },
 
     // 卡片容器 - 玻璃态效果 + 圆角
@@ -39,9 +39,9 @@ export const clerkAppearance: Theme = {
       WebkitBackdropFilter: "blur(20px)",
       boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.3)",
       border: "1px solid rgba(255, 255, 255, 0.3)",
-      borderRadius: "24px", // 🔥 主卡片圆角
+      borderRadius: "24px",
       padding: "2.5rem",
-      overflow: "hidden", // 🔥 确保内容不会破坏圆角
+      overflow: "hidden",
     },
 
     // 标题
@@ -65,7 +65,7 @@ export const clerkAppearance: Theme = {
     socialButtonsBlockButton: {
       background: "white",
       border: "1.5px solid #e2e8f0",
-      borderRadius: "12px", // 圆角按钮
+      borderRadius: "12px",
       padding: "0.875rem 1.25rem",
       fontSize: "0.9375rem",
       fontWeight: "500",
@@ -78,8 +78,8 @@ export const clerkAppearance: Theme = {
         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
       },
       "&:focus": {
-        borderColor: "#667eea",
-        boxShadow: "0 0 0 3px rgba(102, 126, 234, 0.1)",
+        borderColor: "#6366f1",
+        boxShadow: "0 0 0 3px rgba(99, 102, 241, 0.1)",
       },
     },
 
@@ -120,11 +120,11 @@ export const clerkAppearance: Theme = {
       marginBottom: "0.5rem",
     },
 
-    // 输入框 - 圆角
+    // 输入框
     formFieldInput: {
       background: "white",
       border: "1.5px solid #e2e8f0",
-      borderRadius: "12px", // 🔥 输入框圆角
+      borderRadius: "12px",
       padding: "0.875rem 1rem",
       fontSize: "0.9375rem",
       color: "#1a202c",
@@ -133,8 +133,8 @@ export const clerkAppearance: Theme = {
         borderColor: "#cbd5e1",
       },
       "&:focus": {
-        borderColor: "#667eea",
-        boxShadow: "0 0 0 3px rgba(102, 126, 234, 0.1)",
+        borderColor: "#6366f1",
+        boxShadow: "0 0 0 3px rgba(99, 102, 241, 0.1)",
         outline: "none",
       },
       "&::placeholder": {
@@ -142,37 +142,52 @@ export const clerkAppearance: Theme = {
       },
     },
 
-    // 主按钮（Continue/Sign in）- 圆角
+    // 🔥 主按钮（Continue/Sign in）- 白色风格匹配Google按钮
     formButtonPrimary: {
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-      color: "white",
-      border: "none",
-      borderRadius: "12px", // 🔥 按钮圆角
+      background: "#ffffff",
+      color: "#1f2937", // 深灰色文字
+      border: "1.5px solid #e5e7eb", // 浅灰色边框
+      borderRadius: "8px",
       padding: "0.875rem 1.5rem",
-      fontSize: "1rem",
-      fontWeight: "600",
-      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-      boxShadow: "0 10px 30px rgba(102, 126, 234, 0.3)",
+      fontSize: "0.9375rem",
+      fontWeight: "500",
+      minHeight: "48px",
+      transition: "all 0.2s ease",
+      boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+      opacity: "1",
+      visibility: "visible",
+      display: "block",
+      width: "100%",
+      cursor: "pointer",
+      position: "relative",
+      zIndex: "10",
       "&:hover": {
-        transform: "translateY(-2px)",
-        boxShadow: "0 15px 40px rgba(102, 126, 234, 0.4)",
+        background: "#f9fafb",
+        borderColor: "#d1d5db",
+        boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
       },
       "&:active": {
-        transform: "translateY(0)",
+        background: "#f3f4f6",
       },
       "&:focus": {
-        boxShadow: "0 0 0 3px rgba(102, 126, 234, 0.3)",
+        boxShadow: "0 0 0 3px rgba(99, 102, 241, 0.1)",
+        borderColor: "#6366f1",
+        opacity: "1",
+      },
+      "&:disabled": {
+        opacity: "0.5",
+        cursor: "not-allowed",
       },
     },
 
     // 底部链接（Don't have an account? / Already have an account?）
     footerActionLink: {
-      color: "#667eea",
+      color: "#6366f1",
       fontWeight: "600",
       textDecoration: "none",
       transition: "color 0.2s ease",
       "&:hover": {
-        color: "#764ba2",
+        color: "#8b5cf6",
         textDecoration: "underline",
       },
     },
@@ -191,52 +206,52 @@ export const clerkAppearance: Theme = {
 
     // 身份验证图标
     identityPreviewEditButton: {
-      color: "#667eea",
+      color: "#6366f1",
       "&:hover": {
-        color: "#764ba2",
+        color: "#8b5cf6",
       },
     },
 
     // 加载状态
     spinner: {
-      color: "#667eea",
+      color: "#6366f1",
     },
 
     // 返回按钮
     backButton: {
-      color: "#667eea",
+      color: "#6366f1",
       fontWeight: "500",
       "&:hover": {
-        color: "#764ba2",
+        color: "#8b5cf6",
       },
     },
 
-    // 🔥 Footer (Secured by Clerk) - 白色背景 + 底部圆角
+    // Footer (Secured by Clerk) - 白色背景 + 底部圆角
     footer: {
-      background: "rgba(255, 255, 255, 0.95)", // 白色背景
-      backdropFilter: "blur(20px)", // 模糊效果
-      WebkitBackdropFilter: "blur(20px)", // Safari 支持
-      borderTop: "1px solid rgba(226, 232, 240, 0.8)", // 分割线
-      padding: "1.5rem", // 内边距
-      borderRadius: "0 0 24px 24px", // 🔥 底部圆角（重要！）
+      background: "rgba(255, 255, 255, 0.95)",
+      backdropFilter: "blur(20px)",
+      WebkitBackdropFilter: "blur(20px)",
+      borderTop: "1px solid rgba(226, 232, 240, 0.8)",
+      padding: "1.5rem",
+      borderRadius: "0 0 24px 24px",
       marginTop: "1.5rem",
-      marginLeft: "-2.5rem", // 🔥 负边距，让 footer 延伸到卡片边缘
-      marginRight: "-2.5rem", // 🔥 负边距，让 footer 延伸到卡片边缘
-      marginBottom: "-2.5rem", // 🔥 负边距，让 footer 延伸到卡片底部
-      paddingLeft: "2.5rem", // 🔥 补偿负边距，保持内容居中
-      paddingRight: "2.5rem", // 🔥 补偿负边距，保持内容居中
-      paddingBottom: "2rem", // 🔥 底部额外间距
-      boxShadow: "none", // 无阴影
+      marginLeft: "-2.5rem",
+      marginRight: "-2.5rem",
+      marginBottom: "-2.5rem",
+      paddingLeft: "2.5rem",
+      paddingRight: "2.5rem",
+      paddingBottom: "2rem",
+      boxShadow: "none",
       "& a": {
-        color: "#667eea",
+        color: "#6366f1",
         fontWeight: "500",
         "&:hover": {
-          color: "#764ba2",
+          color: "#8b5cf6",
         },
       },
     },
 
-    // 🔥 Footer Action - 确保背景透明
+    // Footer Action - 确保背景透明
     footerAction: {
       background: "transparent",
     },
@@ -255,22 +270,22 @@ export const clerkAppearance: Theme = {
       color: "#64748b",
     },
 
-    // Badge (如 "Recommended") - 圆角
+    // Badge (如 "Recommended")
     badge: {
-      background: "rgba(102, 126, 234, 0.1)",
-      color: "#667eea",
+      background: "rgba(99, 102, 241, 0.1)",
+      color: "#6366f1",
       fontSize: "0.75rem",
       fontWeight: "600",
       padding: "0.25rem 0.625rem",
-      borderRadius: "6px", // 🔥 Badge 圆角
+      borderRadius: "6px",
     },
   },
 };
 
 // 布局配置
 export const clerkLayout = {
-  logoPlacement: "inside" as const, // Logo 放在卡片内部
-  socialButtonsPlacement: "top" as const, // 社交登录按钮在顶部
-  socialButtonsVariant: "blockButton" as const, // 块状按钮
-  showOptionalFields: true, // 显示可选字段
+  logoPlacement: "inside" as const,
+  socialButtonsPlacement: "top" as const,
+  socialButtonsVariant: "blockButton" as const,
+  showOptionalFields: true,
 };

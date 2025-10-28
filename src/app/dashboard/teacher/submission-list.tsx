@@ -11,14 +11,13 @@ import {
 } from '@/app/components/ui/card';
 import { GradeSubmissionForm } from './grade-submission-form';
 import { Id } from '../../../../convex/_generated/dataModel';
-import { FileIcon, Download, Eye, CheckCircle2 } from 'lucide-react';
+import { FileIcon, Download, Eye, CheckCircle2, User } from 'lucide-react';
 
 interface SubmissionListProps {
   taskId: Id<'tasks'>;
 }
 
 export function SubmissionList({ taskId }: SubmissionListProps) {
-  // ✅ 使用正确的 API - 从 taskSubmissions 表获取
   const submissions = useQuery(api.submissions.getTaskSubmissions, { taskId });
 
   if (!submissions) {
@@ -50,75 +49,7 @@ export function SubmissionList({ taskId }: SubmissionListProps) {
       ) : (
         <div className="grid gap-4">
           {submissions.map((submission) => (
-            <Card key={submission._id}>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Student Submission</span>
-                  <span className="text-sm font-normal text-gray-500">
-                    Submitted: {formatDate(submission.submittedAt)}
-                  </span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Student ID */}
-                  <div>
-                    <h4 className="font-medium text-sm text-gray-600">Student ID:</h4>
-                    <p className="mt-1 text-gray-800 text-sm font-mono">
-                      {submission.studentId}
-                    </p>
-                  </div>
-
-                  {/* ✅ Submission Content - 使用 content 字段 */}
-                  <div>
-                    <h4 className="font-medium">Response:</h4>
-                    <p className="mt-1 text-gray-600 whitespace-pre-wrap">
-                      {submission.content}
-                    </p>
-                  </div>
-
-                  {/* ✅ 附件 - 使用单个文件字段 */}
-                  {submission.storageId && submission.attachmentName && (
-                    <div className="mt-4">
-                      <h4 className="font-medium mb-2 flex items-center gap-2">
-                        <FileIcon className="w-4 h-4" />
-                        Attachment:
-                      </h4>
-                      <FileDownloadCard
-                        storageId={submission.storageId}
-                        fileName={submission.attachmentName}
-                        fileUrl={submission.attachmentUrl}
-                      />
-                    </div>
-                  )}
-
-                  {/* Grade Display or Grading Form */}
-                  {submission.status === 'graded' && submission.grade !== undefined ? (
-                    <div className="bg-gray-50 p-4 rounded-md">
-                      <div className="flex items-center gap-2 mb-2">
-                        <CheckCircle2 className="w-5 h-5 text-green-600" />
-                        <h4 className="font-medium">Grade: {submission.grade}/100</h4>
-                      </div>
-                      {submission.feedback && (
-                        <p className="mt-2 text-gray-600">
-                          Feedback: {submission.feedback}
-                        </p>
-                      )}
-                      {submission.gradedAt && (
-                        <p className="text-sm text-gray-500 mt-2">
-                          Graded on: {formatDate(submission.gradedAt)}
-                        </p>
-                      )}
-                    </div>
-                  ) : (
-                    <GradeSubmissionForm
-                      taskId={taskId}
-                      studentId={submission.studentId}
-                    />
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+            <SubmissionCard key={submission._id} submission={submission} taskId={taskId} />
           ))}
         </div>
       )}
@@ -126,7 +57,102 @@ export function SubmissionList({ taskId }: SubmissionListProps) {
   );
 }
 
-// ✅ 修复：处理单个文件的组件
+// 新增：单个提交卡片组件，负责查询学生信息
+function SubmissionCard({
+                          submission,
+                          taskId
+                        }: {
+  submission: any;
+  taskId: Id<'tasks'>;
+}) {
+  // 查询学生个人资料获取真实姓名
+  const studentProfile = useQuery(
+    api.students.getStudentProfile,
+    { studentId: submission.studentId }
+  );
+
+  // 获取学生显示名称
+  const studentName = studentProfile
+    ? `${studentProfile.firstName || ''} ${studentProfile.lastName || ''}`.trim()
+    : 'Loading...';
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <span>Student Submission</span>
+          <span className="text-sm font-normal text-gray-500">
+            Submitted: {formatDate(submission.submittedAt)}
+          </span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {/* 显示学生真实姓名 */}
+          <div>
+            <h4 className="font-medium text-sm text-gray-600 flex items-center gap-2">
+              <User className="w-4 h-4" />
+              Student:
+            </h4>
+            <p className="mt-1 text-gray-800 font-medium">
+              {studentName || submission.studentId}
+            </p>
+          </div>
+
+          {/* Submission Content */}
+          <div>
+            <h4 className="font-medium">Response:</h4>
+            <p className="mt-1 text-gray-600 whitespace-pre-wrap">
+              {submission.content}
+            </p>
+          </div>
+
+          {/* 附件 */}
+          {submission.storageId && submission.attachmentName && (
+            <div className="mt-4">
+              <h4 className="font-medium mb-2 flex items-center gap-2">
+                <FileIcon className="w-4 h-4" />
+                Attachment:
+              </h4>
+              <FileDownloadCard
+                storageId={submission.storageId}
+                fileName={submission.attachmentName}
+                fileUrl={submission.attachmentUrl}
+              />
+            </div>
+          )}
+
+          {/* Grade Display or Grading Form */}
+          {submission.status === 'graded' && submission.grade !== undefined ? (
+            <div className="bg-gray-50 p-4 rounded-md">
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle2 className="w-5 h-5 text-green-600" />
+                <h4 className="font-medium">Grade: {submission.grade}/100</h4>
+              </div>
+              {submission.feedback && (
+                <p className="mt-2 text-gray-600">
+                  Feedback: {submission.feedback}
+                </p>
+              )}
+              {submission.gradedAt && (
+                <p className="text-sm text-gray-500 mt-2">
+                  Graded on: {formatDate(submission.gradedAt)}
+                </p>
+              )}
+            </div>
+          ) : (
+            <GradeSubmissionForm
+              taskId={taskId}
+              studentId={submission.studentId}
+            />
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// 处理单个文件的组件
 function FileDownloadCard({
                             storageId,
                             fileName,
@@ -136,7 +162,6 @@ function FileDownloadCard({
   fileName: string;
   fileUrl?: string;
 }) {
-  // 如果已经有 URL 就使用，否则从 Convex 获取
   const fetchedUrl = useQuery(
     api.files.getFileUrl,
     providedUrl ? 'skip' : { storageId }

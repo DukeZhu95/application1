@@ -74,7 +74,7 @@
 /* 社交按钮 */
 .cl-socialButtonsBlockButton {
     background: white !important;
-    border: 1.5px solid rgba(0, 0, 0, 0.1) !important;
+    border: 2px solid rgba(0, 0, 0, 0.1) !important;
     border-radius: 12px !important;
     transition: all 0.2s ease !important;
 }
@@ -88,7 +88,7 @@
 /* 输入框 */
 .cl-formFieldInput {
     background: white !important;
-    border: 1.5px solid rgba(0, 0, 0, 0.1) !important;
+    border: 2px solid rgba(0, 0, 0, 0.1) !important;
     border-radius: 12px !important;
     transition: all 0.2s ease !important;
 }
