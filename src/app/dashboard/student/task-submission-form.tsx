@@ -121,13 +121,12 @@ export function TaskSubmissionForm({
         fileName = file.name;
       }
 
-      // 提交任务
       await submit({
         taskId: taskId as Id<'tasks'>,
         studentId: user.id,
         content: values.content,
-        storageId,
-        fileName,
+        storageIds: storageId ? [storageId] : undefined,
+        fileNames: fileName ? [fileName] : undefined,
       });
 
       toast({
