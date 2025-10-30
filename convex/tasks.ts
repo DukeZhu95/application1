@@ -375,6 +375,8 @@ export const getTeacherTasks = query({
 /**
  * 获取学生的所有任务
  * 用于学生Dashboard的任务列表
+ *
+ * ✅ 修复：添加了 classCode 备用值和 classroomId 字段
  */
 export const getStudentTasks = query({
   args: {
@@ -417,7 +419,8 @@ export const getStudentTasks = query({
         allTasks.push({
           ...task,
           className: classroom.name || "Unnamed Class",
-          classCode: classroom.code,
+          classCode: classroom.code || classroom._id,
+          classroomId: classroom._id,
           isSubmitted: !!submission,
           submissionStatus: submission?.status || null,
           grade: submission?.grade || null,

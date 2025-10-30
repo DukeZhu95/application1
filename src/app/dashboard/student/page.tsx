@@ -1,7 +1,6 @@
 'use client';
 
 import { JoinClassForm } from '@/app/dashboard/student/join-class-form';
-import { AllTasksList } from '@/app/dashboard/student/all-tasks';
 import { RouteGuard } from '@/app/components/auth/route-guard';
 import {
   // BookOpen,
@@ -19,6 +18,7 @@ import { api } from '../../../../convex/_generated/api';
 import { CustomUserMenu } from '@/app/dashboard/student/custom-user-menu';
 import { Toaster } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { CurrentTasks } from './current-tasks';
 
 export default function StudentDashboard() {
   const { user } = useUser();
@@ -183,7 +183,6 @@ export default function StudentDashboard() {
               </div>
             </section>
 
-            {/* 所有任务部分 - 替换原来的班级列表 */}
             <section className="glass-student-section glass-student-tasks-section">
               <div className="glass-student-section-header">
                 <div className="glass-student-section-title-group">
@@ -199,7 +198,7 @@ export default function StudentDashboard() {
                 </div>
               </div>
               <div className="glass-student-tasks-wrapper">
-                <AllTasksList />
+                <CurrentTasks />
               </div>
             </section>
           </div>
