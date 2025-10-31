@@ -116,7 +116,7 @@ export default defineSchema({
     updatedAt: v.number(),
   }).index('by_student_id', ['studentId']),
 
-  // 教师课程表
+  // 教师课程表（教师个人的课程安排 - 现有的）
   teacherSchedules: defineTable({
     teacherId: v.string(),
     courseName: v.string(),
@@ -128,4 +128,14 @@ export default defineSchema({
   })
     .index('by_teacher', ['teacherId'])
     .index('by_teacher_and_day', ['teacherId', 'dayOfWeek']),
+
+  // ✅ 新增：班级课程安排表（用于学生课程表）
+  classroomSchedules: defineTable({
+    classroomId: v.id('classrooms'),     // 关联到具体班级
+    daysOfWeek: v.array(v.number()),     // [1, 3, 5] = 周一、三、五
+    startTime: v.string(),                // "09:00"
+    endTime: v.string(),                  // "10:30"
+    location: v.optional(v.string()),     // "Room 101" 或 "Lab A"
+    createdAt: v.number(),
+  }).index('by_classroom', ['classroomId']),
 });

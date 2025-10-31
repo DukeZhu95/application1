@@ -3,7 +3,6 @@
 import { JoinClassForm } from '@/app/dashboard/student/join-class-form';
 import { RouteGuard } from '@/app/components/auth/route-guard';
 import {
-  // BookOpen,
   Plus,
   GraduationCap,
   Sparkles,
@@ -30,38 +29,91 @@ export default function StudentDashboard() {
     user?.id ? { studentId: user.id } : 'skip'
   );
 
+  // ✅ 获取学生的课程安排
+  const schedules = useQuery(
+    api.classroomSchedules.getStudentSchedules,
+    user?.id ? { studentId: user.id } : 'skip'
+  );
+
   // 获取显示的名字（优先使用数据库中的名字）
   const displayName = profile?.firstName
     ? `${profile.firstName}${profile.lastName ? ' ' + profile.lastName : ''}`
     : user?.firstName || 'Student';
 
-  // 计算当前是学期的第几周（假设学期从2025年2月1日开始）
-  const calculateWeekNumber = () => {
-    const semesterStart = new Date('2025-02-01'); // 可以根据实际情况调整
+  // ✅ 计算课程表信息
+  const getTimetableInfo = () => {
+    if (!schedules || schedules.length === 0) {
+      return {
+        label: 'No classes',
+        value: 'Join a class',
+      };
+    }
+
     const today = new Date();
-    const diffTime = Math.abs(today.getTime() - semesterStart.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    const weekNumber = Math.ceil(diffDays / 7);
-    return weekNumber;
+    const currentDay = today.getDay();
+    const currentTime = today.getHours() * 60 + today.getMinutes(); // 转换为分钟
+
+    // 获取今天的课程
+    const todayClasses = schedules.filter(schedule =>
+      schedule.daysOfWeek?.includes(currentDay)
+    );
+
+    // 如果今天有课
+    if (todayClasses.length > 0) {
+      // 查找下一节课
+      const upcomingClass = todayClasses.find(schedule => {
+        const [hours, minutes] = schedule.startTime.split(':').map(Number);
+        const classTime = hours * 60 + minutes;
+        return classTime > currentTime;
+      });
+
+      if (upcomingClass) {
+        // 有即将开始的课
+        return {
+          label: 'Next class',
+          value: `${upcomingClass.startTime}`,
+        };
+      } else {
+        // 今天的课都结束了
+        return {
+          label: 'Today',
+          value: `${todayClasses.length} completed`,
+        };
+      }
+    }
+
+    // 今天没课，显示本周课程数
+    const daysOfWeek = [0, 1, 2, 3, 4, 5, 6];
+    let weeklyClasses = 0;
+
+    daysOfWeek.forEach(day => {
+      const dayClasses = schedules.filter(schedule =>
+        schedule.daysOfWeek?.includes(day)
+      );
+      weeklyClasses += dayClasses.length;
+    });
+
+    return {
+      label: 'This week',
+      value: `${weeklyClasses} classes`,
+    };
   };
 
-  const currentWeek = calculateWeekNumber();
+  const timetableInfo = getTimetableInfo();
 
   // 跳转到所有班级页面
   const viewAllClasses = () => {
     router.push('/dashboard/student/classes');
   };
 
-  // 查看课程表（占位功能）
+  // 查看课程表
   const viewTimetable = () => {
-    alert('Timetable feature coming soon! 📅\nWeek ' + currentWeek + ' of semester');
-    // TODO: 实现课程表功能或跳转到课程表页面
+    router.push('/dashboard/student/timetable');
   };
 
   // 查看成绩（占位功能）
   const viewGrades = () => {
     alert('Grades feature coming soon! 📊\nView all your grades and progress here');
-    // TODO: 实现成绩查看功能或跳转到成绩页面
   };
 
   return (
@@ -88,7 +140,6 @@ export default function StudentDashboard() {
                 </div>
               </div>
               <div className="glass-student-user-section">
-                {/* 将 profile 传递给 CustomUserMenu 以显示自定义头像 */}
                 <CustomUserMenu
                   afterSignOutUrl="/auth/sign-in"
                   profile={profile}
@@ -100,7 +151,7 @@ export default function StudentDashboard() {
 
         {/* 主要内容 */}
         <main className="container glass-student-main">
-          {/* 欢迎区域 - 使用数据库中的名字 */}
+          {/* 欢迎区域 */}
           <div className="glass-student-welcome">
             <div className="glass-student-welcome-content">
               <div className="glass-student-sparkle-icon">
@@ -133,6 +184,7 @@ export default function StudentDashboard() {
               </div>
             </div>
 
+            {/* ✅ 修改：显示基于课程表的真实信息 */}
             <div
               className="glass-student-stat-mini glass-student-stat-2"
               onClick={viewTimetable}
@@ -142,8 +194,8 @@ export default function StudentDashboard() {
                 <Calendar size={24} strokeWidth={2} />
               </div>
               <div className="glass-student-stat-mini-content">
-                <p className="glass-student-stat-mini-label">Time Table</p>
-                <p className="glass-student-stat-mini-value">Week {currentWeek}</p>
+                <p className="glass-student-stat-mini-label">{timetableInfo.label}</p>
+                <p className="glass-student-stat-mini-value">{timetableInfo.value}</p>
               </div>
             </div>
 

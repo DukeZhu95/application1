@@ -5,6 +5,7 @@ import { useQuery, useMutation } from 'convex/react';
 import { useRouter } from 'next/navigation';
 import { api } from '../../../../../convex/_generated/api';
 import { ScheduleCourseDialog } from '@/app/dashboard/teacher/schedule-course-dialog';
+import AddCourseDialog from '@/app/dashboard/teacher/AddCourseDialog-updated'; // ✅ 新增
 import { Id } from '../../../../../convex/_generated/dataModel';
 import {
   ArrowLeft,
@@ -41,6 +42,7 @@ export default function TeacherSchedulePage() {
   const router = useRouter();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false); // ✅ 新增
   const [editingCourse, setEditingCourse] = useState<CourseSchedule | undefined>();
   const [selectedDay, setSelectedDay] = useState<DayDetails | null>(null);
 
@@ -193,10 +195,7 @@ export default function TeacherSchedulePage() {
               </button>
             </div>
             <button
-              onClick={() => {
-                setEditingCourse(undefined);
-                setIsDialogOpen(true);
-              }}
+              onClick={() => setIsAddDialogOpen(true)} // ✅ 修改：使用新对话框
               className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
             >
               <Plus className="w-4 h-4" />
@@ -326,7 +325,20 @@ export default function TeacherSchedulePage() {
         </div>
       )}
 
-      {/* 添加/编辑课程对话框 */}
+      {/* ✅ 新增：添加课程对话框（支持班级选择、多天、地点） */}
+      <AddCourseDialog
+        isOpen={isAddDialogOpen}
+        onClose={() => setIsAddDialogOpen(false)}
+        onSuccess={() => {
+          // 可选：显示成功消息
+          toast({
+            title: 'Success',
+            description: 'Course added successfully',
+          });
+        }}
+      />
+
+      {/* 编辑课程对话框（保留原有功能） */}
       <ScheduleCourseDialog
         isOpen={isDialogOpen}
         onClose={() => {

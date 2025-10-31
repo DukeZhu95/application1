@@ -210,3 +210,17 @@ export const getClassByCode = query({
     };
   },
 });
+
+// ✅ 新增：获取学生加入的所有班级（用于课程表）
+export const getStudentClassrooms = query({
+  args: {
+    studentId: v.string()
+  },
+  handler: async (ctx, args) => {
+    const allClassrooms = await ctx.db.query("classrooms").collect();
+
+    return allClassrooms.filter(classroom =>
+      classroom.students?.some(student => student.studentId === args.studentId)
+    );
+  },
+});
