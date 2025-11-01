@@ -1,10 +1,6 @@
 /**
  * Current Tasks 组件
  * 显示学生dashboard上的当前任务列表
- *
- * ✅ 此版本完全适配你现有的 Convex API
- * ✅ 只需要一个查询：getStudentTasks
- * ✅ 不需要修改任何后端代码
  */
 
 'use client';
@@ -14,13 +10,42 @@ import { api } from '../../../../convex/_generated/api';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { Clock, CheckCircle2, Star, AlertCircle } from 'lucide-react';
+import { Id } from '../../../../convex/_generated/dataModel';
+
+// ✅ 完整的任务类型定义 - 匹配 getStudentTasks API 返回的所有字段
+interface Task {
+  _id: Id<'tasks'>;
+  _creationTime: number;
+  title: string;
+  description: string;
+  status: string;
+  createdAt: number;
+  teacherId: string;
+  classroomId: Id<'classrooms'>;
+  className?: string;
+  classCode?: string;
+  dueDate?: number;
+  isSubmitted: boolean;
+  submissionStatus?: string | null;
+  grade?: number | null;
+  feedback?: string | null;
+  attachments?: Array<{
+    name: string;
+    url: string;
+    size: number;
+  }>;
+  storageId?: Id<'_storage'>;
+  attachmentName?: string;
+  attachmentUrl?: string;
+  storageIds?: Id<'_storage'>[];
+  attachmentNames?: string[];
+  attachmentUrls?: string[];
+}
 
 export function CurrentTasks() {
   const { user } = useUser();
   const router = useRouter();
 
-  // ✅ 使用你现有的 getStudentTasks API
-  // 它已经返回了所有需要的信息：className, classCode, isSubmitted, submissionStatus, grade
   const allTasks = useQuery(
     api.tasks.getStudentTasks,
     user?.id ? { userId: user.id } : 'skip'
@@ -74,25 +99,24 @@ export function CurrentTasks() {
     }
   };
 
-  // 📌 处理任务点击 - 跳转到任务详情页
-  const handleTaskClick = (task: any) => {
+  // 📌 处理任务点击
+  const handleTaskClick = (task: Task) => {
     if (task.classCode) {
-      // ✅ 修复：使用正确的URL格式，包含classCode
       router.push(
         `/dashboard/student/classroom/${task.classCode}/task/${task._id}`
       );
     }
   };
 
-  // 📌 获取任务状态（基于你的API返回的字段）
-  const getTaskStatus = (task: any) => {
+  // 📌 获取任务状态
+  const getTaskStatus = (task: Task) => {
     if (task.submissionStatus === 'graded') return 'graded';
     if (task.isSubmitted) return 'submitted';
     return 'not-submitted';
   };
 
   // 📌 渲染状态徽章
-  const renderStatusBadge = (task: any) => {
+  const renderStatusBadge = (task: Task) => {
     const status = getTaskStatus(task);
 
     switch (status) {
@@ -123,10 +147,8 @@ export function CurrentTasks() {
     }
   };
 
-  // 只显示最近的5个任务（你的API已经按截止日期排序了）
   const displayTasks = allTasks?.slice(0, 5);
 
-  // 加载状态
   if (!user) {
     return (
       <div className="bg-white p-6 rounded-lg shadow">
@@ -136,7 +158,6 @@ export function CurrentTasks() {
     );
   }
 
-  // 空状态
   if (!displayTasks || displayTasks.length === 0) {
     return (
       <div className="bg-white p-6 rounded-lg shadow">
@@ -152,10 +173,8 @@ export function CurrentTasks() {
     );
   }
 
-  // 主要渲染
   return (
     <div className="bg-white p-6 rounded-lg shadow">
-      {/* 标题和"更多任务"链接 */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Current Tasks</h2>
         {allTasks && allTasks.length > 5 && (
@@ -168,7 +187,6 @@ export function CurrentTasks() {
         )}
       </div>
 
-      {/* 任务列表 */}
       <div className="space-y-3">
         {displayTasks.map((task) => {
           const dueDateInfo = task.dueDate ? formatDueDate(task.dueDate) : null;
@@ -182,7 +200,6 @@ export function CurrentTasks() {
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
-                  {/* 任务标题 + 状态徽章 */}
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <h3 className="font-medium text-gray-900 truncate">
                       {task.title}
@@ -190,7 +207,6 @@ export function CurrentTasks() {
                     {renderStatusBadge(task)}
                   </div>
 
-                  {/* 班级名称 + 截止日期 */}
                   <div className="flex items-center gap-4 text-sm flex-wrap">
                     <span className="text-gray-600 truncate">
                       {task.className || 'Unknown Class'}
@@ -204,7 +220,6 @@ export function CurrentTasks() {
                     )}
                   </div>
 
-                  {/* 任务描述（可选） */}
                   {task.description && (
                     <p className="text-sm text-gray-500 mt-2 line-clamp-2">
                       {task.description}

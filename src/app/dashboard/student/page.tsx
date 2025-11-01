@@ -18,30 +18,50 @@ import { CustomUserMenu } from '@/app/dashboard/student/custom-user-menu';
 import { Toaster } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { CurrentTasks } from './current-tasks';
+import { Id } from '../../../../convex/_generated/dataModel';
+
+// ✅ 定义类型
+interface Schedule {
+  _id: Id<'classroomSchedules'>;
+  classroomId: Id<'classrooms'>;
+  daysOfWeek: number[];
+  startTime: string;
+  endTime: string;
+  location?: string;
+}
+
+interface Classroom {
+  _id: Id<'classrooms'>;
+  code: string;
+  name?: string;
+  courseName?: string;
+  teacherId: string;
+  students: Array<{
+    studentId: string;
+    joinedAt: number;
+    status: string;
+  }>;
+}
 
 export default function StudentDashboard() {
   const { user } = useUser();
   const router = useRouter();
 
-  // 从 Convex 数据库获取学生的个人资料
   const profile = useQuery(
     api.students.getStudentProfile,
     user?.id ? { studentId: user.id } : 'skip'
   );
 
-  // ✅ 获取学生的课程安排
   const schedules = useQuery(
     api.classroomSchedules.getStudentSchedules,
     user?.id ? { studentId: user.id } : 'skip'
   );
 
-  // ✅ 获取学生的班级列表（用于获取课程名）
   const classrooms = useQuery(
     api.classes.getStudentClassrooms,
     user?.id ? { studentId: user.id } : 'skip'
   );
 
-  // 获取显示的名字（优先使用数据库中的名字）
   const displayName = profile?.firstName
     ? `${profile.firstName}${profile.lastName ? ' ' + profile.lastName : ''}`
     : user?.firstName || 'Student';
@@ -56,22 +76,20 @@ export default function StudentDashboard() {
     }
 
     const now = new Date();
-    const currentDay = now.getDay(); // 0-6 (Sunday-Saturday)
+    const currentDay = now.getDay();
     const currentTime = now.getHours() * 60 + now.getMinutes();
 
-    // 解析时间字符串为分钟数
     const parseTime = (timeStr: string) => {
       const [hours, minutes] = timeStr.split(':').map(Number);
       return hours * 60 + minutes;
     };
 
-    // 星期几的名称
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-    // 获取所有未来的课程（包括今天和未来7天）
+    // ✅ 使用明确的类型
     const allUpcomingClasses: Array<{
-      schedule: any;
-      classroom: any;
+      schedule: Schedule;
+      classroom: Classroom;
       dayOfWeek: number;
       startTimeMinutes: number;
       daysUntil: number;
@@ -83,13 +101,9 @@ export default function StudentDashboard() {
 
       schedule.daysOfWeek.forEach((dayOfWeek: number) => {
         const startTimeMinutes = parseTime(schedule.startTime);
-
-        // 计算到这节课还有多少天
         let daysUntil = dayOfWeek - currentDay;
 
-        // 如果是今天的课
         if (daysUntil === 0) {
-          // 如果课程还没开始，加入列表
           if (startTimeMinutes > currentTime) {
             allUpcomingClasses.push({
               schedule,
@@ -99,9 +113,7 @@ export default function StudentDashboard() {
               daysUntil: 0,
             });
           }
-        }
-        // 如果是本周未来的课
-        else if (daysUntil > 0) {
+        } else if (daysUntil > 0) {
           allUpcomingClasses.push({
             schedule,
             classroom,
@@ -109,9 +121,7 @@ export default function StudentDashboard() {
             startTimeMinutes,
             daysUntil,
           });
-        }
-        // 如果是下周的课
-        else {
+        } else {
           daysUntil += 7;
           allUpcomingClasses.push({
             schedule,
@@ -124,7 +134,6 @@ export default function StudentDashboard() {
       });
     });
 
-    // 按照时间排序（先按天数，再按时间）
     allUpcomingClasses.sort((a, b) => {
       if (a.daysUntil !== b.daysUntil) {
         return a.daysUntil - b.daysUntil;
@@ -132,7 +141,6 @@ export default function StudentDashboard() {
       return a.startTimeMinutes - b.startTimeMinutes;
     });
 
-    // 获取最近的课程
     const nextClass = allUpcomingClasses[0];
 
     if (!nextClass) {
@@ -142,24 +150,20 @@ export default function StudentDashboard() {
       };
     }
 
-    // 格式化显示
     const dayName = dayNames[nextClass.dayOfWeek];
     const courseName = nextClass.classroom.courseName || nextClass.classroom.name;
 
     if (nextClass.daysUntil === 0) {
-      // 今天的课程
       return {
         label: 'Today',
         value: courseName,
       };
     } else if (nextClass.daysUntil === 1) {
-      // 明天的课程
       return {
         label: 'Tomorrow',
         value: courseName,
       };
     } else {
-      // 未来几天的课程
       return {
         label: dayName,
         value: courseName,
@@ -169,17 +173,14 @@ export default function StudentDashboard() {
 
   const timetableInfo = getTimetableInfo();
 
-  // 跳转到所有班级页面
   const viewAllClasses = () => {
     router.push('/dashboard/student/classes');
   };
 
-  // 查看课程表
   const viewTimetable = () => {
     router.push('/dashboard/student/timetable');
   };
 
-  // 查看成绩（占位功能）
   const viewGrades = () => {
     alert('Grades feature coming soon! 📊\nView all your grades and progress here');
   };
@@ -187,14 +188,12 @@ export default function StudentDashboard() {
   return (
     <RouteGuard>
       <div className="glass-student-container">
-        {/* 动态背景 */}
         <div className="glass-student-background">
           <div className="glass-student-gradient-1"></div>
           <div className="glass-student-gradient-2"></div>
           <div className="glass-student-gradient-3"></div>
         </div>
 
-        {/* 导航栏 */}
         <nav className="glass-student-nav">
           <div className="container">
             <div className="glass-student-nav-content">
@@ -217,9 +216,7 @@ export default function StudentDashboard() {
           </div>
         </nav>
 
-        {/* 主要内容 */}
         <main className="container glass-student-main">
-          {/* 欢迎区域 */}
           <div className="glass-student-welcome">
             <div className="glass-student-welcome-content">
               <div className="glass-student-sparkle-icon">
@@ -236,7 +233,6 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* 快速统计卡片 */}
           <div className="glass-student-quick-stats">
             <div
               className="glass-student-stat-mini glass-student-stat-1"
@@ -282,7 +278,6 @@ export default function StudentDashboard() {
           </div>
 
           <div className="glass-student-grid">
-            {/* 加入班级部分 */}
             <section className="glass-student-section glass-student-join-section">
               <div className="glass-student-section-header">
                 <div className="glass-student-section-title-group">

@@ -40,20 +40,17 @@ const DAYS_FULL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Frid
 export default function AddCourseDialog({ isOpen, onClose, onSuccess }: AddCourseDialogProps) {
   const { user } = useUser();
 
-  // 获取教师的所有班级
   const classrooms = useQuery(
     api.classes.getTeacherClasses,
     user?.id ? { teacherId: user.id } : 'skip'
   );
 
-  // Mutations
   const addTeacherSchedule = useMutation(api.schedule.addTeacherSchedule);
   const addClassroomSchedule = useMutation(api.classroomSchedules.createClassroomSchedule);
 
-  // Form state
   const [courseName, setCourseName] = useState('');
   const [selectedClassroom, setSelectedClassroom] = useState<string>('');
-  const [selectedDays, setSelectedDays] = useState<number[]>([1]); // 默认周一
+  const [selectedDays, setSelectedDays] = useState<number[]>([1]);
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('10:00');
   const [location, setLocation] = useState('');
@@ -61,7 +58,6 @@ export default function AddCourseDialog({ isOpen, onClose, onSuccess }: AddCours
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Reset form when dialog opens
   useEffect(() => {
     if (isOpen) {
       setCourseName('');
@@ -75,11 +71,9 @@ export default function AddCourseDialog({ isOpen, onClose, onSuccess }: AddCours
     }
   }, [isOpen]);
 
-  // Toggle day selection
   const toggleDay = (day: number) => {
     setSelectedDays(prev => {
       if (prev.includes(day)) {
-        // 至少保留一天
         if (prev.length === 1) return prev;
         return prev.filter(d => d !== day);
       } else {
@@ -114,7 +108,6 @@ export default function AddCourseDialog({ isOpen, onClose, onSuccess }: AddCours
         throw new Error('End time must be after start time');
       }
 
-      // 1. 为每一天添加到 teacherSchedules（保持现有功能）
       for (const day of selectedDays) {
         await addTeacherSchedule({
           courseName,
@@ -125,7 +118,6 @@ export default function AddCourseDialog({ isOpen, onClose, onSuccess }: AddCours
         });
       }
 
-      // 2. 添加到 classroomSchedules（新功能 - 学生可见）
       await addClassroomSchedule({
         classroomId: selectedClassroom as Id<'classrooms'>,
         daysOfWeek: selectedDays,
@@ -134,19 +126,20 @@ export default function AddCourseDialog({ isOpen, onClose, onSuccess }: AddCours
         location: location.trim() || undefined,
       });
 
-      // Success
       toast({
         title: 'Success',
         description: 'Course added successfully',
       });
       onSuccess?.();
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      // ✅ 修复类型错误
       console.error('Error adding course:', err);
-      setError(err.message || 'Failed to add course');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to add course';
+      setError(errorMessage);
       toast({
         title: 'Error',
-        description: err.message || 'Failed to add course',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -158,7 +151,6 @@ export default function AddCourseDialog({ isOpen, onClose, onSuccess }: AddCours
 
   return (
     <>
-      {/* 颜色强制显示样式 */}
       <style dangerouslySetInnerHTML={{__html: `
         .color-picker-btn {
           background: var(--btn-color) !important;
@@ -175,7 +167,6 @@ export default function AddCourseDialog({ isOpen, onClose, onSuccess }: AddCours
 
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-xl border border-purple-200 p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-          {/* Close button */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Add New Course</h2>
             <button
@@ -186,7 +177,6 @@ export default function AddCourseDialog({ isOpen, onClose, onSuccess }: AddCours
             </button>
           </div>
 
-          {/* Error message */}
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
               {error}
@@ -194,7 +184,6 @@ export default function AddCourseDialog({ isOpen, onClose, onSuccess }: AddCours
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Course Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Course Name
@@ -209,7 +198,6 @@ export default function AddCourseDialog({ isOpen, onClose, onSuccess }: AddCours
               />
             </div>
 
-            {/* Select Classroom */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Select Classroom
@@ -234,7 +222,6 @@ export default function AddCourseDialog({ isOpen, onClose, onSuccess }: AddCours
               )}
             </div>
 
-            {/* Days of Week */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Days of Week
@@ -264,7 +251,6 @@ export default function AddCourseDialog({ isOpen, onClose, onSuccess }: AddCours
               </p>
             </div>
 
-            {/* Time */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -292,7 +278,6 @@ export default function AddCourseDialog({ isOpen, onClose, onSuccess }: AddCours
               </div>
             </div>
 
-            {/* Location */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Location (Optional)
@@ -306,7 +291,6 @@ export default function AddCourseDialog({ isOpen, onClose, onSuccess }: AddCours
               />
             </div>
 
-            {/* Color */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Color
@@ -335,7 +319,6 @@ export default function AddCourseDialog({ isOpen, onClose, onSuccess }: AddCours
               </div>
             </div>
 
-            {/* Buttons */}
             <div className="flex gap-3 pt-4">
               <button
                 type="button"
