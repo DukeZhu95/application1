@@ -8,7 +8,7 @@ import {
   Sparkles,
   Library,
   Calendar,
-  TrendingUp,
+  Award,
   CheckSquare
 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
@@ -18,6 +18,7 @@ import { CustomUserMenu } from '@/app/dashboard/student/custom-user-menu';
 import { Toaster } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { CurrentTasks } from './current-tasks';
+import { Achievements } from './Achievements';
 import { Id } from '../../../../convex/_generated/dataModel';
 
 // ✅ 定义类型
@@ -86,7 +87,6 @@ export default function StudentDashboard() {
 
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-    // ✅ 使用明确的类型
     const allUpcomingClasses: Array<{
       schedule: Schedule;
       classroom: Classroom;
@@ -181,8 +181,10 @@ export default function StudentDashboard() {
     router.push('/dashboard/student/timetable');
   };
 
-  const viewGrades = () => {
-    alert('Grades feature coming soon! 📊\nView all your grades and progress here');
+  // ✅ 新增：查看成就
+  const viewAchievements = () => {
+    // 可以跳转到详细的成就页面，或者暂时不做任何操作
+    // router.push('/dashboard/student/achievements');
   };
 
   return (
@@ -233,6 +235,7 @@ export default function StudentDashboard() {
             </div>
           </div>
 
+          {/* 快速统计卡片 */}
           <div className="glass-student-quick-stats">
             <div
               className="glass-student-stat-mini glass-student-stat-1"
@@ -262,22 +265,24 @@ export default function StudentDashboard() {
               </div>
             </div>
 
+            {/* ✅ 替换：GRADE → ACHIEVEMENTS */}
             <div
               className="glass-student-stat-mini glass-student-stat-3"
-              onClick={viewGrades}
+              onClick={viewAchievements}
               style={{ cursor: 'pointer' }}
             >
               <div className="glass-student-stat-mini-icon">
-                <TrendingUp size={24} strokeWidth={2} />
+                <Award size={24} strokeWidth={2} />
               </div>
               <div className="glass-student-stat-mini-content">
-                <p className="glass-student-stat-mini-label">Grade</p>
+                <p className="glass-student-stat-mini-label">Achievements</p>
                 <p className="glass-student-stat-mini-value">View All</p>
               </div>
             </div>
           </div>
 
           <div className="glass-student-grid">
+            {/* 加入班级部分 */}
             <section className="glass-student-section glass-student-join-section">
               <div className="glass-student-section-header">
                 <div className="glass-student-section-title-group">
@@ -297,24 +302,33 @@ export default function StudentDashboard() {
               </div>
             </section>
 
-            <section className="glass-student-section glass-student-tasks-section">
-              <div className="glass-student-section-header">
-                <div className="glass-student-section-title-group">
-                  <div className="glass-student-section-icon">
-                    <CheckSquare size={24} strokeWidth={2.5} />
-                  </div>
-                  <div>
-                    <h2>Current Tasks</h2>
-                    <p className="glass-student-section-subtitle">
-                      Track your upcoming assignments and deadlines
-                    </p>
+            {/* ✅ 右侧改为两栏布局 */}
+            <div className="space-y-6">
+              {/* Current Tasks */}
+              <section className="glass-student-section glass-student-tasks-section">
+                <div className="glass-student-section-header">
+                  <div className="glass-student-section-title-group">
+                    <div className="glass-student-section-icon">
+                      <CheckSquare size={24} strokeWidth={2.5} />
+                    </div>
+                    <div>
+                      <h2>Current Tasks</h2>
+                      <p className="glass-student-section-subtitle">
+                        Track your upcoming assignments and deadlines
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="glass-student-tasks-wrapper">
-                <CurrentTasks />
-              </div>
-            </section>
+                <div className="glass-student-tasks-wrapper">
+                  <CurrentTasks />
+                </div>
+              </section>
+
+              {/* ✅ 新增：Achievements Section */}
+              <section className="glass-student-section">
+                <Achievements />
+              </section>
+            </div>
           </div>
         </main>
       </div>
