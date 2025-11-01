@@ -35,68 +35,136 @@ export default function StudentDashboard() {
     user?.id ? { studentId: user.id } : 'skip'
   );
 
+  // ✅ 获取学生的班级列表（用于获取课程名）
+  const classrooms = useQuery(
+    api.classes.getStudentClassrooms,
+    user?.id ? { studentId: user.id } : 'skip'
+  );
+
   // 获取显示的名字（优先使用数据库中的名字）
   const displayName = profile?.firstName
     ? `${profile.firstName}${profile.lastName ? ' ' + profile.lastName : ''}`
     : user?.firstName || 'Student';
 
-  // ✅ 计算课程表信息
+  // ✅ 计算课程表信息 - 显示"星期几 + 课程名"
   const getTimetableInfo = () => {
-    if (!schedules || schedules.length === 0) {
+    if (!schedules || schedules.length === 0 || !classrooms || classrooms.length === 0) {
       return {
         label: 'No classes',
         value: 'Join a class',
       };
     }
 
-    const today = new Date();
-    const currentDay = today.getDay();
-    const currentTime = today.getHours() * 60 + today.getMinutes(); // 转换为分钟
+    const now = new Date();
+    const currentDay = now.getDay(); // 0-6 (Sunday-Saturday)
+    const currentTime = now.getHours() * 60 + now.getMinutes();
 
-    // 获取今天的课程
-    const todayClasses = schedules.filter(schedule =>
-      schedule.daysOfWeek?.includes(currentDay)
-    );
+    // 解析时间字符串为分钟数
+    const parseTime = (timeStr: string) => {
+      const [hours, minutes] = timeStr.split(':').map(Number);
+      return hours * 60 + minutes;
+    };
 
-    // 如果今天有课
-    if (todayClasses.length > 0) {
-      // 查找下一节课
-      const upcomingClass = todayClasses.find(schedule => {
-        const [hours, minutes] = schedule.startTime.split(':').map(Number);
-        const classTime = hours * 60 + minutes;
-        return classTime > currentTime;
+    // 星期几的名称
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    // 获取所有未来的课程（包括今天和未来7天）
+    const allUpcomingClasses: Array<{
+      schedule: any;
+      classroom: any;
+      dayOfWeek: number;
+      startTimeMinutes: number;
+      daysUntil: number;
+    }> = [];
+
+    schedules.forEach((schedule) => {
+      const classroom = classrooms.find((c) => c._id === schedule.classroomId);
+      if (!classroom) return;
+
+      schedule.daysOfWeek.forEach((dayOfWeek: number) => {
+        const startTimeMinutes = parseTime(schedule.startTime);
+
+        // 计算到这节课还有多少天
+        let daysUntil = dayOfWeek - currentDay;
+
+        // 如果是今天的课
+        if (daysUntil === 0) {
+          // 如果课程还没开始，加入列表
+          if (startTimeMinutes > currentTime) {
+            allUpcomingClasses.push({
+              schedule,
+              classroom,
+              dayOfWeek,
+              startTimeMinutes,
+              daysUntil: 0,
+            });
+          }
+        }
+        // 如果是本周未来的课
+        else if (daysUntil > 0) {
+          allUpcomingClasses.push({
+            schedule,
+            classroom,
+            dayOfWeek,
+            startTimeMinutes,
+            daysUntil,
+          });
+        }
+        // 如果是下周的课
+        else {
+          daysUntil += 7;
+          allUpcomingClasses.push({
+            schedule,
+            classroom,
+            dayOfWeek,
+            startTimeMinutes,
+            daysUntil,
+          });
+        }
       });
-
-      if (upcomingClass) {
-        // 有即将开始的课
-        return {
-          label: 'Next class',
-          value: `${upcomingClass.startTime}`,
-        };
-      } else {
-        // 今天的课都结束了
-        return {
-          label: 'Today',
-          value: `${todayClasses.length} completed`,
-        };
-      }
-    }
-
-    // 今天没课，显示本周课程数
-    const daysOfWeek = [0, 1, 2, 3, 4, 5, 6];
-    let weeklyClasses = 0;
-
-    daysOfWeek.forEach(day => {
-      const dayClasses = schedules.filter(schedule =>
-        schedule.daysOfWeek?.includes(day)
-      );
-      weeklyClasses += dayClasses.length;
     });
 
-    return {
-      label: 'This week',
-      value: `${weeklyClasses} classes`,
-    };
+    // 按照时间排序（先按天数，再按时间）
+    allUpcomingClasses.sort((a, b) => {
+      if (a.daysUntil !== b.daysUntil) {
+        return a.daysUntil - b.daysUntil;
+      }
+      return a.startTimeMinutes - b.startTimeMinutes;
+    });
+
+    // 获取最近的课程
+    const nextClass = allUpcomingClasses[0];
+
+    if (!nextClass) {
+      return {
+        label: 'No classes',
+        value: 'This week',
+      };
+    }
+
+    // 格式化显示
+    const dayName = dayNames[nextClass.dayOfWeek];
+    const courseName = nextClass.classroom.courseName || nextClass.classroom.name;
+
+    if (nextClass.daysUntil === 0) {
+      // 今天的课程
+      return {
+        label: 'Today',
+        value: courseName,
+      };
+    } else if (nextClass.daysUntil === 1) {
+      // 明天的课程
+      return {
+        label: 'Tomorrow',
+        value: courseName,
+      };
+    } else {
+      // 未来几天的课程
+      return {
+        label: dayName,
+        value: courseName,
+      };
+    }
   };
 
   const timetableInfo = getTimetableInfo();
@@ -184,7 +252,6 @@ export default function StudentDashboard() {
               </div>
             </div>
 
-            {/* ✅ 修改：显示基于课程表的真实信息 */}
             <div
               className="glass-student-stat-mini glass-student-stat-2"
               onClick={viewTimetable}
